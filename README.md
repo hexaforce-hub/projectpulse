@@ -5,6 +5,9 @@
 > **Division:** Infrastructure and Project Monitoring Division (IPMD)  
 > **Reference Ecosystem:** PAIMANA (Central Sector Projects costing ₹150 Cr+)  
 > **Team:** HexaForce  
+> 
+> 🌐 **Live Web Deployment:** [https://projectpulse-mospi.vercel.app](https://projectpulse-mospi.vercel.app)  
+> 📦 **GitHub Repository:** [https://github.com/hexaforce-hub/projectpulse](https://github.com/hexaforce-hub/projectpulse)  
 
 ---
 
