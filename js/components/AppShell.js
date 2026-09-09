@@ -415,7 +415,19 @@ const AppShell = {
                   </div>
                 </button>
 
-                <!-- 7. Central Admin & Mission Director -->
+                <!-- 7. Divisional Field Officer -->
+                <button data-switch-role="FIELD_OFFICER" class="btn-role-opt w-full text-left p-3 rounded-lg border border-slate-200 hover:border-orange-400 hover:bg-orange-50/50 flex items-start gap-3 transition-colors">
+                  <span class="w-8 h-8 rounded-full bg-orange-100 text-orange-900 flex items-center justify-center font-bold text-xs flex-shrink-0">SS</span>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-bold text-slate-900">Shri Sanjay Sharma (FIELD OFFICER)</span>
+                      <span class="text-[9px] bg-orange-100 text-orange-900 font-bold px-1.5 py-0.2 rounded border border-orange-200">Field Project Scope</span>
+                    </div>
+                    <div class="text-[11px] text-slate-500">Divisional Field Operations Officer • Site inspection audit, RoW clear-cut, contractor notice dispatches</div>
+                  </div>
+                </button>
+
+                <!-- 8. Central Admin & Mission Director -->
                 <button data-switch-role="ADMIN" class="btn-role-opt w-full text-left p-3 rounded-lg border border-slate-200 hover:border-purple-400 hover:bg-purple-50/50 flex items-start gap-3 transition-colors">
                   <span class="w-8 h-8 rounded-full bg-purple-100 text-purple-900 flex items-center justify-center font-bold text-xs flex-shrink-0">RK</span>
                   <div class="flex-1 min-w-0">
@@ -586,11 +598,12 @@ const AppShell = {
           NATIONAL_LEADER: "#/dashboard",
           MINISTRY_OFFICIAL: "#/ministry",
           ANALYST: "#/analytics",
-          PROJECT_MANAGER: "#/my-projects",
+          PROJECT_MANAGER: "#/execution",
           ENGINEER: "#/engineer",
           FIELD_WORKER: "#/field",
-          ADMIN: "#/dashboard",
-          MONITORING_OFFICER: "#/dashboard",
+          FIELD_OFFICER: "#/field-officer",
+          ADMIN: "#/execution",
+          MONITORING_OFFICER: "#/execution",
           VIEWER: "#/dashboard"
         };
         const targetHash = homeRoutes[role.toUpperCase()] || "#/dashboard";
@@ -614,6 +627,7 @@ const AppShell = {
           heading: "National Command",
           items: [
             { route: "dashboard", icon: "📊", label: "National Command Center" },
+            { route: "execution", icon: "⏱️", label: "National CPM Control", badge: "CPM" },
             { route: "directives", icon: "📜", label: "Directives & Escalations", badge: "Action" },
             { route: "portfolio-matrix", icon: "🎯", label: "Risk vs Outlay Matrix" },
             { route: "projects", icon: "📁", label: "Central Projects Registry" }
@@ -644,6 +658,7 @@ const AppShell = {
           heading: "Ministry Command",
           items: [
             { route: "ministry", icon: "🏛️", label: "Ministry Command Center", badge: "MoRTH" },
+            { route: "execution", icon: "⏱️", label: "Corridor CPM Control", badge: "CPM" },
             { route: "directives", icon: "📜", label: "Downward Directives" },
             { route: "projects", icon: "📁", label: "Ministry Projects (4,113)" }
           ]
@@ -670,8 +685,10 @@ const AppShell = {
     if (r === "PROJECT_MANAGER" || r === "PM") {
       return [
         {
-          heading: "Corridor Management",
+          heading: "Execution & Corridor Command",
           items: [
+            { route: "execution", icon: "⏱️", label: "Execution & CPM Control", badge: "Live CPM" },
+            { route: "onboarding", icon: "⚡", label: "AI Project Onboarding & WBS" },
             { route: "my-projects", icon: "🛣️", label: "My Corridors (3 Active)", badge: "Active" },
             { route: "projects", icon: "📁", label: "Corridors Registry" },
             { route: "directives", icon: "📜", label: "Directives & Action Items" }
@@ -682,6 +699,7 @@ const AppShell = {
           items: [
             { route: "engineer", icon: "👷", label: "Site Engineering Station" },
             { route: "field", icon: "🚜", label: "Field Ground Tasks" },
+            { route: "field-officer", icon: "🛡️", label: "Field Officer Supervisory" },
             { route: "early-warnings", icon: "⚠️", label: "Corridor Warnings Queue" },
             { route: "bottlenecks", icon: "📍", label: "Bottlenecks Intel" }
           ]
@@ -701,6 +719,7 @@ const AppShell = {
           heading: "Site Engineering Desk",
           items: [
             { route: "engineer", icon: "👷", label: "Expressway Engineering", badge: "Live" },
+            { route: "execution", icon: "⏱️", label: "Execution & CPM Control", badge: "CPM" },
             { route: "projects", icon: "📁", label: "Assigned Corridor Project" },
             { route: "field", icon: "🚜", label: "Field Tasks Progress" }
           ]
@@ -716,12 +735,34 @@ const AppShell = {
       ];
     }
 
+    if (r === "FIELD_OFFICER" || r === "FO") {
+      return [
+        {
+          heading: "Field Supervisory Desk",
+          items: [
+            { route: "field-officer", icon: "🛡️", label: "Field Officer Desk", badge: "Supervisory" },
+            { route: "execution", icon: "⏱️", label: "Execution & CPM Timeline", badge: "CPM" },
+            { route: "field", icon: "🚜", label: "Ground Field Tasks" },
+            { route: "engineer", icon: "👷", label: "Site Engineering Station" }
+          ]
+        },
+        {
+          heading: "Clearances & Safety",
+          items: [
+            { route: "directives", icon: "📜", label: "Directives & Clearances" },
+            { route: "early-warnings", icon: "⚠️", label: "Corridor Early Warnings" }
+          ]
+        }
+      ];
+    }
+
     if (r === "FIELD_WORKER" || r === "FIELD") {
       return [
         {
           heading: "Field Workstation",
           items: [
             { route: "field", icon: "🚜", label: "My Ground Tasks Desk", badge: "Today" },
+            { route: "execution", icon: "⏱️", label: "CPM Execution Schedule" },
             { route: "engineer", icon: "👷", label: "Engineering Dossier" }
           ]
         },
@@ -740,6 +781,7 @@ const AppShell = {
           heading: "Predictive Analytics Suite",
           items: [
             { route: "analytics", icon: "📈", label: "Portfolio Analytics", badge: "ML" },
+            { route: "execution", icon: "⏱️", label: "CPM Execution Analysis", badge: "CPM" },
             { route: "dashboard", icon: "📊", label: "National Command Center" },
             { route: "portfolio-matrix", icon: "🎯", label: "Risk vs Outlay Matrix" },
             { route: "compare", icon: "⚖️", label: "Peer Benchmarking" }
@@ -763,9 +805,12 @@ const AppShell = {
         heading: "Command & Portfolios",
         items: [
           { route: "dashboard", icon: "📊", label: "National Command Center" },
+          { route: "execution", icon: "⏱️", label: "Execution & CPM Control", badge: "Live CPM" },
+          { route: "onboarding", icon: "⚡", label: "AI Project Onboarding & WBS", badge: "AI" },
           { route: "ministry", icon: "🏛️", label: "Ministry Command Center" },
           { route: "my-projects", icon: "🛣️", label: "Corridors Workspace" },
           { route: "engineer", icon: "👷", label: "Site Engineering" },
+          { route: "field-officer", icon: "🛡️", label: "Field Officer Desk" },
           { route: "field", icon: "🚜", label: "Field Operations" },
           { route: "portfolio-matrix", icon: "🎯", label: "Risk vs Outlay Matrix" },
           { route: "projects", icon: "📁", label: "Projects Registry" }

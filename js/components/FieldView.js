@@ -1,26 +1,37 @@
 // ==========================================================================
-// PROJECTPULSE — Phase 10: Field Operations & Ground Task Workstation
+// PROJECTPULSE — Phase 10 & 11: Field Operations & Daily Telemetry Workstation
 // Ministry of Statistics & Programme Implementation (MoSPI) - IPMD
 // Smart India Hackathon 2026 — Team HexaForce
 // ==========================================================================
 
 const FieldView = {
   tasks: [],
+  targets: [],
   selectedFilter: "ALL",
 
   async render(container) {
+    if (!container) {
+      container = document.getElementById("main-content-mount");
+    }
+    if (!container) return;
+
     container.innerHTML = `
-      <div class="space-y-6 animate-fade-in max-w-4xl mx-auto">
+      <div class="space-y-6 animate-fade-in max-w-4xl mx-auto pb-16">
         <div class="p-8 text-center text-slate-500">
           <div class="inline-block animate-spin w-8 h-8 border-4 border-amber-600 border-t-transparent rounded-full mb-3"></div>
-          <p class="text-sm font-medium">Syncing Ground Tasks Telemetry...</p>
+          <p class="text-sm font-medium">Syncing Ground Tasks & Daily Targets Telemetry...</p>
         </div>
       </div>
     `;
 
     try {
-      const tasksRes = await window.APIClient.listTasks();
+      const [tasksRes, targetsRes] = await Promise.all([
+        window.APIClient.listTasks(),
+        window.APIClient.getMyTargets()
+      ]);
+
       this.tasks = (tasksRes && tasksRes.tasks) ? tasksRes.tasks : [];
+      this.targets = (targetsRes && targetsRes.targets) ? targetsRes.targets : [];
       this.renderContent(container);
     } catch (e) {
       console.error("[FieldView] Render error:", e);
@@ -44,16 +55,17 @@ const FieldView = {
     const blockedCount = this.tasks.filter(t => t.status === "BLOCKED").length;
 
     container.innerHTML = `
-      <div class="space-y-5 animate-fade-in max-w-4xl mx-auto pb-12">
+      <div class="space-y-5 animate-fade-in max-w-4xl mx-auto pb-16">
+        
         <!-- Field Supervisor Header -->
         <div class="bg-gradient-to-r from-slate-900 via-amber-950 to-slate-900 text-white rounded-2xl p-5 shadow-xl border border-slate-800">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div class="space-y-1">
               <div class="flex items-center gap-2">
                 <span class="px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-400/30 rounded-full text-xs font-bold uppercase tracking-wider">
-                  👷 Site Operations Workstation
+                  👷 Ground Operations Workstation
                 </span>
-                <span class="text-xs text-slate-400 font-mono">PKG-3 Section</span>
+                <span class="text-xs text-slate-400 font-mono">PKG-3 Ganga River Viaduct</span>
               </div>
               <h1 class="text-xl font-extrabold text-white flex items-center gap-2">
                 ${user.name || "Shri Rajesh Gurjar"}
@@ -63,11 +75,62 @@ const FieldView = {
               </p>
             </div>
 
-            <div class="flex items-center gap-2">
-              <button id="btn-quick-field-hazard" class="w-full sm:w-auto px-3.5 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow transition flex items-center justify-center gap-1.5">
+            <div class="flex flex-wrap items-center gap-2">
+              <a href="#/execution" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition flex items-center gap-1.5">
+                <span>⏱️</span> Execution CPM
+              </a>
+              <button id="btn-report-stoppage" class="px-3.5 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow transition flex items-center justify-center gap-1.5">
                 <span>🚨</span> Report Ground Stoppage
               </button>
             </div>
+          </div>
+        </div>
+
+        <!-- NEW Phase 11: Today's Assigned Operational Targets -->
+        <div class="bg-white rounded-2xl p-5 border-2 border-amber-200 shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-base">🎯</span>
+                <h3 class="font-bold text-slate-900 text-sm uppercase tracking-wider">Today's Physical Targets & Telemetry</h3>
+              </div>
+              <p class="text-xs text-slate-500">Log verified completed quantities for Resident Engineer approval</p>
+            </div>
+            <span class="text-xs font-bold bg-amber-100 text-amber-900 px-2.5 py-1 rounded-full">
+              ${this.targets.length} Active Targets
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            ${this.targets.map(tgt => `
+              <div class="p-4 rounded-xl border ${tgt.status === 'BLOCKED' ? 'border-rose-300 bg-rose-50/50' : 'border-slate-200 bg-slate-50'} space-y-2 flex flex-col justify-between text-xs">
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span class="font-mono text-[10px] font-bold px-1.5 py-0.2 rounded ${tgt.is_critical ? 'bg-rose-100 text-rose-800' : 'bg-slate-200 text-slate-800'}">
+                      ${tgt.is_critical ? 'CRITICAL PATH' : 'SUB-CRITICAL'}
+                    </span>
+                    <span class="text-[10px] font-bold ${tgt.status === 'BLOCKED' ? 'text-rose-700' : 'text-emerald-700'}">${tgt.status}</span>
+                  </div>
+                  <h4 class="font-bold text-slate-900 line-clamp-2">${tgt.task_name}</h4>
+                  ${tgt.impediment ? `<div class="text-[10px] text-rose-800 bg-rose-100/70 p-1.5 rounded font-medium">⚠️ ${tgt.impediment}</div>` : ''}
+                </div>
+
+                <div class="pt-2 border-t border-slate-200 space-y-2">
+                  <div class="flex justify-between items-center text-slate-600 text-[11px]">
+                    <span>Today's Target:</span>
+                    <strong class="text-slate-900 font-mono">${tgt.target_quantity} ${tgt.unit}</strong>
+                  </div>
+                  <div class="flex justify-between items-center text-slate-600 text-[11px]">
+                    <span>Logged Today:</span>
+                    <strong class="text-blue-700 font-mono font-bold">${tgt.completed_quantity} ${tgt.unit}</strong>
+                  </div>
+
+                  <button data-log-progress="${tgt.task_id}" data-task-name="${tgt.task_name}" data-unit="${tgt.unit}" class="w-full py-1.5 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg shadow-sm transition flex items-center justify-center gap-1">
+                    <span>📝</span> Log Physical Quantity
+                  </button>
+                </div>
+              </div>
+            `).join('')}
           </div>
         </div>
 
@@ -114,12 +177,12 @@ const FieldView = {
                       t.priority === 'CRITICAL' ? 'bg-rose-100 text-rose-800' :
                       t.priority === 'HIGH' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-700'
                     }">
-                      ${t.priority}
+                      ${t.priority || 'NORMAL'}
                     </span>
-                    <span class="text-[10px] text-slate-500 font-semibold">${t.site_id || 'SITE-A'}</span>
+                    <span class="text-[10px] text-slate-500 font-semibold">${t.site_id || 'SITE-B'}</span>
                   </div>
-                  <h4 class="font-bold text-slate-900 text-sm">${t.title}</h4>
-                  <p class="text-xs text-slate-600 leading-relaxed">${t.description}</p>
+                  <h4 class="font-bold text-slate-900 text-sm">${t.title || t.task_name}</h4>
+                  <p class="text-xs text-slate-600 leading-relaxed">${t.description || ''}</p>
                 </div>
 
                 <span class="text-xs font-bold px-2 py-1 rounded flex-shrink-0 ${
@@ -127,7 +190,7 @@ const FieldView = {
                   t.status === 'BLOCKED' ? 'bg-rose-100 text-rose-800' :
                   t.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-700'
                 }">
-                  ${t.status.replace("_", " ")}
+                  ${(t.status || '').replace("_", " ")}
                 </span>
               </div>
 
@@ -140,7 +203,7 @@ const FieldView = {
               <!-- 1-Tap Action Bar -->
               <div class="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
                 <div class="text-[11px] text-slate-500">
-                  Due: <strong>${t.due_date}</strong>
+                  Due: <strong>${t.due_date || '2026-03-31'}</strong>
                 </div>
 
                 <div class="flex items-center gap-1.5">
@@ -161,6 +224,10 @@ const FieldView = {
       </div>
     `;
 
+    this.bindEvents(container);
+  },
+
+  bindEvents(container) {
     // Filter event handlers
     container.querySelectorAll("[data-filter]").forEach(btn => {
       btn.addEventListener("click", (e) => {
@@ -169,33 +236,185 @@ const FieldView = {
       });
     });
 
-    // Action handlers for 1-Tap status updates
+    // 1-Tap status update handlers
     container.querySelectorAll("[data-task-action]").forEach(btn => {
       btn.addEventListener("click", async (e) => {
         const taskId = e.currentTarget.getAttribute("data-task-action");
         const newStatus = e.currentTarget.getAttribute("data-new-status");
         let remarks = "";
         if (newStatus === "BLOCKED") {
-          remarks = prompt("Enter blocker details (e.g. Forest department inspection pending):", "Site halted due to statutory inspection notice.");
+          remarks = prompt("Enter blocker details (e.g. Subsurface boulder):", "Subsurface obstruction encountered.");
         } else if (newStatus === "COMPLETED") {
-          remarks = prompt("Enter completion notes / test verification:", "Work inspected and approved as per specifications.");
+          remarks = prompt("Enter completion verification notes:", "Inspected and measured as per specification.");
         }
 
         await window.APIClient.updateTask(taskId, { status: newStatus, remarks });
-        const mainContainer = document.getElementById("main-content");
-        if (mainContainer) this.render(mainContainer);
+        this.render(container);
       });
     });
 
-    // Quick hazard report button
-    const btnHazard = container.querySelector("#btn-quick-field-hazard");
-    if (btnHazard) {
-      btnHazard.addEventListener("click", () => {
-        if (window.EngineerView) {
-          window.EngineerView.showIssueModal();
-        }
+    // Log progress modal trigger
+    container.querySelectorAll("[data-log-progress]").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const taskId = btn.getAttribute("data-log-progress");
+        const taskName = btn.getAttribute("data-task-name");
+        const unit = btn.getAttribute("data-unit") || "meters";
+        this.showProgressModal(taskId, taskName, unit);
+      });
+    });
+
+    // Report ground stoppage trigger (with 9 canonical categories)
+    const btnStoppage = container.querySelector("#btn-report-stoppage");
+    if (btnStoppage) {
+      btnStoppage.addEventListener("click", () => {
+        this.showStoppageModal();
       });
     }
+  },
+
+  showProgressModal(taskId, taskName, unit) {
+    const modalId = "modal-progress-log";
+    let modal = document.getElementById(modalId);
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.id = modalId;
+      modal.className = "fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4";
+      document.body.appendChild(modal);
+    }
+
+    modal.innerHTML = `
+      <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-200 animate-scale-in space-y-4">
+        <div class="flex items-center justify-between border-b pb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">📝</span>
+            <h3 class="font-bold text-slate-900 text-sm">Log Physical Quantity Telemetry</h3>
+          </div>
+          <button id="close-prog-modal" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <div class="text-[10px] text-slate-400 uppercase font-mono">${taskId}</div>
+            <div class="font-bold text-slate-900">${taskName}</div>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Quantity Completed Today (${unit}) *</label>
+            <div class="flex items-center gap-2">
+              <input type="number" id="inp-log-qty" step="0.1" value="0.5" class="flex-1 p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 text-sm font-bold font-mono" required />
+              <button type="button" id="btn-add-05" class="px-2.5 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl font-bold">+0.5</button>
+              <button type="button" id="btn-add-10" class="px-2.5 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl font-bold">+1.0</button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Field Observations / Stratigraphy Remarks</label>
+            <textarea id="inp-log-notes" rows="2" class="w-full p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500" placeholder="e.g. Reverse circulation rig drilling through basalt layer"></textarea>
+          </div>
+
+          <div class="p-2.5 bg-blue-50 text-blue-900 rounded-xl border border-blue-200 flex items-center justify-between text-[11px]">
+            <span>📍 Geo-Stamped: 25°19'N, 83°00'E</span>
+            <span class="font-bold text-emerald-700">GPS Verified ✓</span>
+          </div>
+
+          <button id="btn-submit-telemetry" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-xl shadow transition">
+            Submit to Resident Engineer Verification Queue
+          </button>
+        </div>
+      </div>
+    `;
+
+    modal.querySelector("#close-prog-modal").addEventListener("click", () => modal.remove());
+    modal.querySelector("#btn-add-05").addEventListener("click", () => {
+      const inp = modal.querySelector("#inp-log-qty");
+      inp.value = (parseFloat(inp.value || 0) + 0.5).toFixed(1);
+    });
+    modal.querySelector("#btn-add-10").addEventListener("click", () => {
+      const inp = modal.querySelector("#inp-log-qty");
+      inp.value = (parseFloat(inp.value || 0) + 1.0).toFixed(1);
+    });
+
+    modal.querySelector("#btn-submit-telemetry").addEventListener("click", async () => {
+      const qty = parseFloat(modal.querySelector("#inp-log-qty")?.value) || 0.5;
+      const notes = modal.querySelector("#inp-log-notes")?.value || "Field telemetry report";
+      await window.APIClient.submitTaskProgress(taskId, { quantity_completed: qty, unit, remarks: notes });
+      modal.remove();
+      this.render();
+    });
+  },
+
+  showStoppageModal() {
+    const modalId = "modal-stoppage-report";
+    let modal = document.getElementById(modalId);
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.id = modalId;
+      modal.className = "fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4";
+      document.body.appendChild(modal);
+    }
+
+    modal.innerHTML = `
+      <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-slate-200 animate-scale-in space-y-4">
+        <div class="flex items-center justify-between border-b pb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">🚨</span>
+            <h3 class="font-bold text-slate-900 text-sm">Report Ground Stoppage (9 MoSPI Categories)</h3>
+          </div>
+          <button id="close-stop-modal" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Stoppage Cause Category *</label>
+            <select id="sel-stop-category" class="w-full p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500 font-semibold">
+              <option value="EQUIPMENT_BREAKDOWN" selected>EQUIPMENT_BREAKDOWN — Machinery Failure / Rig Inoperable</option>
+              <option value="LABOR_SHORTAGE">LABOR_SHORTAGE — Gang Demobilization / Festival Outflow</option>
+              <option value="MATERIAL_UNAVAILABLE">MATERIAL_UNAVAILABLE — Cement, Aggregate or Bitumen Supply Halt</option>
+              <option value="WEATHER_STOPPAGE">WEATHER_STOPPAGE — Monsoon River Surge / Unsafe Flood Current</option>
+              <option value="PERMIT_DELAY">PERMIT_DELAY — Stage-II Wildlife / Statutory Stop Notice</option>
+              <option value="DESIGN_REVISION">DESIGN_REVISION — Pier Foundation Depth Modification</option>
+              <option value="RIGHT_OF_WAY_BLOCKED">RIGHT_OF_WAY_BLOCKED — Encroachment / Land Litigation Dispute</option>
+              <option value="PAYMENT_DISPUTE">PAYMENT_DISPUTE — Milestone IPC Payment Clearance Delay</option>
+              <option value="QUALITY_REJECTION">QUALITY_REJECTION — Core Compaction Test Non-Conformance</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Affected Work Package / Task *</label>
+            <select id="sel-stop-task" class="w-full p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500">
+              <option value="TSK-001">TSK-001: Ganga River Pier P-04 Well Excavation (CRITICAL PATH)</option>
+              <option value="TSK-002">TSK-002: Pier P-05 Pneumatic Caisson Sinking (CRITICAL PATH)</option>
+              <option value="TSK-005">TSK-005: Ch 12+400 to 18+200 Embankment Compaction</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Ground Narrative & Resolution Requirement</label>
+            <textarea id="txt-stop-desc" rows="3" class="w-full p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500" placeholder="e.g. Well cutting edge hit basalt boulder at 16.2m depth. Excavation halted. Urgently require reverse circulation pneumatic drill rig."></textarea>
+          </div>
+
+          <div class="p-2.5 bg-rose-50 text-rose-900 rounded-xl border border-rose-200 text-[11px]">
+            ⚡ Submitting this stoppage triggers automated Critical Path downstream delay propagation and alerts the Project Director.
+          </div>
+
+          <button id="btn-submit-stoppage" class="w-full py-2.5 bg-rose-700 hover:bg-rose-600 text-white font-bold text-xs rounded-xl shadow transition">
+            Dispatch Stoppage Alert to Project Director & CPM Scheduler
+          </button>
+        </div>
+      </div>
+    `;
+
+    modal.querySelector("#close-stop-modal").addEventListener("click", () => modal.remove());
+    modal.querySelector("#btn-submit-stoppage").addEventListener("click", async () => {
+      const cat = modal.querySelector("#sel-stop-category")?.value;
+      const tid = modal.querySelector("#sel-stop-task")?.value;
+      const desc = modal.querySelector("#txt-stop-desc")?.value || "Ground stoppage reported";
+      
+      await window.APIClient.updateTask(tid, { status: "BLOCKED", remarks: `[${cat}] ${desc}` });
+      window.APIClient.showToast(`Stoppage logged under ${cat}. Critical path recalculated.`, "warning");
+      modal.remove();
+      this.render();
+    });
   }
 };
 

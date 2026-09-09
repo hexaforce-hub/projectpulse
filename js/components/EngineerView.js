@@ -71,9 +71,14 @@ const EngineerView = {
               </p>
             </div>
 
-            <button id="btn-open-issue-form" class="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-2">
-              <span>⚠️</span> Log Technical Site Issue
-            </button>
+            <div class="flex flex-wrap items-center gap-2">
+              <a href="#/execution" class="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-2">
+                <span>⏱️</span> Execution & CPM Control
+              </a>
+              <button id="btn-open-issue-form" class="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg transition flex items-center gap-2">
+                <span>⚠️</span> Log Technical Site Issue
+              </button>
+            </div>
           </div>
         </div>
 
@@ -86,23 +91,85 @@ const EngineerView = {
             `<svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>`
           )}
           ${CommonUI.renderKPICard(
+            "Verification Queue",
+            "2 Submissions",
+            "Awaiting Physical Ratification",
+            `<svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>`
+          )}
+          ${CommonUI.renderKPICard(
             "Open Technical Issues",
             this.issues.filter(i => i.status !== 'RESOLVED').length.toString(),
             "Requiring Technical Resolution",
             `<svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`
           )}
           ${CommonUI.renderKPICard(
-            "Engineering Documents",
-            this.documents.length.toString(),
-            "DPRs, Approvals & Logs",
-            `<svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`
-          )}
-          ${CommonUI.renderKPICard(
             "Schedule Slippage",
             `${p.schedule_slippage_months || 14} mos`,
-            `Critical Path Delayed`,
+            `Critical Path Delayed (+42d)`,
             `<svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`
           )}
+        </div>
+
+        <!-- NEW Phase 11: Progress Verification Queue -->
+        <div class="gov-card border-2 border-blue-200 bg-blue-50/20">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-base">📋</span>
+                <h3 class="font-bold text-slate-900 text-sm uppercase tracking-wider">Field Progress Verification & Ratification Queue</h3>
+              </div>
+              <p class="text-xs text-slate-500">Ground-worker daily telemetry submissions requiring Resident Engineer sign-off before entering official ledger</p>
+            </div>
+            <span class="text-xs font-bold bg-blue-100 text-blue-800 px-2.5 py-1 rounded-full">
+              2 Pending Action
+            </span>
+          </div>
+
+          <div class="space-y-3" id="verification-queue-items">
+            <!-- Item 1: Pier P-04 Well Excavation -->
+            <div id="vqueue-item-01" class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
+              <div class="space-y-1 flex-1">
+                <div class="flex items-center gap-2">
+                  <span class="font-mono text-[10px] font-bold bg-slate-200 text-slate-800 px-1.5 py-0.5 rounded">PRG-SYN-001</span>
+                  <span class="font-mono text-[10px] font-bold bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded">CRITICAL PATH</span>
+                  <span class="font-bold text-slate-900">TSK-001: Ganga River Pier P-04 Well Excavation & Steining</span>
+                </div>
+                <p class="text-slate-600">Reported by <strong>Shri Rajesh Gurjar</strong> (Field Supervisor) · <strong>0.5 meters</strong> excavated (Total: 16.2 / 28.5m)</p>
+                <div class="text-[11px] text-slate-400">Encountered hard basalt strata; pneumatic drill rig deployed. Timestamp: 2026-03-09 11:30 AM</div>
+              </div>
+
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <button data-reject-prg="PRG-SYN-001" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 font-bold rounded-lg transition">
+                  Reject & Request Core Check
+                </button>
+                <button data-verify-prg="PRG-SYN-001" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg shadow transition">
+                  ✓ Verify & Ratify
+                </button>
+              </div>
+            </div>
+
+            <!-- Item 2: Embankment Compaction -->
+            <div id="vqueue-item-02" class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
+              <div class="space-y-1 flex-1">
+                <div class="flex items-center gap-2">
+                  <span class="font-mono text-[10px] font-bold bg-slate-200 text-slate-800 px-1.5 py-0.5 rounded">PRG-SYN-002</span>
+                  <span class="font-mono text-[10px] font-bold bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">FLOAT: 45d</span>
+                  <span class="font-bold text-slate-900">TSK-005: Ch 12+400 to 18+200 Embankment Compaction Layer-4</span>
+                </div>
+                <p class="text-slate-600">Reported by <strong>Shri Rajesh Gurjar</strong> (Field Supervisor) · <strong>950.0 cum</strong> compacted (Total: 38,000 / 45,000 cum)</p>
+                <div class="text-[11px] text-slate-400">Nuclear density test report attached (98.4% Proctor Density). Timestamp: 2026-03-09 02:15 PM</div>
+              </div>
+
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <button data-reject-prg="PRG-SYN-002" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 font-bold rounded-lg transition">
+                  Reject
+                </button>
+                <button data-verify-prg="PRG-SYN-002" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg shadow transition">
+                  ✓ Verify & Ratify
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Technical Issues Section -->
@@ -183,6 +250,34 @@ const EngineerView = {
         </div>
       </div>
     `;
+
+    // Progress Verification Queue listeners
+    container.querySelectorAll("[data-verify-prg]").forEach(btn => {
+      btn.addEventListener("click", async (e) => {
+        const prgId = btn.getAttribute("data-verify-prg");
+        await window.APIClient.verifyTaskProgress(prgId, { notes: "Physically verified by Resident Engineer." });
+        const card = btn.closest(".p-4");
+        if (card) {
+          card.classList.add("bg-emerald-50", "border-emerald-200");
+          btn.parentElement.innerHTML = `<span class="px-3 py-1 bg-emerald-100 text-emerald-800 font-bold rounded-lg text-xs">✓ Ratified in Ledger</span>`;
+        }
+      });
+    });
+
+    container.querySelectorAll("[data-reject-prg]").forEach(btn => {
+      btn.addEventListener("click", async (e) => {
+        const prgId = btn.getAttribute("data-reject-prg");
+        const reason = prompt("Enter technical deficiency reason for rejection:", "Core thickness check does not meet IRC specification.");
+        if (reason) {
+          await window.APIClient.rejectTaskProgress(prgId, { rejection_reason: reason });
+          const card = btn.closest(".p-4");
+          if (card) {
+            card.classList.add("bg-rose-50", "border-rose-200");
+            btn.parentElement.innerHTML = `<span class="px-3 py-1 bg-rose-100 text-rose-800 font-bold rounded-lg text-xs">✗ Rejected</span>`;
+          }
+        }
+      });
+    });
 
     // Modal and action event listeners
     const btnForm = container.querySelector("#btn-open-issue-form");

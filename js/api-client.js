@@ -200,6 +200,8 @@ const APIClient = {
       ENGINEER: { user_id: "USR-ENGINEER-01", username: "engineer", name: "Er. Neha Verma", role: "ENGINEER", badge: "Site Engineer", designation: "Executive Resident Engineer (Civil)", division: "NHAI Corridor PIU", ministry: "Ministry of Road Transport & Highways", scope_type: "PROJECT", scope_value: "PRJ-SYN-000002", assigned_projects: ["PRJ-SYN-000002"] },
       FIELD_WORKER: { user_id: "USR-FIELD-01", username: "field", name: "Shri Rajesh Gurjar", role: "FIELD_WORKER", badge: "Field Operations", designation: "Senior Site Supervisor (PKG-3)", division: "NH Field Unit", ministry: "Ministry of Road Transport & Highways", scope_type: "SITE", scope_value: "PRJ-SYN-000002", assigned_projects: ["PRJ-SYN-000002"] },
       FIELD: { user_id: "USR-FIELD-01", username: "field", name: "Shri Rajesh Gurjar", role: "FIELD_WORKER", badge: "Field Operations", designation: "Senior Site Supervisor (PKG-3)", division: "NH Field Unit", ministry: "Ministry of Road Transport & Highways", scope_type: "SITE", scope_value: "PRJ-SYN-000002", assigned_projects: ["PRJ-SYN-000002"] },
+      FIELD_OFFICER: { user_id: "USR-FO-01", username: "fo", name: "Shri Sanjay Sharma", role: "FIELD_OFFICER", badge: "Field Officer", designation: "Divisional Field Operations Officer", division: "NHAI Field Division", ministry: "Ministry of Road Transport & Highways", scope_type: "PROJECT", scope_value: "PRJ-SYN-000002", assigned_projects: ["PRJ-SYN-000002"] },
+      FO: { user_id: "USR-FO-01", username: "fo", name: "Shri Sanjay Sharma", role: "FIELD_OFFICER", badge: "Field Officer", designation: "Divisional Field Operations Officer", division: "NHAI Field Division", ministry: "Ministry of Road Transport & Highways", scope_type: "PROJECT", scope_value: "PRJ-SYN-000002", assigned_projects: ["PRJ-SYN-000002"] },
       ADMIN: { user_id: "USR-ADMIN-01", username: "admin", name: "Dr. Rajesh Kumar", role: "ADMIN", badge: "Central Admin", designation: "Joint Secretary & Mission Director", division: "MoSPI / IPMD", ministry: "MoSPI", scope_type: "SYSTEM", scope_value: "ALL", assigned_projects: [] },
       MONITORING_OFFICER: { user_id: "USR-OFFICER-01", username: "officer", name: "Smt. Priya Sharma", role: "MONITORING_OFFICER", badge: "Monitoring Officer", designation: "Director (Infrastructure Monitoring)", division: "MoSPI / IPMD Surveillance Desk", ministry: "MoSPI", scope_type: "NATIONAL", scope_value: "ALL", assigned_projects: [] },
       VIEWER: { user_id: "USR-VIEWER-01", username: "viewer", name: "Shri Vikram Mehta", role: "VIEWER", badge: "Observer", designation: "Central Sector Observer", division: "NITI Aayog", ministry: "National", scope_type: "NATIONAL", scope_value: "ALL", assigned_projects: [] }
@@ -245,6 +247,7 @@ const APIClient = {
         else if (this.currentUser.role === "ADMIN") color = "bg-purple-100 text-purple-800 border-purple-200";
         else if (this.currentUser.role === "PROJECT_MANAGER") color = "bg-sky-100 text-sky-800 border-sky-300";
         else if (this.currentUser.role === "ENGINEER") color = "bg-emerald-100 text-emerald-800 border-emerald-300";
+        else if (this.currentUser.role === "FIELD_OFFICER") color = "bg-orange-100 text-orange-900 border-orange-300 font-bold";
         else if (this.currentUser.role === "FIELD_WORKER") color = "bg-amber-100 text-amber-900 border-amber-300";
         else if (this.currentUser.role === "MONITORING_OFFICER") color = "bg-teal-100 text-teal-800 border-teal-200";
         else if (this.currentUser.role === "ANALYST") color = "bg-violet-100 text-violet-800 border-violet-200";
@@ -1075,13 +1078,689 @@ const APIClient = {
         disclaimer: "Operational telemetry feed. Physical progress validated against field geo-coordinates."
       };
     }
+  },
+
+  // ==========================================================================
+  // PHASE 11: AI-Assisted Execution & Intelligence Engine Methods
+  // ==========================================================================
+
+  async onboardProject(projectData) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/projects`, {
+          method: "POST",
+          headers: this.getAuthHeaders(),
+          body: JSON.stringify(projectData)
+        });
+        if (res.ok) {
+          const data = await res.json();
+          this.showToast(`Project ${data.project_id || data.project?.project_id} onboarded successfully!`, "success");
+          return data;
+        }
+      } catch (e) {
+        console.warn("[ProjectPulse API] Project onboarding live call error:", e);
+      }
+    }
+    const pid = projectData.project_id || `PRJ-ONBOARD-${Date.now().toString().slice(-4)}`;
+    const mockPrj = {
+      project_id: pid,
+      project_name: projectData.project_name || "New Infrastructure Corridor",
+      ministry: projectData.ministry || "Ministry of Road Transport & Highways",
+      implementing_agency: projectData.implementing_agency || "NHAI",
+      state: projectData.state || "Uttar Pradesh",
+      district: projectData.district || "Varanasi",
+      original_cost_inr_cr: projectData.original_cost_inr_cr || 1250.0,
+      revised_cost_inr_cr: projectData.original_cost_inr_cr || 1250.0,
+      start_date: projectData.start_date || "2026-04-01",
+      target_completion_date: projectData.target_completion_date || "2029-03-31",
+      status: "APPROVED",
+      created_at: new Date().toISOString()
+    };
+    this.showToast(`[Offline] Project ${pid} onboarded into registry`, "success");
+    return { status: "success", project: mockPrj, project_id: pid };
+  },
+
+  async uploadProjectDocument(projectId, docData) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/documents`, {
+          method: "POST",
+          headers: this.getAuthHeaders(),
+          body: JSON.stringify(docData)
+        });
+        if (res.ok) {
+          this.showToast("Document attached successfully", "success");
+          return await res.json();
+        }
+      } catch (e) {
+        console.warn("[ProjectPulse API] Document upload error:", e);
+      }
+    }
+    const docId = `DOC-${Date.now().toString().slice(-4)}`;
+    this.showToast("Document parsed and entity-extracted", "info");
+    return { status: "success", document_id: docId, ...docData };
+  },
+
+  async getProjectDocuments(projectId) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/documents`, {
+          headers: this.getAuthHeaders()
+        });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] Get documents error:", e);
+      }
+    }
     return {
-      title: "Institutional Infrastructure Risk Intelligence Brief",
-      role: role,
-      target: "Monitoring & Evaluation Division",
-      summary: "10,000 Central Sector projects evaluated with TreeSHAP feature attribution. Predictive accuracy: 88.4% ROC-AUC on 90-day delay classification.",
-      action_recommendation: "Review early warning radar triage queue for 12 new high-priority escalation signals.",
-      disclaimer: "Decision support system complementing PAIMANA. All predictions require administrative verification."
+      status: "success",
+      count: 4,
+      documents: [
+        { doc_id: "DOC-DPR-01", document_name: "Detailed Project Report (DPR) Vol 1", document_type: "DPR", file_size_kb: 14200, uploaded_at: "2026-01-15", verified: true },
+        { doc_id: "DOC-CA-02", document_name: "EPC Concession Agreement & Schedule H", document_type: "CONTRACT", file_size_kb: 8900, uploaded_at: "2026-02-01", verified: true },
+        { doc_id: "DOC-GEO-03", document_name: "Geotechnical Borehole Stratigraphy Survey", document_type: "GEOTECHNICAL", file_size_kb: 5600, uploaded_at: "2026-02-18", verified: true },
+        { doc_id: "DOC-ENV-04", document_name: "Stage-II Forest & Wildlife Clearance Sanction", document_type: "CLEARANCE", file_size_kb: 3200, uploaded_at: "2026-03-05", verified: true }
+      ]
+    };
+  },
+
+  async analyzeProjectDocuments(projectId) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/execution/analyze`, {
+          method: "POST",
+          headers: this.getAuthHeaders(),
+          body: JSON.stringify({ project_id: projectId })
+        });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] Analyze docs error:", e);
+      }
+    }
+    return {
+      status: "success",
+      project_id: projectId,
+      extracted_entities: {
+        corridor_length_km: 42.5,
+        lanes: 6,
+        major_bridges: 2,
+        minor_bridges: 14,
+        culverts: 68,
+        contractor_name: "Larsen & Toubro Ltd - Infrastructure Division",
+        sanctioned_amount_cr: 1420.5,
+        completion_deadline_months: 36,
+        key_bill_of_quantities: [
+          { item: "Ganga Viaduct Well Sinking (12m dia)", quantity: 18, unit: "wells", spec: "M35 Grade Concrete" },
+          { item: "Pier Caps & Segmental Piers", quantity: 36, unit: "piers", spec: "High Performance Concrete" },
+          { item: "Prestressed Segmental Box Girders", quantity: 24, unit: "spans", spec: "50m span each" },
+          { item: "Subgrade Compaction & Embankment", quantity: 680000, unit: "cum", spec: "IRC:36-2010 Standard" },
+          { item: "Dense Bituminous Macadam (DBM)", quantity: 245000, unit: "sqm", spec: "VG-40 Bitumen" }
+        ]
+      }
+    };
+  },
+
+  async generateExecutionPlan(projectId) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/execution/plan/generate`, {
+          method: "POST",
+          headers: this.getAuthHeaders(),
+          body: JSON.stringify({ project_id: projectId })
+        });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] Generate plan error:", e);
+      }
+    }
+    return {
+      status: "success",
+      plan_id: `EXP-PLAN-${projectId}`,
+      project_id: projectId,
+      work_packages_count: 12,
+      tasks_count: 54,
+      ai_confidence_score: 94.2,
+      message: "AI Work Breakdown Structure synthesized from DPR & BOQ entities with human approval gate pending."
+    };
+  },
+
+  async getExecutionPlan(projectId) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/execution/plan`, {
+          headers: this.getAuthHeaders()
+        });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] Get plan error:", e);
+      }
+    }
+    return {
+      plan_id: `EXP-PLAN-${projectId}`,
+      project_id: projectId,
+      status: "APPROVED",
+      approved_by: "USR-PM-01",
+      approved_at: "2026-03-01T10:00:00Z",
+      work_packages_count: 12,
+      tasks_count: 54,
+      dependencies_count: 37,
+      ai_confidence_score: 94.2
+    };
+  },
+
+  async approveExecutionPlan(projectId, approvalNotes = "") {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/execution/plan/approve`, {
+          method: "POST",
+          headers: this.getAuthHeaders(),
+          body: JSON.stringify({ notes: approvalNotes })
+        });
+        if (res.ok) {
+          this.showToast("Execution Plan baselined and ratified!", "success");
+          return await res.json();
+        }
+      } catch (e) {
+        console.warn("[ProjectPulse API] Approve plan error:", e);
+      }
+    }
+    this.showToast("Execution Plan baselined and ratified by Project Director", "success");
+    return { status: "success", plan_id: `EXP-PLAN-${projectId}`, approval_status: "APPROVED", approved_at: new Date().toISOString() };
+  },
+
+  async getWorkPackages(projectId) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/work-packages`, {
+          headers: this.getAuthHeaders()
+        });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] Get work packages error:", e);
+      }
+    }
+    return {
+      project_id: projectId,
+      count: 12,
+      work_packages: [
+        { work_package_id: "WP-01", wbs_code: "WBS 1.1", title: "Project Inception & Geotechnical Borehole Survey", planned_start_date: "2026-01-01", planned_end_date: "2026-03-31", progress_pct: 100.0, status: "COMPLETED", task_count: 3 },
+        { work_package_id: "WP-02", wbs_code: "WBS 1.2", title: "Statutory Forest & Environmental Approvals", planned_start_date: "2026-02-01", planned_end_date: "2026-05-31", progress_pct: 75.0, status: "IN_PROGRESS", task_count: 4 },
+        { work_package_id: "WP-03", wbs_code: "WBS 1.3", title: "Right-of-Way & Land Acquisition Encumbrance Clearance", planned_start_date: "2026-02-15", planned_end_date: "2026-06-30", progress_pct: 60.0, status: "IN_PROGRESS", task_count: 4 },
+        { work_package_id: "WP-04", wbs_code: "WBS 1.4", title: "Ganga River Viaduct Deep Well Sinking & Steining", planned_start_date: "2026-04-01", planned_end_date: "2026-12-31", progress_pct: 38.5, status: "IN_PROGRESS", task_count: 6, is_critical: true },
+        { work_package_id: "WP-05", wbs_code: "WBS 1.5", title: "Substructure Piers, Abutments & Seismic Bearings", planned_start_date: "2026-08-01", planned_end_date: "2027-04-30", progress_pct: 12.0, status: "IN_PROGRESS", task_count: 5, is_critical: true },
+        { work_package_id: "WP-06", wbs_code: "WBS 1.6", title: "Segmental Box Girder Precast Yard Operations", planned_start_date: "2026-07-01", planned_end_date: "2027-08-31", progress_pct: 20.0, status: "IN_PROGRESS", task_count: 5 },
+        { work_package_id: "WP-07", wbs_code: "WBS 1.7", title: "Superstructure Segment Erection & Post-Tensioning", planned_start_date: "2027-01-15", planned_end_date: "2027-12-31", progress_pct: 0.0, status: "TODO", task_count: 5, is_critical: true },
+        { work_package_id: "WP-08", wbs_code: "WBS 1.8", title: "Embankment Earthwork & Granular Sub-Base (GSB)", planned_start_date: "2026-05-01", planned_end_date: "2027-06-30", progress_pct: 45.0, status: "IN_PROGRESS", task_count: 5 },
+        { work_package_id: "WP-09", wbs_code: "WBS 1.9", title: "Pavement Paving: Wet Mix Macadam & DBM", planned_start_date: "2027-04-01", planned_end_date: "2028-02-28", progress_pct: 0.0, status: "TODO", task_count: 4 },
+        { work_package_id: "WP-10", wbs_code: "WBS 1.10", title: "Safety Crash Barriers, Median Drains & Signage", planned_start_date: "2027-10-01", planned_end_date: "2028-06-30", progress_pct: 0.0, status: "TODO", task_count: 4 },
+        { work_package_id: "WP-11", wbs_code: "WBS 1.11", title: "Intelligent Transport Systems (ITS) & Tolling Infrastructure", planned_start_date: "2028-01-01", planned_end_date: "2028-08-31", progress_pct: 0.0, status: "TODO", task_count: 5 },
+        { work_package_id: "WP-12", wbs_code: "WBS 1.12", title: "CRS Load Testing, Safety Certification & Final Commissioning", planned_start_date: "2028-07-01", planned_end_date: "2028-12-31", progress_pct: 0.0, status: "TODO", task_count: 4, is_critical: true }
+      ]
+    };
+  },
+
+  async createTask(projectId, taskData) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/tasks`, {
+          method: "POST",
+          headers: this.getAuthHeaders(),
+          body: JSON.stringify(taskData)
+        });
+        if (res.ok) {
+          this.showToast("Task created successfully", "success");
+          return await res.json();
+        }
+      } catch (e) {
+        console.warn("[ProjectPulse API] Create task error:", e);
+      }
+    }
+    const tid = `TSK-${Date.now().toString().slice(-4)}`;
+    this.showToast(`[Offline] Task ${tid} created`, "success");
+    return { status: "success", task: { ...taskData, task_id: tid, project_id: projectId } };
+  },
+
+  async getProjectTasks(projectId, params = {}) {
+    if (this.isLive) {
+      try {
+        const qs = new URLSearchParams(params).toString();
+        const url = `${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/tasks${qs ? '?' + qs : ''}`;
+        const res = await fetch(url, { headers: this.getAuthHeaders() });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] Get tasks error:", e);
+      }
+    }
+    // Mock fallback 12 sample high-impact tasks
+    return {
+      project_id: projectId,
+      count: 12,
+      tasks: [
+        { task_id: "TSK-001", task_name: "Ganga River Pier P-04 Well Excavation & Steining", work_package_id: "WP-04", wbs_code: "WBS 1.4.1", status: "BLOCKED", is_critical: true, total_float: 0, target_quantity: 28.5, completed_quantity: 16.2, unit: "meters", planned_progress: 85.0, actual_progress: 56.8, source: "DOCUMENT_EXTRACTED", assigned_to_name: "Shri Rajesh Gurjar", site_name: "Ganga Viaduct Main Span Pier P-04" },
+        { task_id: "TSK-002", task_name: "Pier P-05 Pneumatic Caisson Sinking", work_package_id: "WP-04", wbs_code: "WBS 1.4.2", status: "IN_PROGRESS", is_critical: true, total_float: 0, target_quantity: 32.0, completed_quantity: 22.0, unit: "meters", planned_progress: 68.0, actual_progress: 68.75, source: "DOCUMENT_EXTRACTED", assigned_to_name: "Shri Sanjay Sharma", site_name: "Ganga Viaduct Pier P-05" },
+        { task_id: "TSK-003", task_name: "Pier Cap P-03 Reinforcement & Formwork", work_package_id: "WP-05", wbs_code: "WBS 1.5.1", status: "IN_PROGRESS", is_critical: false, total_float: 14, target_quantity: 120.0, completed_quantity: 90.0, unit: "cum", planned_progress: 75.0, actual_progress: 75.0, source: "AI_INFERRED", assigned_to_name: "Er. Neha Verma", site_name: "Ganga North Approach Pier P-03" },
+        { task_id: "TSK-004", task_name: "Segment Casting Span S-08 in Precast Yard", work_package_id: "WP-06", wbs_code: "WBS 1.6.2", status: "IN_PROGRESS", is_critical: false, total_float: 28, target_quantity: 16.0, completed_quantity: 12.0, unit: "segments", planned_progress: 70.0, actual_progress: 75.0, source: "DOCUMENT_EXTRACTED", assigned_to_name: "Shri Rajesh Gurjar", site_name: "Central Casting Yard Mugalsarai" },
+        { task_id: "TSK-005", task_name: "Ch 12+400 to 18+200 Embankment Compaction Layer-4", work_package_id: "WP-08", wbs_code: "WBS 1.8.3", status: "IN_PROGRESS", is_critical: false, total_float: 45, target_quantity: 45000.0, completed_quantity: 38000.0, unit: "cum", planned_progress: 80.0, actual_progress: 84.4, source: "AI_INFERRED", assigned_to_name: "Shri Rajesh Gurjar", site_name: "Package 3 North Section" },
+        { task_id: "TSK-006", task_name: "Pier P-04 Subsurface Boulder Hydro-Jetting", work_package_id: "WP-04", wbs_code: "WBS 1.4.3", status: "BLOCKED", is_critical: true, total_float: 0, target_quantity: 1.0, completed_quantity: 0.3, unit: "bore", planned_progress: 100.0, actual_progress: 30.0, source: "AI_INFERRED", assigned_to_name: "Er. Neha Verma", site_name: "Pier P-04 Well Bottom" },
+        { task_id: "TSK-007", task_name: "Seismic Elastomeric Bearing Installation Pier P-01", work_package_id: "WP-05", wbs_code: "WBS 1.5.3", status: "TODO", is_critical: false, total_float: 22, target_quantity: 8.0, completed_quantity: 0.0, unit: "units", planned_progress: 0.0, actual_progress: 0.0, source: "DOCUMENT_EXTRACTED", assigned_to_name: "Er. Neha Verma", site_name: "Pier P-01 Abutment" },
+        { task_id: "TSK-008", task_name: "Stage-II Forest Border Demarcation Pillars", work_package_id: "WP-02", wbs_code: "WBS 1.2.4", status: "COMPLETED", is_critical: false, total_float: 60, target_quantity: 240.0, completed_quantity: 240.0, unit: "pillars", planned_progress: 100.0, actual_progress: 100.0, source: "DOCUMENT_EXTRACTED", assigned_to_name: "Shri Sanjay Sharma", site_name: "Chandauli Reserve Forest" },
+        { task_id: "TSK-009", task_name: "Span 4 Cantilever Launching Gantry Setup", work_package_id: "WP-07", wbs_code: "WBS 1.7.1", status: "TODO", is_critical: true, total_float: 0, target_quantity: 1.0, completed_quantity: 0.0, unit: "gantry", planned_progress: 0.0, actual_progress: 0.0, source: "AI_INFERRED", assigned_to_name: "Er. Neha Verma", site_name: "Pier P-04 to P-05 Launch Site" },
+        { task_id: "TSK-010", task_name: "Culvert C-24 Box Cast-in-Situ Concreting", work_package_id: "WP-08", wbs_code: "WBS 1.8.5", status: "COMPLETED", is_critical: false, total_float: 90, target_quantity: 85.0, completed_quantity: 85.0, unit: "cum", planned_progress: 100.0, actual_progress: 100.0, source: "DOCUMENT_EXTRACTED", assigned_to_name: "Shri Rajesh Gurjar", site_name: "Chainage 16+800" },
+        { task_id: "TSK-011", task_name: "Granular Sub-Base (GSB) Layer 1 Paving", work_package_id: "WP-08", wbs_code: "WBS 1.8.4", status: "IN_PROGRESS", is_critical: false, total_float: 35, target_quantity: 12000.0, completed_quantity: 8400.0, unit: "sqm", planned_progress: 70.0, actual_progress: 70.0, source: "DOCUMENT_EXTRACTED", assigned_to_name: "Shri Rajesh Gurjar", site_name: "Chainage 14+200" },
+        { task_id: "TSK-012", task_name: "Bridge Health Sensor Strain Gauge Cabling", work_package_id: "WP-11", wbs_code: "WBS 1.11.2", status: "TODO", is_critical: false, total_float: 110, target_quantity: 48.0, completed_quantity: 0.0, unit: "nodes", planned_progress: 0.0, actual_progress: 0.0, source: "AI_INFERRED", assigned_to_name: "Er. Neha Verma", site_name: "Main Navigational Span" }
+      ]
+    };
+  },
+
+  async getSingleTask(taskId) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/tasks/${encodeURIComponent(taskId)}`, {
+          headers: this.getAuthHeaders()
+        });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] Get task error:", e);
+      }
+    }
+    const tasks = (await this.getProjectTasks("PRJ-SYN-000002")).tasks;
+    return tasks.find(t => t.task_id === taskId) || tasks[0];
+  },
+
+  async getMyTargets() {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/users/me/targets`, {
+          headers: this.getAuthHeaders()
+        });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] Get targets error:", e);
+      }
+    }
+    return {
+      user_id: this.currentUser?.user_id || "USR-FIELD-01",
+      date: new Date().toISOString().slice(0, 10),
+      count: 3,
+      targets: [
+        {
+          task_id: "TSK-001",
+          task_name: "Ganga River Pier P-04 Well Excavation & Steining",
+          project_id: "PRJ-SYN-000002",
+          project_name: "Varanasi-Ranchi-Kolkata Expressway PKG-3",
+          target_quantity: 4.5,
+          completed_quantity: 1.8,
+          unit: "meters",
+          target_period: "TODAY",
+          status: "BLOCKED",
+          is_critical: true,
+          impediment: "Subsurface basalt boulder layer obstructing cutting edge",
+          last_update_hours_ago: 3
+        },
+        {
+          task_id: "TSK-002",
+          task_name: "Pier P-05 Pneumatic Caisson Sinking",
+          project_id: "PRJ-SYN-000002",
+          project_name: "Varanasi-Ranchi-Kolkata Expressway PKG-3",
+          target_quantity: 3.0,
+          completed_quantity: 2.4,
+          unit: "meters",
+          target_period: "TODAY",
+          status: "IN_PROGRESS",
+          is_critical: true,
+          impediment: null,
+          last_update_hours_ago: 6
+        },
+        {
+          task_id: "TSK-005",
+          task_name: "Ch 12+400 to 18+200 Embankment Compaction Layer-4",
+          project_id: "PRJ-SYN-000002",
+          project_name: "Varanasi-Ranchi-Kolkata Expressway PKG-3",
+          target_quantity: 1200.0,
+          completed_quantity: 950.0,
+          unit: "cum",
+          target_period: "TODAY",
+          status: "IN_PROGRESS",
+          is_critical: false,
+          impediment: null,
+          last_update_hours_ago: 8
+        }
+      ]
+    };
+  },
+
+  async getMyTasks() {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/users/me/tasks`, {
+          headers: this.getAuthHeaders()
+        });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] Get my tasks error:", e);
+      }
+    }
+    return await this.getMyTargets();
+  },
+
+  async submitTaskProgress(taskId, progressData) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/tasks/${encodeURIComponent(taskId)}/progress`, {
+          method: "POST",
+          headers: this.getAuthHeaders(),
+          body: JSON.stringify(progressData)
+        });
+        if (res.ok) {
+          this.showToast("Daily progress telemetry logged and queued for engineer verification", "success");
+          return await res.json();
+        }
+      } catch (e) {
+        console.warn("[ProjectPulse API] Submit progress error:", e);
+      }
+    }
+    const pid = `PRG-${Date.now().toString().slice(-4)}`;
+    this.showToast(`[Offline] Progress logged (${progressData.quantity_completed} ${progressData.unit || ''}) · Pending Verification`, "success");
+    return {
+      status: "success",
+      progress_id: pid,
+      task_id: taskId,
+      quantity_completed: progressData.quantity_completed,
+      verification_status: "PENDING_VERIFICATION",
+      created_at: new Date().toISOString()
+    };
+  },
+
+  async getTaskProgressHistory(taskId) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/tasks/${encodeURIComponent(taskId)}/progress`, {
+          headers: this.getAuthHeaders()
+        });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] Get progress history error:", e);
+      }
+    }
+    return {
+      task_id: taskId,
+      count: 3,
+      history: [
+        { progress_id: "PRG-001", reported_date: "2026-03-08", quantity_completed: 0.8, unit: "meters", verification_status: "VERIFIED", verified_by_name: "Er. Neha Verma", remarks: "Hydro-jet test shot" },
+        { progress_id: "PRG-002", reported_date: "2026-03-09", quantity_completed: 0.5, unit: "meters", verification_status: "PENDING_VERIFICATION", remarks: "Heavy silt resistance encountered" },
+        { progress_id: "PRG-003", reported_date: "2026-03-09", quantity_completed: 0.0, unit: "meters", verification_status: "PENDING_VERIFICATION", remarks: "Stoppage due to boulder layer" }
+      ]
+    };
+  },
+
+  async verifyTaskProgress(progressId, payload = {}) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/progress/${encodeURIComponent(progressId)}/verify`, {
+          method: "POST",
+          headers: this.getAuthHeaders(),
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          this.showToast("Progress verified and ratified into ledger", "success");
+          return await res.json();
+        }
+      } catch (e) {
+        console.warn("[ProjectPulse API] Verify progress error:", e);
+      }
+    }
+    this.showToast(`Progress ${progressId} verified & ratified by Engineer`, "success");
+    return {
+      status: "success",
+      progress_id: progressId,
+      verification_status: "VERIFIED",
+      verified_by: this.currentUser?.user_id || "USR-ENGINEER-01",
+      notes: payload.notes || "Inspected on site and corroborated against field level survey."
+    };
+  },
+
+  async rejectTaskProgress(progressId, payload = {}) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/progress/${encodeURIComponent(progressId)}/reject`, {
+          method: "POST",
+          headers: this.getAuthHeaders(),
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          this.showToast("Progress rejected with deficiency note", "info");
+          return await res.json();
+        }
+      } catch (e) {
+        console.warn("[ProjectPulse API] Reject progress error:", e);
+      }
+    }
+    this.showToast(`Progress ${progressId} rejected: ${payload.rejection_reason || 'Deficiency reported'}`, "warning");
+    return {
+      status: "success",
+      progress_id: progressId,
+      verification_status: "REJECTED",
+      rejection_reason: payload.rejection_reason || "Discrepancy between reported quantity and onsite core check."
+    };
+  },
+
+  async getExecutionTimeline(projectId) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/execution/timeline`, {
+          headers: this.getAuthHeaders()
+        });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] Timeline error:", e);
+      }
+    }
+    // CPM schedule timeline
+    return {
+      project_id: projectId,
+      critical_path_duration_days: 980,
+      critical_tasks_count: 14,
+      total_tasks: 54,
+      milestones: [
+        { milestone_id: "M-01", name: "Inception & Geotechnical Clearance", target_date: "2026-03-31", actual_date: "2026-03-25", is_critical: true, status: "COMPLETED", progress_pct: 100 },
+        { milestone_id: "M-02", name: "Stage-II Forest & RoW Clearance", target_date: "2026-06-30", actual_date: null, is_critical: false, status: "IN_PROGRESS", progress_pct: 65 },
+        { milestone_id: "M-03", name: "Ganga Viaduct Deep Wells Sinking Substructure", target_date: "2026-12-31", actual_date: null, is_critical: true, status: "AT_RISK", progress_pct: 38, float_days: 0 },
+        { milestone_id: "M-04", name: "Pier Caps & Seismic Isolation Installation", target_date: "2027-04-30", actual_date: null, is_critical: true, status: "PENDING", progress_pct: 12, float_days: 0 },
+        { milestone_id: "M-05", name: "Cantilever Segment Box Girder Launching", target_date: "2027-12-31", actual_date: null, is_critical: true, status: "PENDING", progress_pct: 0, float_days: 0 },
+        { milestone_id: "M-06", name: "Subgrade & Granular Sub-Base Paving", target_date: "2027-06-30", actual_date: null, is_critical: false, status: "IN_PROGRESS", progress_pct: 45, float_days: 42 },
+        { milestone_id: "M-07", name: "Bituminous Concrete & Asphalt Wearing Course", target_date: "2028-02-28", actual_date: null, is_critical: false, status: "PENDING", progress_pct: 0, float_days: 35 },
+        { milestone_id: "M-08", name: "Crash Barrier & Intelligent Lighting Corridor", target_date: "2028-06-30", actual_date: null, is_critical: false, status: "PENDING", progress_pct: 0, float_days: 28 },
+        { milestone_id: "M-09", name: "Intelligent Tolling Plaza & Weigh-in-Motion", target_date: "2028-08-31", actual_date: null, is_critical: false, status: "PENDING", progress_pct: 0, float_days: 50 },
+        { milestone_id: "M-10", name: "CRS High-Speed Load Testing & Final Commissioning", target_date: "2028-12-31", actual_date: null, is_critical: true, status: "PENDING", progress_pct: 0, float_days: 0 }
+      ]
+    };
+  },
+
+  async addDependency(projectId, depData) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/dependencies`, {
+          method: "POST",
+          headers: this.getAuthHeaders(),
+          body: JSON.stringify(depData)
+        });
+        if (res.ok) {
+          this.showToast("Task dependency link created", "success");
+          return await res.json();
+        }
+      } catch (e) {
+        console.warn("[ProjectPulse API] Add dependency error:", e);
+      }
+    }
+    return { status: "success", dependency_id: `DEP-${Date.now().toString().slice(-4)}`, ...depData };
+  },
+
+  async deleteDependency(depId) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/dependencies/${encodeURIComponent(depId)}`, {
+          method: "DELETE",
+          headers: this.getAuthHeaders()
+        });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] Delete dependency error:", e);
+      }
+    }
+    return { status: "success", dependency_id: depId, message: "Dependency removed" };
+  },
+
+  async getPlanVsActual(projectId) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/execution/plan-vs-actual`, {
+          headers: this.getAuthHeaders()
+        });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] Plan-vs-actual error:", e);
+      }
+    }
+    return {
+      project_id: projectId,
+      schedule_variance_days: 42,
+      cost_variance_inr_cr: 18.5,
+      target_misses_count: 3,
+      stale_updates_count: 1,
+      execution_velocity: 0.74,
+      health_index: 68.2,
+      status: "AT_RISK",
+      primary_blocker: {
+        task_id: "TSK-001",
+        task_name: "Ganga River Pier P-04 Well Excavation",
+        category: "EQUIPMENT_BREAKDOWN",
+        days_delayed: 42,
+        details: "Subsurface basalt boulder layer obstructing cutting edge; requires pneumatic reverse-circulation drilling rig."
+      },
+      s_curve: {
+        labels: ["Month 1", "Month 2", "Month 3", "Month 4", "Month 5", "Month 6", "Month 7", "Month 8", "Month 9", "Month 10", "Month 11", "Month 12"],
+        planned_curve: [3.5, 8.0, 14.5, 22.0, 31.0, 42.0, 54.0, 67.0, 78.0, 88.0, 95.0, 100.0],
+        actual_curve:  [3.2, 7.8, 13.8, 20.1, 26.5, 34.0, null, null, null, null, null, null],
+        projected_curve: [null, null, null, null, null, 34.0, 41.5, 51.0, 62.0, 73.5, 85.0, 94.0]
+      }
+    };
+  },
+
+  async getExecutionHealth(projectId) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/execution/health`, {
+          headers: this.getAuthHeaders()
+        });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] Health error:", e);
+      }
+    }
+    return {
+      project_id: projectId,
+      health_index: 68.2,
+      tier: "MODERATE_RISK",
+      critical_path_slippage_days: 42,
+      active_blockers_count: 2,
+      verification_queue_count: 2,
+      velocity_ratio: 0.74
+    };
+  },
+
+  async getRecoveryOptions(projectId) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/execution/recovery-options`, {
+          headers: this.getAuthHeaders()
+        });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] Recovery options error:", e);
+      }
+    }
+    return {
+      project_id: projectId,
+      critical_delay_days: 42,
+      options: [
+        {
+          id: "REC-01",
+          strategy: "FAST_TRACKING",
+          name: "Parallelize Substructure & Segment Precasting",
+          description: "Execute Pier Cap P-05 and Cantilever Segment Casting concurrently with foundation sinking rather than sequentially.",
+          days_recovered: 28,
+          cost_impact_inr_cr: 2.4,
+          risk_level: "MEDIUM",
+          feasibility_score: 92,
+          recommendation_tag: "RECOMMENDED"
+        },
+        {
+          id: "REC-02",
+          strategy: "CRASHING",
+          name: "Mobilize Dual Hydraulic Reverse-Circulation Rig",
+          description: "Contract specialized marine drilling contractor with 2400-ton torque hammer to clear Pier P-04 boulder obstruction within 10 days.",
+          days_recovered: 35,
+          cost_impact_inr_cr: 5.8,
+          risk_level: "LOW",
+          feasibility_score: 88,
+          recommendation_tag: "FASTEST"
+        },
+        {
+          id: "REC-03",
+          strategy: "SHIFT_OPTIMIZATION",
+          name: "Transition to 24/7 3-Shift Continuous Marine Operations",
+          description: "Deploy additional marine safety crew and night lighting arrays to maintain around-the-clock de-watering and steining.",
+          days_recovered: 22,
+          cost_impact_inr_cr: 1.8,
+          risk_level: "LOW",
+          feasibility_score: 95,
+          recommendation_tag: "COST_OPTIMAL"
+        },
+        {
+          id: "REC-04",
+          strategy: "SCOPE_PHASING",
+          name: "Sectional Commissioning of 2-Lane Viaduct Carriageway",
+          description: "Complete and open Left Hand Carriageway (LHC) 3 months ahead of Right Hand Carriageway (RHC) to allow commercial traffic diversion.",
+          days_recovered: 45,
+          cost_impact_inr_cr: -1.2,
+          risk_level: "HIGH",
+          feasibility_score: 74,
+          recommendation_tag: "ALTERNATIVE"
+        },
+        {
+          id: "REC-05",
+          strategy: "BUFFERING",
+          name: "Buffer Absorption on Non-Critical Pavement Packages",
+          description: "Compress 42 days of non-critical total float in Package 1.8 (Subgrade) and 1.9 (DBM) to absorb substructure slippage.",
+          days_recovered: 18,
+          cost_impact_inr_cr: 0.0,
+          risk_level: "MINIMAL",
+          feasibility_score: 98,
+          recommendation_tag: "ZERO_COST"
+        }
+      ]
+    };
+  },
+
+  async getProjectSites(projectId) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/sites`, {
+          headers: this.getAuthHeaders()
+        });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] Get sites error:", e);
+      }
+    }
+    return {
+      project_id: projectId,
+      count: 3,
+      sites: [
+        { site_id: "SITE-01", name: "Site Alpha — Varanasi Approach & Ch 0+000 to 14+200", chainage_start_km: 0.0, chainage_end_km: 14.2, incharge_name: "Er. Neha Verma", status: "ACTIVE" },
+        { site_id: "SITE-02", name: "Site Beta — Ganga River Viaduct Corridor Ch 14+200 to 19+800", chainage_start_km: 14.2, chainage_end_km: 19.8, incharge_name: "Shri Sanjay Sharma", status: "CRITICAL_EXECUTION" },
+        { site_id: "SITE-03", name: "Site Gamma — South Connector Ch 19+800 to 42+500", chainage_start_km: 19.8, chainage_end_km: 42.5, incharge_name: "Shri Rajesh Gurjar", status: "ACTIVE" }
+      ]
     };
   }
 };

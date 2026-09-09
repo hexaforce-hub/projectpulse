@@ -19,7 +19,10 @@ const Router = {
     "my-projects": window.ProjectManagerView,
     engineer: window.EngineerView,
     field: window.FieldView,
-    directives: window.DirectivesView
+    directives: window.DirectivesView,
+    onboarding: window.ProjectOnboardingView,
+    execution: window.ExecutionControlView,
+    "field-officer": window.FieldOfficerDesk
   },
 
   init() {
@@ -101,6 +104,15 @@ const Router = {
     } else if (rootRoute === "directives") {
       if (window.DirectivesView) window.DirectivesView.render(mount);
       window.AppShell.updateActiveNav("directives");
+    } else if (rootRoute === "onboarding") {
+      if (window.ProjectOnboardingView) window.ProjectOnboardingView.render(mount);
+      window.AppShell.updateActiveNav("onboarding");
+    } else if (rootRoute === "execution") {
+      if (window.ExecutionControlView) window.ExecutionControlView.render(mount);
+      window.AppShell.updateActiveNav("execution");
+    } else if (rootRoute === "field-officer") {
+      if (window.FieldOfficerDesk) window.FieldOfficerDesk.render(mount);
+      window.AppShell.updateActiveNav("field-officer");
     } else {
       // Fallback to Dashboard
       window.location.hash = "#/dashboard";

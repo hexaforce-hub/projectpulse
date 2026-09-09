@@ -112,6 +112,34 @@ DEMO_USERS = {
         "assigned_projects": ["PRJ-SYN-000002"],
         "badge": "Field Operations"
     },
+    "fo": {
+        "user_id": "USR-FO-01",
+        "username": "fo",
+        "password": "fo123",
+        "name": "Shri Sanjay Sharma",
+        "designation": "Resident Field Officer & Site Inspector",
+        "division": "NH-44 Works Division (PKG-3)",
+        "ministry": "Ministry of Road Transport & Highways",
+        "role": "FIELD_OFFICER",
+        "scope_type": "SITE",
+        "scope_value": "PRJ-SYN-000002",
+        "assigned_projects": ["PRJ-SYN-000002"],
+        "badge": "Field Officer"
+    },
+    "field_officer": {
+        "user_id": "USR-FO-01",
+        "username": "field_officer",
+        "password": "fo123",
+        "name": "Shri Sanjay Sharma",
+        "designation": "Resident Field Officer & Site Inspector",
+        "division": "NH-44 Works Division (PKG-3)",
+        "ministry": "Ministry of Road Transport & Highways",
+        "role": "FIELD_OFFICER",
+        "scope_type": "SITE",
+        "scope_value": "PRJ-SYN-000002",
+        "assigned_projects": ["PRJ-SYN-000002"],
+        "badge": "Field Officer"
+    },
     "admin": {
         "user_id": "USR-ADMIN-01",
         "username": "admin",
@@ -232,6 +260,21 @@ ROLE_PERMISSIONS = {
         "can_view_dashboard": False,
         "can_view_projects": False,
         "can_view_warnings": False,
+        "can_manage_warnings": False,
+        "can_issue_directives": False,
+        "can_run_scenarios": False,
+        "can_save_scenarios": False,
+        "can_view_analytics": False,
+        "can_view_audit": False,
+        "can_manage_tasks": True,
+        "can_manage_issues": True,
+        "can_manage_users": False,
+        "can_manage_system": False
+    },
+    "FIELD_OFFICER": {
+        "can_view_dashboard": False,
+        "can_view_projects": True,
+        "can_view_warnings": True,
         "can_manage_warnings": False,
         "can_issue_directives": False,
         "can_run_scenarios": False,
@@ -461,7 +504,7 @@ def authorize_project_scope(project_id: str, user: dict):
 def authorize_analytics_access(user: dict):
     """Restricts access to macro portfolio analytics for ground-level field roles."""
     role = user.get("role", "MONITORING_OFFICER")
-    if role == "FIELD_WORKER":
+    if role in ["FIELD_WORKER", "FIELD_OFFICER"]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied: Field operational personnel are restricted to task-level workflows."

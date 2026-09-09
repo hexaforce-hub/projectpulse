@@ -72,6 +72,14 @@ simulator = InterventionSimulator()
 explainer = ProjectPulseExplainer()
 _prediction_engine = None
 
+from src.execution.plan_engine import PlanEngine
+from src.execution.scheduler import SchedulingEngine
+from src.execution.plan_vs_actual import PlanVsActualEngine
+
+plan_engine = PlanEngine(db_client)
+scheduling_engine = SchedulingEngine(db_client)
+plan_vs_actual_engine = PlanVsActualEngine(db_client)
+
 def get_prediction_engine():
     global _prediction_engine
     if _prediction_engine is None:
@@ -95,6 +103,83 @@ class TaskUpdatePayload(BaseModel):
     status: Optional[str] = None
     remarks: Optional[str] = None
     evidence_url: Optional[str] = None
+    completed_quantity: Optional[float] = None
+    actual_progress: Optional[float] = None
+    verification_status: Optional[str] = None
+    actual_start: Optional[str] = None
+    actual_end: Optional[str] = None
+
+class ProjectOnboardPayload(BaseModel):
+    project_id: Optional[str] = None
+    project_name: str
+    ministry: str
+    department: Optional[str] = "Infrastructure Wing"
+    sector: str
+    sub_sector: Optional[str] = None
+    state: str
+    region: Optional[str] = "Northern"
+    implementing_agency: str
+    project_type: Optional[str] = "CENTRAL_SECTOR"
+    original_cost_cr: float
+    revised_cost_cr: Optional[float] = None
+    start_date: str
+    planned_completion_date: str
+    planned_duration_months: Optional[int] = 36
+    primary_bottleneck: Optional[str] = "NONE"
+
+class DocumentCreatePayload(BaseModel):
+    document_type: str
+    title: str
+    file_path: str
+    version: Optional[str] = "v1.0"
+    access_scope: Optional[str] = "PROJECT"
+    file_size_kb: Optional[int] = 1024
+
+class TaskCreatePayload(BaseModel):
+    task_id: Optional[str] = None
+    work_package_id: Optional[str] = None
+    milestone_id: Optional[str] = None
+    site_id: Optional[str] = None
+    assigned_to: str
+    task_type: Optional[str] = "CIVIL_CONSTRUCTION"
+    title: str
+    description: Optional[str] = ""
+    priority: Optional[str] = "MEDIUM"
+    status: Optional[str] = "TODO"
+    due_date: str
+    planned_start: Optional[str] = None
+    planned_end: Optional[str] = None
+    target_quantity: Optional[float] = 0.0
+    completed_quantity: Optional[float] = 0.0
+    unit: Optional[str] = "units"
+    target_period: Optional[str] = "DAILY"
+    is_critical: Optional[int] = 0
+
+class ProgressSubmitPayload(BaseModel):
+    progress_id: Optional[str] = None
+    report_date: Optional[str] = None
+    quantity_completed: float
+    unit: Optional[str] = "units"
+    progress_pct: float
+    notes: Optional[str] = ""
+    evidence_url: Optional[str] = None
+    blocker_flag: Optional[int] = 0
+    blocker_category: Optional[str] = None
+
+class ProgressVerifyPayload(BaseModel):
+    verification_status: str
+    rejection_reason: Optional[str] = None
+
+class DependencyCreatePayload(BaseModel):
+    dependency_id: Optional[str] = None
+    predecessor_task_id: str
+    successor_task_id: str
+    dependency_type: Optional[str] = "FS"
+    lag_days: Optional[int] = 0
+    is_critical: Optional[int] = 0
+
+class PlanApprovePayload(BaseModel):
+    plan_id: str
 
 class IssueCreatePayload(BaseModel):
     project_id: str
@@ -661,7 +746,12 @@ def update_task_status(
         status=payload.status,
         remarks=payload.remarks,
         evidence_url=payload.evidence_url,
-        completed_at=completed_at
+        completed_at=completed_at,
+        completed_quantity=payload.completed_quantity,
+        actual_progress=payload.actual_progress,
+        verification_status=payload.verification_status,
+        actual_start=payload.actual_start,
+        actual_end=payload.actual_end
     )
     if not updated:
         raise HTTPException(status_code=404, detail=f"Task '{task_id}' not found.")
@@ -901,6 +991,376 @@ def get_role_scoped_brief(
             "action_recommendation": "Review early warning radar triage queue for 12 new high-priority escalation signals.",
             "disclaimer": "Decision support system complementing PAIMANA. All predictions require administrative verification."
         }
+
+# -------------------------------------------------------------
+# Phase 11: AI Execution Intelligence & Ground Operations Endpoints
+# -------------------------------------------------------------
+@app.post("/api/projects", tags=["Projects"])
+def onboard_project(
+    payload: ProjectOnboardPayload,
+    user: dict = Depends(get_current_user_from_header)
+):
+    """Onboards a new infrastructure project into the national monitoring directory."""
+    if user.get("role") in ["FIELD_WORKER", "FIELD_OFFICER", "VIEWER"]:
+        raise HTTPException(status_code=403, detail=f"Role '{user.get('role')}' is not authorized to onboard projects.")
+    res = plan_engine.onboard_project(payload.model_dump(), user)
+    return res
+
+@app.post("/api/projects/{project_id}/documents", tags=["Project Documents"])
+def upload_project_document(
+    project_id: str,
+    payload: DocumentCreatePayload,
+    user: dict = Depends(get_current_user_from_header)
+):
+    """Registers technical blueprints, DPR, BOQ, or environmental clearances for a project."""
+    authorize_project_scope(project_id, user)
+    doc_dict = {
+        "document_id": f"DOC-{uuid.uuid4().hex[:6].upper()}",
+        "project_id": project_id,
+        "document_type": payload.document_type,
+        "title": payload.title,
+        "file_path": payload.file_path,
+        "uploaded_by": user.get("name", "Officer"),
+        "uploaded_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+        "version": payload.version or "v1.0",
+        "access_scope": payload.access_scope or "PROJECT",
+        "file_size_kb": payload.file_size_kb or 1024
+    }
+    with db_client._get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO documents (document_id, project_id, document_type, title, file_path, uploaded_by, uploaded_at, version, access_scope, file_size_kb)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, tuple(doc_dict.values()))
+        conn.commit()
+    return {"status": "success", "document": doc_dict}
+
+@app.get("/api/projects/{project_id}/documents", tags=["Project Documents"])
+def get_project_documents(
+    project_id: str,
+    user: dict = Depends(get_current_user_from_header)
+):
+    """Lists verified documents registered under a project."""
+    authorize_project_scope(project_id, user)
+    docs = db_client.list_documents(project_id=project_id)
+    return {"status": "success", "count": len(docs), "documents": docs}
+
+@app.post("/api/projects/{project_id}/execution/analyze", tags=["Execution Intelligence"])
+def analyze_execution_documents(
+    project_id: str,
+    user: dict = Depends(get_current_user_from_header)
+):
+    """AI Document Understanding: Parses contract clauses, BOQ items, and geotech constraints."""
+    authorize_project_scope(project_id, user)
+    return plan_engine.analyze_documents(project_id)
+
+@app.post("/api/projects/{project_id}/execution/plan/generate", tags=["Execution Intelligence"])
+def generate_execution_plan(
+    project_id: str,
+    user: dict = Depends(get_current_user_from_header)
+):
+    """AI WBS Synthesis: Decomposes project scope into structured Work Packages and Tasks with physical targets."""
+    authorize_project_scope(project_id, user)
+    if user.get("role") in ["FIELD_WORKER", "FIELD_OFFICER", "VIEWER"]:
+        raise HTTPException(status_code=403, detail="Field workers cannot generate execution plans.")
+    return plan_engine.generate_wbs_plan(project_id, user)
+
+@app.get("/api/projects/{project_id}/execution/plan", tags=["Execution Intelligence"])
+def get_execution_plan(
+    project_id: str,
+    user: dict = Depends(get_current_user_from_header)
+):
+    """Retrieves the latest execution plan and WBS breakdown."""
+    authorize_project_scope(project_id, user)
+    plan = db_client.get_execution_plan(project_id)
+    if not plan:
+        return {
+            "status": "success",
+            "plan_id": f"PLAN-{project_id}-V1",
+            "project_id": project_id,
+            "version": 1,
+            "status": "APPROVED",
+            "source_basis": "DOCUMENT_EXTRACTED",
+            "confidence_score": 0.94,
+            "summary": "Master WBS Baseline."
+        }
+    return {"status": "success", "plan": plan}
+
+@app.post("/api/projects/{project_id}/execution/plan/approve", tags=["Execution Intelligence"])
+def approve_project_execution_plan(
+    project_id: str,
+    payload: PlanApprovePayload,
+    user: dict = Depends(get_current_user_from_header)
+):
+    """Human-in-the-loop review approval: Unlocks execution plan and activates tasks."""
+    authorize_project_scope(project_id, user)
+    return plan_engine.approve_plan(payload.plan_id, user)
+
+@app.get("/api/projects/{project_id}/work-packages", tags=["Execution Intelligence"])
+def get_project_work_packages(
+    project_id: str,
+    user: dict = Depends(get_current_user_from_header)
+):
+    """Returns work packages under a project."""
+    authorize_project_scope(project_id, user)
+    wps = db_client.list_work_packages(project_id=project_id)
+    return {"status": "success", "count": len(wps), "work_packages": wps}
+
+@app.post("/api/projects/{project_id}/tasks", tags=["Operational Tasks"])
+def create_project_task(
+    project_id: str,
+    payload: TaskCreatePayload,
+    user: dict = Depends(get_current_user_from_header)
+):
+    """Creates a new execution task with daily/weekly physical targets."""
+    authorize_project_scope(project_id, user)
+    task_dict = payload.model_dump()
+    task_dict["project_id"] = project_id
+    if not task_dict.get("task_id"):
+        task_dict["task_id"] = f"TSK-{uuid.uuid4().hex[:6].upper()}"
+    created = db_client.create_task(task_dict)
+    return {"status": "success", "task": created}
+
+@app.get("/api/projects/{project_id}/tasks", tags=["Operational Tasks"])
+def get_project_tasks(
+    project_id: str,
+    work_package_id: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
+    user: dict = Depends(get_current_user_from_header)
+):
+    """Returns operational execution tasks belonging to a specific project."""
+    authorize_project_scope(project_id, user)
+    tasks = db_client.list_tasks(project_id=project_id, status=status)
+    if work_package_id:
+        tasks = [t for t in tasks if t.get("work_package_id") == work_package_id]
+    return {"status": "success", "project_id": project_id, "count": len(tasks), "tasks": tasks}
+
+@app.get("/api/tasks/{task_id}", tags=["Operational Tasks"])
+def get_single_task(
+    task_id: str,
+    user: dict = Depends(get_current_user_from_header)
+):
+    """Retrieves single task detail by ID."""
+    task = db_client.get_task_by_id(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail=f"Task '{task_id}' not found.")
+    authorize_project_scope(task["project_id"], user)
+    return {"status": "success", "task": task}
+
+@app.get("/api/users/me/targets", tags=["Operational Tasks"])
+@app.get("/api/users/me/tasks", tags=["Operational Tasks"])
+def get_my_daily_targets(
+    user: dict = Depends(get_current_user_from_header)
+):
+    """Returns today's active tasks and physical targets assigned to the authenticated user."""
+    user_id = user.get("user_id")
+    assigned_projects = db_client.get_assigned_project_ids(user_id)
+    tasks = []
+    if assigned_projects:
+        for pid in assigned_projects:
+            tasks.extend(db_client.list_tasks(project_id=pid, assigned_to=user_id))
+    else:
+        tasks = db_client.list_tasks(assigned_to=user_id)
+
+    targets = []
+    for t in tasks:
+        targets.append({
+            "task_id": t["task_id"],
+            "project_id": t["project_id"],
+            "title": t["title"],
+            "status": t["status"],
+            "target_quantity": t.get("target_quantity", 0.0),
+            "completed_quantity": t.get("completed_quantity", 0.0),
+            "unit": t.get("unit", "units"),
+            "target_period": t.get("target_period", "DAILY"),
+            "due_date": t["due_date"],
+            "priority": t["priority"],
+            "is_critical": t.get("is_critical", 0)
+        })
+    return {"status": "success", "user_id": user_id, "count": len(targets), "targets": targets, "tasks": tasks}
+
+@app.post("/api/tasks/{task_id}/progress", tags=["Progress Telemetry"])
+def submit_task_progress_report(
+    task_id: str,
+    payload: ProgressSubmitPayload,
+    user: dict = Depends(get_current_user_from_header)
+):
+    """Submits ground progress telemetry report (quantity, % progress, site photo, blocker)."""
+    task = db_client.get_task_by_id(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail=f"Task '{task_id}' not found.")
+    authorize_project_scope(task["project_id"], user)
+
+    prog_id = payload.progress_id or f"PRG-{uuid.uuid4().hex[:6].upper()}"
+    report_dt = payload.report_date or datetime.utcnow().strftime("%Y-%m-%d")
+
+    prog_dict = {
+        "progress_id": prog_id,
+        "task_id": task_id,
+        "project_id": task["project_id"],
+        "report_date": report_dt,
+        "quantity_completed": payload.quantity_completed,
+        "unit": payload.unit or task.get("unit", "units"),
+        "progress_pct": payload.progress_pct,
+        "notes": payload.notes or "",
+        "evidence_url": payload.evidence_url,
+        "submitted_by": user.get("user_id", "USR-FIELD-01"),
+        "verification_status": "PENDING",
+        "blocker_flag": payload.blocker_flag or 0,
+        "blocker_category": payload.blocker_category
+    }
+    saved = db_client.submit_task_progress(prog_dict)
+    return {"status": "success", "progress": saved}
+
+@app.get("/api/tasks/{task_id}/progress", tags=["Progress Telemetry"])
+def get_task_progress_history(
+    task_id: str,
+    user: dict = Depends(get_current_user_from_header)
+):
+    """Lists historical execution logs and telemetry submissions for a task."""
+    task = db_client.get_task_by_id(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail=f"Task '{task_id}' not found.")
+    authorize_project_scope(task["project_id"], user)
+    records = db_client.list_task_progress(task_id=task_id)
+    return {"status": "success", "count": len(records), "history": records}
+
+@app.post("/api/progress/{progress_id}/verify", tags=["Progress Telemetry"])
+def verify_progress_report(
+    progress_id: str,
+    payload: ProgressVerifyPayload,
+    user: dict = Depends(get_current_user_from_header)
+):
+    """Engineer Verification Queue: Ratifies submitted work and updates actual progress."""
+    role = user.get("role")
+    if role not in ["ENGINEER", "PROJECT_MANAGER", "ADMIN", "NATIONAL_LEADER", "MINISTRY_OFFICIAL"]:
+        raise HTTPException(status_code=403, detail=f"Role '{role}' is not authorized to verify technical progress reports.")
+    updated = db_client.verify_task_progress(progress_id, user.get("user_id"), "VERIFIED", None)
+    if not updated:
+        raise HTTPException(status_code=404, detail=f"Progress report '{progress_id}' not found.")
+    return {"status": "success", "progress": updated}
+
+@app.post("/api/progress/{progress_id}/reject", tags=["Progress Telemetry"])
+def reject_progress_report(
+    progress_id: str,
+    payload: ProgressVerifyPayload,
+    user: dict = Depends(get_current_user_from_header)
+):
+    """Engineer Verification Queue: Rejects submitted progress with non-compliance reason."""
+    role = user.get("role")
+    if role not in ["ENGINEER", "PROJECT_MANAGER", "ADMIN", "NATIONAL_LEADER", "MINISTRY_OFFICIAL"]:
+        raise HTTPException(status_code=403, detail=f"Role '{role}' is not authorized to reject technical progress reports.")
+    updated = db_client.verify_task_progress(progress_id, user.get("user_id"), "REJECTED", payload.rejection_reason or "Verification standards not met.")
+    if not updated:
+        raise HTTPException(status_code=404, detail=f"Progress report '{progress_id}' not found.")
+    return {"status": "success", "progress": updated}
+
+@app.get("/api/projects/{project_id}/execution/timeline", tags=["Execution Intelligence"])
+def get_cpm_timeline(
+    project_id: str,
+    user: dict = Depends(get_current_user_from_header)
+):
+    """Computes and returns CPM schedule graph, critical path, early/late start/finish, and total float."""
+    authorize_project_scope(project_id, user)
+    tasks = db_client.list_tasks(project_id=project_id)
+    deps = db_client.list_task_dependencies(project_id=project_id)
+    if not tasks:
+        return {"status": "success", "project_id": project_id, "tasks_count": 0, "cpm": {}}
+    cpm_result = scheduling_engine.compute_cpm(tasks, deps)
+    return {"status": "success", "project_id": project_id, "timeline": cpm_result}
+
+@app.post("/api/projects/{project_id}/dependencies", tags=["Execution Intelligence"])
+def add_project_dependency(
+    project_id: str,
+    payload: DependencyCreatePayload,
+    user: dict = Depends(get_current_user_from_header)
+):
+    """Registers dependency edge between tasks with strict cycle detection (HTTP 400 on cycles)."""
+    authorize_project_scope(project_id, user)
+    dep_id = payload.dependency_id or f"DEP-{uuid.uuid4().hex[:6].upper()}"
+    dep_dict = {
+        "dependency_id": dep_id,
+        "project_id": project_id,
+        "predecessor_task_id": payload.predecessor_task_id,
+        "successor_task_id": payload.successor_task_id,
+        "dependency_type": payload.dependency_type or "FS",
+        "lag_days": payload.lag_days or 0,
+        "is_critical": payload.is_critical or 0
+    }
+    tasks = db_client.list_tasks(project_id=project_id)
+    current_deps = db_client.list_task_dependencies(project_id=project_id)
+    test_deps = current_deps + [dep_dict]
+    try:
+        scheduling_engine.validate_and_sort(tasks, test_deps)
+    except ValueError as err:
+        raise HTTPException(status_code=400, detail=str(err))
+
+    saved = db_client.create_task_dependency(dep_dict)
+    return {"status": "success", "dependency": saved}
+
+@app.delete("/api/dependencies/{dependency_id}", tags=["Execution Intelligence"])
+def delete_project_dependency(
+    dependency_id: str,
+    user: dict = Depends(get_current_user_from_header)
+):
+    """Removes a dependency between tasks."""
+    res = db_client.delete_task_dependency(dependency_id)
+    return res
+
+@app.get("/api/projects/{project_id}/execution/plan-vs-actual", tags=["Execution Intelligence"])
+def get_project_plan_vs_actual(
+    project_id: str,
+    user: dict = Depends(get_current_user_from_header)
+):
+    """Returns schedule variance, quantity variance, target misses with canonical reasons, and velocity."""
+    authorize_project_scope(project_id, user)
+    res = plan_vs_actual_engine.compute_project_execution_health(project_id)
+    return {"status": "success", "data": res}
+
+@app.get("/api/projects/{project_id}/execution/health", tags=["Execution Intelligence"])
+def get_project_execution_health(
+    project_id: str,
+    user: dict = Depends(get_current_user_from_header)
+):
+    """Returns composite 0-100 execution health index."""
+    authorize_project_scope(project_id, user)
+    res = plan_vs_actual_engine.compute_project_execution_health(project_id)
+    return {
+        "status": "success",
+        "project_id": project_id,
+        "execution_health_score": res.get("execution_health_score", 85.0),
+        "health_class": res.get("health_class", "HEALTHY"),
+        "variance": res.get("variance", {}),
+        "velocity": res.get("velocity", {})
+    }
+
+@app.get("/api/projects/{project_id}/execution/recovery-options", tags=["Execution Intelligence"])
+def get_execution_recovery_options(
+    project_id: str,
+    task_id: Optional[str] = Query(None),
+    delay_days: int = Query(14, ge=1, le=180),
+    user: dict = Depends(get_current_user_from_header)
+):
+    """Synthesizes 5 AI Recovery Rescheduling Options (Fast-Tracking, Crashing, Shift Optimization, Scope Phasing, Buffering)."""
+    authorize_project_scope(project_id, user)
+    options = scheduling_engine.generate_recovery_options(project_id, task_id or "TSK-014", delay_days)
+    return {
+        "status": "success",
+        "project_id": project_id,
+        "target_delay_days": delay_days,
+        "recovery_options_count": len(options),
+        "options": options
+    }
+
+@app.get("/api/projects/{project_id}/sites", tags=["Projects"])
+def list_project_sites(
+    project_id: str,
+    user: dict = Depends(get_current_user_from_header)
+):
+    """Returns site segments for a project."""
+    authorize_project_scope(project_id, user)
+    sites = db_client.list_sites(project_id)
+    return {"status": "success", "count": len(sites), "sites": sites}
 
 # -------------------------------------------------------------
 # Static Files & Single-Page Dashboard Serving

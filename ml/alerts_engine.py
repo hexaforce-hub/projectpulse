@@ -235,3 +235,77 @@ class EarlyWarningEngine:
         conn.commit()
         conn.close()
         return len(records)
+
+    def evaluate_execution_alerts(self, project_id: str):
+        """
+        Phase 11 Execution Intelligence Signals:
+        Scans ground execution telemetry, target misses, blockers, and stale updates.
+        """
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        cursor.execute("SELECT project_name FROM projects WHERE project_id = ?", (project_id,))
+        prow = cursor.fetchone()
+        pname = prow["project_name"] if prow else "Infrastructure Project"
+        today_str = datetime.utcnow().strftime("%Y-%m-%d")
+
+        cursor.execute("SELECT * FROM tasks WHERE project_id = ?", (project_id,))
+        tasks = [dict(r) for r in cursor.fetchall()]
+
+        cursor.execute("SELECT * FROM task_progress WHERE project_id = ? ORDER BY submitted_at DESC", (project_id,))
+        progress_records = [dict(r) for r in cursor.fetchall()]
+        conn.close()
+
+        if not tasks:
+            return []
+
+        alerts = []
+
+        # 1. Critical Path Blocker / Target Miss Alert
+        for t in tasks:
+            if t.get("is_critical") == 1 and (t.get("status") == "BLOCKED" or (t.get("planned_progress", 0) - t.get("actual_progress", 0) > 15.0)):
+                alerts.append({
+                    "alert_id": f"ALT-EXEC-CRIT-{t['task_id']}",
+                    "project_id": project_id,
+                    "project_name": pname,
+                    "severity": "CRITICAL",
+                    "trigger_type": "CRITICAL_PATH_BLOCK",
+                    "signal": f"Critical Path Stoppage: Task '{t['title']}' blocked/delayed. Threatens downstream milestones.",
+                    "detected_at": today_str,
+                    "risk_change": "+24 points",
+                    "status": "Escalated",
+                    "recommended_action": "Deploy emergency repair squad or activate Fast-Tracking recovery schedule immediately."
+                })
+
+        # 2. Stale Update Surveillance
+        now_dt = datetime.utcnow()
+        for t in tasks:
+            if t.get("status") in ["IN_PROGRESS", "BLOCKED"]:
+                t_progs = [p for p in progress_records if p["task_id"] == t["task_id"]]
+                is_stale = False
+                if not t_progs:
+                    is_stale = True
+                else:
+                    try:
+                        rep_dt = datetime.strptime(t_progs[0]["report_date"][:10], "%Y-%m-%d")
+                        if (now_dt - rep_dt).total_seconds() > 48 * 3600:
+                            is_stale = True
+                    except Exception:
+                        is_stale = True
+                if is_stale:
+                    alerts.append({
+                        "alert_id": f"ALT-EXEC-STALE-{t['task_id']}",
+                        "project_id": project_id,
+                        "project_name": pname,
+                        "severity": "MODERATE",
+                        "trigger_type": "STALE_UPDATE",
+                        "signal": f"Telemetry Blackout: No progress recorded for active task '{t['title']}' in >48 hours.",
+                        "detected_at": today_str,
+                        "risk_change": "+8 points",
+                        "status": "Requires Review",
+                        "recommended_action": "Issue automated reminder to assigned Field Supervisor and inspect site."
+                    })
+
+        return alerts
+

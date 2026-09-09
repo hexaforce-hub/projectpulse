@@ -199,6 +199,10 @@ class DatabaseClient:
                 "items": items
             }
 
+    def get_project_by_id(self, project_id, include_shap=False):
+        """Alias for get_project."""
+        return self.get_project(project_id, include_shap=include_shap)
+
     def get_project(self, project_id, include_shap=False):
         """Returns single complete Project entity with child milestones conforming to DATA_CONTRACT.md."""
         lookup_id = "PRJ-SYN-000001" if project_id == "PRJ-DEMO-001" else project_id
@@ -567,8 +571,8 @@ class DatabaseClient:
             cursor.execute(sql, params)
             return [dict(r) for r in cursor.fetchall()]
 
-    def update_task(self, task_id: str, status: str = None, remarks: str = None, evidence_url: str = None, completed_at: str = None):
-        """Updates operational task execution status and evidence."""
+    def update_task(self, task_id: str, status: str = None, remarks: str = None, evidence_url: str = None, completed_at: str = None, completed_quantity: float = None, actual_progress: float = None, verification_status: str = None, actual_start: str = None, actual_end: str = None):
+        """Updates operational task execution status, telemetry and evidence."""
         with self._get_connection() as conn:
             cursor = conn.cursor()
             updates = []
@@ -585,6 +589,21 @@ class DatabaseClient:
             if completed_at is not None:
                 updates.append("completed_at = ?")
                 params.append(completed_at)
+            if completed_quantity is not None:
+                updates.append("completed_quantity = ?")
+                params.append(completed_quantity)
+            if actual_progress is not None:
+                updates.append("actual_progress = ?")
+                params.append(actual_progress)
+            if verification_status is not None:
+                updates.append("verification_status = ?")
+                params.append(verification_status)
+            if actual_start is not None:
+                updates.append("actual_start = ?")
+                params.append(actual_start)
+            if actual_end is not None:
+                updates.append("actual_end = ?")
+                params.append(actual_end)
                 
             if not updates:
                 return None
@@ -747,4 +766,265 @@ class DatabaseClient:
             cursor = conn.cursor()
             cursor.execute("SELECT project_id FROM project_assignments WHERE user_id = ? AND status = 'ACTIVE'", (user_id,))
             return [r["project_id"] for r in cursor.fetchall()]
+
+    # -------------------------------------------------------------
+    # Phase 11: Execution Plans, Work Packages, Graph & Telemetry
+    # -------------------------------------------------------------
+    def get_execution_plan(self, project_id: str):
+        """Retrieves the latest execution plan for a project."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM execution_plans WHERE project_id = ? ORDER BY version DESC LIMIT 1", (project_id,))
+            row = cursor.fetchone()
+            return dict(row) if row else None
+
+    def save_execution_plan(self, plan_dict: dict):
+        """Creates or updates a project execution plan."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT OR REPLACE INTO execution_plans (
+                    plan_id, project_id, version, status, generated_by, approved_by,
+                    approved_at, source_basis, confidence_score, summary, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                plan_dict["plan_id"], plan_dict["project_id"], plan_dict.get("version", 1),
+                plan_dict.get("status", "DRAFT"), plan_dict.get("generated_by", "AI_PIPELINE"),
+                plan_dict.get("approved_by"), plan_dict.get("approved_at"),
+                plan_dict.get("source_basis", "DOCUMENT_EXTRACTED"),
+                plan_dict.get("confidence_score", 0.88), plan_dict.get("summary", ""),
+                plan_dict.get("created_at", datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"))
+            ))
+            conn.commit()
+            return plan_dict
+
+    def approve_execution_plan(self, plan_id: str, user_id: str):
+        """Approves a plan and unlocks all associated tasks for execution."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            now_iso = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+            cursor.execute("""
+                UPDATE execution_plans
+                SET status = 'APPROVED', approved_by = ?, approved_at = ?
+                WHERE plan_id = ?
+            """, (user_id, now_iso, plan_id))
+            cursor.execute("""
+                UPDATE tasks
+                SET approval_status = 'APPROVED'
+                WHERE project_id = (SELECT project_id FROM execution_plans WHERE plan_id = ?)
+            """, (plan_id,))
+            conn.commit()
+            cursor.execute("SELECT * FROM execution_plans WHERE plan_id = ?", (plan_id,))
+            row = cursor.fetchone()
+            return dict(row) if row else None
+
+    def list_work_packages(self, project_id: str, plan_id: str = None):
+        """Returns work packages belonging to a project."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            if plan_id:
+                cursor.execute("SELECT * FROM work_packages WHERE project_id = ? AND plan_id = ? ORDER BY code ASC", (project_id, plan_id))
+            else:
+                cursor.execute("SELECT * FROM work_packages WHERE project_id = ? ORDER BY code ASC", (project_id,))
+            return [dict(r) for r in cursor.fetchall()]
+
+    def create_work_package(self, wp: dict):
+        """Registers a new work package."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT OR REPLACE INTO work_packages (
+                    package_id, project_id, plan_id, code, name, description, weightage_pct,
+                    planned_start, planned_end, actual_start, actual_end, status, site_id
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                wp["package_id"], wp["project_id"], wp.get("plan_id"),
+                wp["code"], wp["name"], wp.get("description", ""),
+                wp.get("weightage_pct", 0.0), wp.get("planned_start"), wp.get("planned_end"),
+                wp.get("actual_start"), wp.get("actual_end"), wp.get("status", "NOT_STARTED"),
+                wp.get("site_id")
+            ))
+            conn.commit()
+            return wp
+
+    def get_task_by_id(self, task_id: str):
+        """Fetches single task by ID with project and package metadata."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT t.*, p.project_name, w.name as work_package_name
+                FROM tasks t
+                JOIN projects p ON t.project_id = p.project_id
+                LEFT JOIN work_packages w ON t.work_package_id = w.package_id
+                WHERE t.task_id = ?
+            """, (task_id,))
+            row = cursor.fetchone()
+            return dict(row) if row else None
+
+    def create_task(self, t: dict):
+        """Creates a new execution task with targets and source attribution."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT OR REPLACE INTO tasks (
+                    task_id, project_id, work_package_id, milestone_id, site_id, assigned_to,
+                    task_type, title, description, priority, status, due_date,
+                    planned_start, planned_end, actual_start, actual_end,
+                    target_quantity, completed_quantity, unit, target_period,
+                    planned_progress, actual_progress, source, source_document,
+                    ai_generated, ai_confidence, approval_status, verification_status,
+                    total_float, is_critical
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                t["task_id"], t["project_id"], t.get("work_package_id"), t.get("milestone_id"),
+                t.get("site_id"), t["assigned_to"], t.get("task_type", "CIVIL_CONSTRUCTION"),
+                t["title"], t.get("description", ""), t.get("priority", "MEDIUM"),
+                t.get("status", "TODO"), t.get("due_date", ""),
+                t.get("planned_start"), t.get("planned_end"), t.get("actual_start"), t.get("actual_end"),
+                t.get("target_quantity", 0.0), t.get("completed_quantity", 0.0),
+                t.get("unit", "units"), t.get("target_period", "DAILY"),
+                t.get("planned_progress", 0.0), t.get("actual_progress", 0.0),
+                t.get("source", "HUMAN"), t.get("source_document"),
+                t.get("ai_generated", 0), t.get("ai_confidence", 1.0),
+                t.get("approval_status", "APPROVED"), t.get("verification_status", "UNVERIFIED"),
+                t.get("total_float", 0), t.get("is_critical", 0)
+            ))
+            conn.commit()
+            return t
+
+    def list_task_dependencies(self, project_id: str):
+        """Returns all dependency relationships in a project."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT d.*, pt.title as predecessor_title, st.title as successor_title
+                FROM task_dependencies d
+                JOIN tasks pt ON d.predecessor_task_id = pt.task_id
+                JOIN tasks st ON d.successor_task_id = st.task_id
+                WHERE d.project_id = ?
+            """, (project_id,))
+            return [dict(r) for r in cursor.fetchall()]
+
+    def create_task_dependency(self, dep: dict):
+        """Registers a predecessor-successor relationship."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT OR REPLACE INTO task_dependencies (
+                    dependency_id, project_id, predecessor_task_id, successor_task_id,
+                    dependency_type, lag_days, is_critical
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (
+                dep["dependency_id"], dep["project_id"], dep["predecessor_task_id"],
+                dep["successor_task_id"], dep.get("dependency_type", "FS"),
+                dep.get("lag_days", 0), dep.get("is_critical", 0)
+            ))
+            conn.commit()
+            return dep
+
+    def delete_task_dependency(self, dependency_id: str):
+        """Removes a dependency."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM task_dependencies WHERE dependency_id = ?", (dependency_id,))
+            conn.commit()
+            return {"status": "deleted", "dependency_id": dependency_id}
+
+    def submit_task_progress(self, prog: dict):
+        """Logs execution progress from field staff."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO task_progress (
+                    progress_id, task_id, project_id, report_date, quantity_completed,
+                    unit, progress_pct, notes, evidence_url, submitted_by, submitted_at,
+                    verification_status, blocker_flag, blocker_category
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                prog["progress_id"], prog["task_id"], prog["project_id"],
+                prog["report_date"], prog.get("quantity_completed", 0.0),
+                prog.get("unit", "units"), prog.get("progress_pct", 0.0),
+                prog.get("notes", ""), prog.get("evidence_url"),
+                prog["submitted_by"], prog.get("submitted_at", datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")),
+                prog.get("verification_status", "PENDING"),
+                prog.get("blocker_flag", 0), prog.get("blocker_category")
+            ))
+            conn.commit()
+            return prog
+
+    def list_task_progress(self, task_id: str = None, project_id: str = None, verification_status: str = None):
+        """Lists historical progress reports with optional filters."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            clauses = ["1=1"]
+            params = []
+            if task_id:
+                clauses.append("tp.task_id = ?")
+                params.append(task_id)
+            if project_id:
+                clauses.append("tp.project_id = ?")
+                params.append(project_id)
+            if verification_status:
+                clauses.append("tp.verification_status = ?")
+                params.append(verification_status)
+            cursor.execute(f"""
+                SELECT tp.*, t.title as task_title, u.name as submitted_by_name, v.name as verified_by_name
+                FROM task_progress tp
+                JOIN tasks t ON tp.task_id = t.task_id
+                LEFT JOIN users u ON tp.submitted_by = u.user_id
+                LEFT JOIN users v ON tp.verified_by = v.user_id
+                WHERE {' AND '.join(clauses)}
+                ORDER BY tp.submitted_at DESC
+            """, params)
+            return [dict(r) for r in cursor.fetchall()]
+
+    def verify_task_progress(self, progress_id: str, user_id: str, verification_status: str, rejection_reason: str = None):
+        """Verifies or rejects a submitted progress report."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            now_iso = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+            cursor.execute("""
+                UPDATE task_progress
+                SET verification_status = ?, verified_by = ?, verified_at = ?, rejection_reason = ?
+                WHERE progress_id = ?
+            """, (verification_status, user_id, now_iso, rejection_reason, progress_id))
+            
+            if verification_status == "VERIFIED":
+                cursor.execute("SELECT task_id, quantity_completed, progress_pct FROM task_progress WHERE progress_id = ?", (progress_id,))
+                row = cursor.fetchone()
+                if row:
+                    tid, qty, pct = row["task_id"], row["quantity_completed"], row["progress_pct"]
+                    cursor.execute("""
+                        UPDATE tasks
+                        SET completed_quantity = completed_quantity + ?,
+                            actual_progress = MAX(actual_progress, ?),
+                            verification_status = 'VERIFIED'
+                        WHERE task_id = ?
+                    """, (qty, pct, tid))
+            conn.commit()
+            cursor.execute("SELECT * FROM task_progress WHERE progress_id = ?", (progress_id,))
+            row = cursor.fetchone()
+            return dict(row) if row else None
+
+    def list_sites(self, project_id: str):
+        """Returns site segments for a project."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM sites WHERE project_id = ? ORDER BY site_id ASC", (project_id,))
+            return [dict(r) for r in cursor.fetchall()]
+
+    def create_site(self, s: dict):
+        """Registers a project site segment."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT OR REPLACE INTO sites (site_id, project_id, name, location, latitude, longitude, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (
+                s["site_id"], s["project_id"], s["name"],
+                s.get("location", ""), s.get("latitude"), s.get("longitude"),
+                s.get("status", "ACTIVE")
+            ))
+            conn.commit()
+            return s
 
