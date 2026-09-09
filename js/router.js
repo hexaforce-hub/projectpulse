@@ -22,7 +22,8 @@ const Router = {
     directives: window.DirectivesView,
     onboarding: window.ProjectOnboardingView,
     execution: window.ExecutionControlView,
-    "field-officer": window.FieldOfficerDesk
+    "field-officer": window.FieldOfficerDesk,
+    reports: window.ReportIntelligenceView
   },
 
   init() {
@@ -113,6 +114,10 @@ const Router = {
     } else if (rootRoute === "field-officer") {
       if (window.FieldOfficerDesk) window.FieldOfficerDesk.render(mount);
       window.AppShell.updateActiveNav("field-officer");
+    } else if (rootRoute === "reports") {
+      mount.innerHTML = window.ReportIntelligenceView.render();
+      if (window.ReportIntelligenceView.postRender) window.ReportIntelligenceView.postRender();
+      window.AppShell.updateActiveNav("reports");
     } else {
       // Fallback to Dashboard
       window.location.hash = "#/dashboard";

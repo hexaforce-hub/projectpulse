@@ -39,6 +39,7 @@ from ml.explainer import ProjectPulseExplainer
 from src.ml.prediction import PredictionEngine
 from src.ml.schemas import ProjectSnapshot, PredictionResult, PortfolioSummary
 from backend.scenario_routes import router as scenario_router
+from backend.reports_routes import router as reports_router
 from backend.auth import (
     LoginRequest, SwitchRoleRequest, AuthUserResponse,
     authenticate_user, get_current_user_from_header,
@@ -63,8 +64,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include Phase 7 Scenario Router
+# Include Phase 7 Scenario Router & Phase 12 Reports Router
 app.include_router(scenario_router)
+app.include_router(reports_router)
 
 # Initialize database client & ML engines (lazy-cached)
 db_client = DatabaseClient()

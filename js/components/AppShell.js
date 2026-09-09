@@ -65,6 +65,12 @@ const AppShell = {
                     <span class="text-base">📁</span>
                     <span class="sidebar-text">Projects Registry</span>
                   </a>
+
+                  <a href="#/reports" data-route="reports" class="nav-item flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-blue-900 bg-blue-50/60 hover:bg-blue-100/60 border border-blue-200/50">
+                    <span class="text-base">📑</span>
+                    <span class="sidebar-text">Report Intelligence</span>
+                    <span class="ml-auto text-[9px] bg-blue-700 text-white font-bold px-1.5 py-0.5 rounded-full">FLASH</span>
+                  </a>
                 </div>
               </div>
 
@@ -645,6 +651,7 @@ const AppShell = {
           heading: "National Command",
           items: [
             { route: "dashboard", icon: "📊", label: "National Command Center" },
+            { route: "reports", icon: "📑", label: "Report Intelligence", badge: "Flash" },
             { route: "execution", icon: "⏱️", label: "National CPM Control", badge: "CPM" },
             { route: "directives", icon: "📜", label: "Directives & Escalations", badge: "Action" },
             { route: "portfolio-matrix", icon: "🎯", label: "Risk vs Outlay Matrix" },
@@ -676,6 +683,7 @@ const AppShell = {
           heading: "Ministry Command",
           items: [
             { route: "ministry", icon: "🏛️", label: "Ministry Command Center", badge: "MoRTH" },
+            { route: "reports", icon: "📑", label: "Report Intelligence", badge: "Flash" },
             { route: "execution", icon: "⏱️", label: "Corridor CPM Control", badge: "CPM" },
             { route: "directives", icon: "📜", label: "Downward Directives" },
             { route: "projects", icon: "📁", label: "Ministry Projects (4,113)" }
@@ -798,6 +806,7 @@ const AppShell = {
         {
           heading: "Predictive Analytics Suite",
           items: [
+            { route: "reports", icon: "📑", label: "Report Intelligence", badge: "Flash" },
             { route: "analytics", icon: "📈", label: "Portfolio Analytics", badge: "ML" },
             { route: "execution", icon: "⏱️", label: "CPM Execution Analysis", badge: "CPM" },
             { route: "dashboard", icon: "📊", label: "National Command Center" },
@@ -823,6 +832,7 @@ const AppShell = {
         heading: "Command & Portfolios",
         items: [
           { route: "dashboard", icon: "📊", label: "National Command Center" },
+          { route: "reports", icon: "📑", label: "Report Intelligence", badge: "Flash" },
           { route: "execution", icon: "⏱️", label: "Execution & CPM Control", badge: "Live CPM" },
           { route: "onboarding", icon: "⚡", label: "AI Project Onboarding & WBS", badge: "AI" },
           { route: "ministry", icon: "🏛️", label: "Ministry Command Center" },
@@ -928,6 +938,7 @@ const AppShell = {
         "dashboard": "National Command Center",
         "portfolio-matrix": "Risk vs Outlay Matrix",
         "projects": "Projects Registry",
+        "reports": "Report Intelligence Center (PAIMANA Flash Reports)",
         "early-warnings": "Early Warning Radar",
         "bottlenecks": "Bottlenecks Intel",
         "analytics": "Portfolio Analytics",

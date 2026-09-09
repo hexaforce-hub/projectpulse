@@ -15,9 +15,11 @@ import sqlite3
 from datetime import datetime
 from pathlib import Path
 
+from database.reports_client import ReportsClientMixin
+
 DEFAULT_DB_PATH = Path(__file__).parent.parent / "data" / "projectpulse.db"
 
-class DatabaseClient:
+class DatabaseClient(ReportsClientMixin):
     def __init__(self, db_path=None):
         self.db_path = str(db_path or DEFAULT_DB_PATH)
         
