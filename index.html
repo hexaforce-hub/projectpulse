@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PROJECTPULSE — Infrastructure Project Risk Intelligence (MoSPI • IPMD / PAIMANA)</title>
+  
+  <!-- Primary Google Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN for utility classes -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Chart.js for data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Official Government Digital Design System -->
+  <link rel="stylesheet" href="css/design-system.css">
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased selection:bg-blue-100">
+
+  <!-- Application Shell Root Container -->
+  <div id="app-root">
+    <div class="h-screen flex items-center justify-center text-slate-400 text-sm">
+      Loading ProjectPulse Intelligence Platform...
+    </div>
+  </div>
+
+  <!-- Modular Scripts in Strict Dependency Order -->
+  <script src="js/types.js"></script>
+  <script src="js/formatters.js"></script>
+  <script src="js/mockData.js"></script>
+  <script src="js/api-client.js"></script>
+  <script src="js/components/common.js"></script>
+  <script src="js/components/DashboardView.js"></script>
+  <script src="js/components/ProjectsView.js"></script>
+  <script src="js/components/ProjectDetailView.js"></script>
+  <script src="js/components/EarlyWarningsView.js"></script>
+  <script src="js/components/AnalyticsView.js"></script>
+  <script src="js/components/SettingsView.js"></script>
+  <script src="js/components/AppShell.js"></script>
+  <script src="js/router.js"></script>
+
+  <!-- Application Bootstrap -->
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      console.log("[ProjectPulse] Booting Government Digital Interface...");
+      window.AppShell.render();
+      if (window.APIClient) await window.APIClient.init();
+      window.Router.init();
+    });
+  </script>
+</body>
+</html>

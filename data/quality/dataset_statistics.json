@@ -1,0 +1,1163 @@
+{
+  "timestamp": "2026-09-07T13:24:46.338065",
+  "profiler_version": "v0.2.0",
+  "dataset_name": "ProjectPulse PAIMANA-Modeled Clean Baseline",
+  "dataset_status": "SYNTHETIC",
+  "total_records": 10000,
+  "numeric_profiles": {
+    "original_cost_cr": {
+      "count": 10000,
+      "mean": 1403.98,
+      "std": 1616.13,
+      "min": 150.0,
+      "p25": 470.12,
+      "p50_median": 895.91,
+      "p75": 1717.11,
+      "p90": 3063.48,
+      "p95": 4253.23,
+      "p99": 7688.83,
+      "max": 27470.96
+    },
+    "revised_cost_cr": {
+      "count": 10000,
+      "mean": 1639.49,
+      "std": 1895.7,
+      "min": 150.0,
+      "p25": 541.66,
+      "p50_median": 1033.2,
+      "p75": 2008.38,
+      "p90": 3581.68,
+      "p95": 4994.07,
+      "p99": 9104.88,
+      "max": 33109.18
+    },
+    "cost_overrun_cr": {
+      "count": 10000,
+      "mean": 235.5,
+      "std": 339.9,
+      "min": 0.0,
+      "p25": 50.45,
+      "p50_median": 126.2,
+      "p75": 290.97,
+      "p90": 558.95,
+      "p95": 823.54,
+      "p99": 1643.34,
+      "max": 7319.2
+    },
+    "cost_growth_pct": {
+      "count": 10000,
+      "mean": 16.72,
+      "std": 9.64,
+      "min": 0.0,
+      "p25": 8.3,
+      "p50_median": 17.01,
+      "p75": 24.6,
+      "p90": 29.35,
+      "p95": 31.59,
+      "p99": 35.94,
+      "max": 48.58
+    },
+    "cumulative_expenditure_cr": {
+      "count": 10000,
+      "mean": 1470.78,
+      "std": 1749.92,
+      "min": 11.61,
+      "p25": 470.58,
+      "p50_median": 919.55,
+      "p75": 1803.87,
+      "p90": 3240.35,
+      "p95": 4491.79,
+      "p99": 8611.41,
+      "max": 32494.63
+    },
+    "physical_progress_pct": {
+      "count": 10000,
+      "mean": 89.1,
+      "std": 16.77,
+      "min": 21.1,
+      "p25": 83.92,
+      "p50_median": 100.0,
+      "p75": 100.0,
+      "p90": 100.0,
+      "p95": 100.0,
+      "p99": 100.0,
+      "max": 100.0
+    },
+    "financial_progress_pct": {
+      "count": 10000,
+      "mean": 89.72,
+      "std": 15.21,
+      "min": 5.6,
+      "p25": 86.38,
+      "p50_median": 97.61,
+      "p75": 98.62,
+      "p90": 99.43,
+      "p95": 99.7,
+      "p99": 99.94,
+      "max": 100.0
+    },
+    "progress_decoupling_gap": {
+      "count": 10000,
+      "mean": 0.62,
+      "std": 4.71,
+      "min": -20.28,
+      "p25": -2.11,
+      "p50_median": -0.86,
+      "p75": 2.61,
+      "p90": 7.82,
+      "p95": 10.36,
+      "p99": 14.85,
+      "max": 26.87
+    },
+    "planned_duration_months": {
+      "count": 10000,
+      "mean": 48.09,
+      "std": 14.16,
+      "min": 24.0,
+      "p25": 36.0,
+      "p50_median": 48.0,
+      "p75": 60.0,
+      "p90": 68.0,
+      "p95": 70.0,
+      "p99": 72.0,
+      "max": 72.0
+    },
+    "revised_duration_months": {
+      "count": 10000,
+      "mean": 60.08,
+      "std": 18.83,
+      "min": 24.0,
+      "p25": 45.0,
+      "p50_median": 60.0,
+      "p75": 75.0,
+      "p90": 86.0,
+      "p95": 92.0,
+      "p99": 100.0,
+      "max": 115.0
+    },
+    "schedule_slippage_months": {
+      "count": 10000,
+      "mean": 11.99,
+      "std": 7.62,
+      "min": 0.0,
+      "p25": 6.0,
+      "p50_median": 11.0,
+      "p75": 17.0,
+      "p90": 23.0,
+      "p95": 26.0,
+      "p99": 32.0,
+      "max": 43.0
+    },
+    "schedule_revisions_count": {
+      "count": 10000,
+      "mean": 1.93,
+      "std": 1.01,
+      "min": 0.0,
+      "p25": 1.0,
+      "p50_median": 2.0,
+      "p75": 3.0,
+      "p90": 3.0,
+      "p95": 4.0,
+      "p99": 4.0,
+      "max": 5.0
+    },
+    "milestone_count": {
+      "count": 10000,
+      "mean": 10.0,
+      "std": 0.0,
+      "min": 10.0,
+      "p25": 10.0,
+      "p50_median": 10.0,
+      "p75": 10.0,
+      "p90": 10.0,
+      "p95": 10.0,
+      "p99": 10.0,
+      "max": 10.0
+    },
+    "milestones_completed": {
+      "count": 10000,
+      "mean": 8.51,
+      "std": 1.98,
+      "min": 2.0,
+      "p25": 7.0,
+      "p50_median": 10.0,
+      "p75": 10.0,
+      "p90": 10.0,
+      "p95": 10.0,
+      "p99": 10.0,
+      "max": 10.0
+    },
+    "milestones_delayed": {
+      "count": 10000,
+      "mean": 7.49,
+      "std": 2.68,
+      "min": 0.0,
+      "p25": 6.0,
+      "p50_median": 8.0,
+      "p75": 9.0,
+      "p90": 10.0,
+      "p95": 10.0,
+      "p99": 10.0,
+      "max": 10.0
+    },
+    "milestones_at_risk": {
+      "count": 10000,
+      "mean": 0.05,
+      "std": 0.21,
+      "min": 0.0,
+      "p25": 0.0,
+      "p50_median": 0.0,
+      "p75": 0.0,
+      "p90": 0.0,
+      "p95": 0.0,
+      "p99": 1.0,
+      "max": 1.0
+    },
+    "milestone_delay_rate": {
+      "count": 10000,
+      "mean": 0.75,
+      "std": 0.27,
+      "min": 0.0,
+      "p25": 0.6,
+      "p50_median": 0.8,
+      "p75": 0.9,
+      "p90": 1.0,
+      "p95": 1.0,
+      "p99": 1.0,
+      "max": 1.0
+    },
+    "target_schedule_delay_months": {
+      "count": 10000,
+      "mean": 11.99,
+      "std": 7.62,
+      "min": 0.0,
+      "p25": 6.0,
+      "p50_median": 11.0,
+      "p75": 17.0,
+      "p90": 23.0,
+      "p95": 26.0,
+      "p99": 32.0,
+      "max": 43.0
+    },
+    "target_cost_overrun_pct": {
+      "count": 10000,
+      "mean": 16.72,
+      "std": 9.64,
+      "min": 0.0,
+      "p25": 8.3,
+      "p50_median": 17.01,
+      "p75": 24.6,
+      "p90": 29.35,
+      "p95": 31.59,
+      "p99": 35.94,
+      "max": 48.58
+    },
+    "overall_risk_score": {
+      "count": 10000,
+      "mean": 40.57,
+      "std": 19.17,
+      "min": 0.0,
+      "p25": 27.0,
+      "p50_median": 41.6,
+      "p75": 55.1,
+      "p90": 65.0,
+      "p95": 70.2,
+      "p99": 79.1,
+      "max": 90.3
+    }
+  },
+  "categorical_profiles": {
+    "ministry": {
+      "cardinality": 9,
+      "top_categories": [
+        {
+          "category": "Ministry of Road Transport & Highways",
+          "count": 4113,
+          "share_pct": 41.13
+        },
+        {
+          "category": "Ministry of Railways",
+          "count": 2402,
+          "share_pct": 24.02
+        },
+        {
+          "category": "Ministry of Power",
+          "count": 1209,
+          "share_pct": 12.09
+        },
+        {
+          "category": "Ministry of Petroleum & Natural Gas",
+          "count": 819,
+          "share_pct": 8.19
+        },
+        {
+          "category": "Ministry of Housing & Urban Affairs",
+          "count": 600,
+          "share_pct": 6.0
+        },
+        {
+          "category": "Ministry of Jal Shakti",
+          "count": 329,
+          "share_pct": 3.29
+        },
+        {
+          "category": "Ministry of Ports, Shipping & Waterways",
+          "count": 222,
+          "share_pct": 2.22
+        },
+        {
+          "category": "Ministry of Civil Aviation",
+          "count": 206,
+          "share_pct": 2.06
+        },
+        {
+          "category": "Ministry of Coal",
+          "count": 100,
+          "share_pct": 1.0
+        }
+      ],
+      "all_categories": [
+        {
+          "category": "Ministry of Road Transport & Highways",
+          "count": 4113,
+          "share_pct": 41.13
+        },
+        {
+          "category": "Ministry of Railways",
+          "count": 2402,
+          "share_pct": 24.02
+        },
+        {
+          "category": "Ministry of Power",
+          "count": 1209,
+          "share_pct": 12.09
+        },
+        {
+          "category": "Ministry of Petroleum & Natural Gas",
+          "count": 819,
+          "share_pct": 8.19
+        },
+        {
+          "category": "Ministry of Housing & Urban Affairs",
+          "count": 600,
+          "share_pct": 6.0
+        },
+        {
+          "category": "Ministry of Jal Shakti",
+          "count": 329,
+          "share_pct": 3.29
+        },
+        {
+          "category": "Ministry of Ports, Shipping & Waterways",
+          "count": 222,
+          "share_pct": 2.22
+        },
+        {
+          "category": "Ministry of Civil Aviation",
+          "count": 206,
+          "share_pct": 2.06
+        },
+        {
+          "category": "Ministry of Coal",
+          "count": 100,
+          "share_pct": 1.0
+        }
+      ]
+    },
+    "sector": {
+      "cardinality": 9,
+      "top_categories": [
+        {
+          "category": "Roads & Highways",
+          "count": 4113,
+          "share_pct": 41.13
+        },
+        {
+          "category": "Railways",
+          "count": 2402,
+          "share_pct": 24.02
+        },
+        {
+          "category": "Power",
+          "count": 1209,
+          "share_pct": 12.09
+        },
+        {
+          "category": "Petroleum & Natural Gas",
+          "count": 819,
+          "share_pct": 8.19
+        },
+        {
+          "category": "Urban Transit",
+          "count": 600,
+          "share_pct": 6.0
+        },
+        {
+          "category": "Water Resources",
+          "count": 329,
+          "share_pct": 3.29
+        },
+        {
+          "category": "Ports & Shipping",
+          "count": 222,
+          "share_pct": 2.22
+        },
+        {
+          "category": "Civil Aviation",
+          "count": 206,
+          "share_pct": 2.06
+        },
+        {
+          "category": "Coal Infrastructure",
+          "count": 100,
+          "share_pct": 1.0
+        }
+      ],
+      "all_categories": [
+        {
+          "category": "Roads & Highways",
+          "count": 4113,
+          "share_pct": 41.13
+        },
+        {
+          "category": "Railways",
+          "count": 2402,
+          "share_pct": 24.02
+        },
+        {
+          "category": "Power",
+          "count": 1209,
+          "share_pct": 12.09
+        },
+        {
+          "category": "Petroleum & Natural Gas",
+          "count": 819,
+          "share_pct": 8.19
+        },
+        {
+          "category": "Urban Transit",
+          "count": 600,
+          "share_pct": 6.0
+        },
+        {
+          "category": "Water Resources",
+          "count": 329,
+          "share_pct": 3.29
+        },
+        {
+          "category": "Ports & Shipping",
+          "count": 222,
+          "share_pct": 2.22
+        },
+        {
+          "category": "Civil Aviation",
+          "count": 206,
+          "share_pct": 2.06
+        },
+        {
+          "category": "Coal Infrastructure",
+          "count": 100,
+          "share_pct": 1.0
+        }
+      ]
+    },
+    "state": {
+      "cardinality": 15,
+      "top_categories": [
+        {
+          "category": "Uttar Pradesh",
+          "count": 1261,
+          "share_pct": 12.61
+        },
+        {
+          "category": "Maharashtra",
+          "count": 1092,
+          "share_pct": 10.92
+        },
+        {
+          "category": "Gujarat",
+          "count": 879,
+          "share_pct": 8.79
+        },
+        {
+          "category": "Karnataka",
+          "count": 822,
+          "share_pct": 8.22
+        },
+        {
+          "category": "Tamil Nadu",
+          "count": 791,
+          "share_pct": 7.91
+        },
+        {
+          "category": "Andhra Pradesh",
+          "count": 715,
+          "share_pct": 7.15
+        },
+        {
+          "category": "Madhya Pradesh",
+          "count": 698,
+          "share_pct": 6.98
+        },
+        {
+          "category": "Rajasthan",
+          "count": 693,
+          "share_pct": 6.93
+        },
+        {
+          "category": "Odisha",
+          "count": 624,
+          "share_pct": 6.24
+        },
+        {
+          "category": "Telangana",
+          "count": 594,
+          "share_pct": 5.94
+        }
+      ],
+      "all_categories": [
+        {
+          "category": "Uttar Pradesh",
+          "count": 1261,
+          "share_pct": 12.61
+        },
+        {
+          "category": "Maharashtra",
+          "count": 1092,
+          "share_pct": 10.92
+        },
+        {
+          "category": "Gujarat",
+          "count": 879,
+          "share_pct": 8.79
+        },
+        {
+          "category": "Karnataka",
+          "count": 822,
+          "share_pct": 8.22
+        },
+        {
+          "category": "Tamil Nadu",
+          "count": 791,
+          "share_pct": 7.91
+        },
+        {
+          "category": "Andhra Pradesh",
+          "count": 715,
+          "share_pct": 7.15
+        },
+        {
+          "category": "Madhya Pradesh",
+          "count": 698,
+          "share_pct": 6.98
+        },
+        {
+          "category": "Rajasthan",
+          "count": 693,
+          "share_pct": 6.93
+        },
+        {
+          "category": "Odisha",
+          "count": 624,
+          "share_pct": 6.24
+        },
+        {
+          "category": "Telangana",
+          "count": 594,
+          "share_pct": 5.94
+        },
+        {
+          "category": "Bihar",
+          "count": 481,
+          "share_pct": 4.81
+        },
+        {
+          "category": "West Bengal",
+          "count": 477,
+          "share_pct": 4.77
+        },
+        {
+          "category": "Assam",
+          "count": 373,
+          "share_pct": 3.73
+        },
+        {
+          "category": "Jharkhand",
+          "count": 300,
+          "share_pct": 3.0
+        },
+        {
+          "category": "Chhattisgarh",
+          "count": 200,
+          "share_pct": 2.0
+        }
+      ]
+    },
+    "region": {
+      "cardinality": 6,
+      "top_categories": [
+        {
+          "category": "South",
+          "count": 2922,
+          "share_pct": 29.22
+        },
+        {
+          "category": "West",
+          "count": 1971,
+          "share_pct": 19.71
+        },
+        {
+          "category": "North",
+          "count": 1954,
+          "share_pct": 19.54
+        },
+        {
+          "category": "East",
+          "count": 1882,
+          "share_pct": 18.82
+        },
+        {
+          "category": "Central",
+          "count": 898,
+          "share_pct": 8.98
+        },
+        {
+          "category": "Northeast",
+          "count": 373,
+          "share_pct": 3.73
+        }
+      ],
+      "all_categories": [
+        {
+          "category": "South",
+          "count": 2922,
+          "share_pct": 29.22
+        },
+        {
+          "category": "West",
+          "count": 1971,
+          "share_pct": 19.71
+        },
+        {
+          "category": "North",
+          "count": 1954,
+          "share_pct": 19.54
+        },
+        {
+          "category": "East",
+          "count": 1882,
+          "share_pct": 18.82
+        },
+        {
+          "category": "Central",
+          "count": 898,
+          "share_pct": 8.98
+        },
+        {
+          "category": "Northeast",
+          "count": 373,
+          "share_pct": 3.73
+        }
+      ]
+    },
+    "implementing_agency": {
+      "cardinality": 9,
+      "top_categories": [
+        {
+          "category": "National Highways Authority of India (NHAI)",
+          "count": 4113,
+          "share_pct": 41.13
+        },
+        {
+          "category": "Railway Infrastructure Board / DFCCIL",
+          "count": 2402,
+          "share_pct": 24.02
+        },
+        {
+          "category": "National Thermal & Hydro Power Corp (NTPC/NHPC)",
+          "count": 1209,
+          "share_pct": 12.09
+        },
+        {
+          "category": "Gas & Oil Infrastructure Authority (GAIL/IOCL)",
+          "count": 819,
+          "share_pct": 8.19
+        },
+        {
+          "category": "Metro Rail Infrastructure SPV",
+          "count": 600,
+          "share_pct": 6.0
+        },
+        {
+          "category": "National Water Development Agency",
+          "count": 329,
+          "share_pct": 3.29
+        },
+        {
+          "category": "Major Ports Authority",
+          "count": 222,
+          "share_pct": 2.22
+        },
+        {
+          "category": "Airports Authority of India (AAI)",
+          "count": 206,
+          "share_pct": 2.06
+        },
+        {
+          "category": "Coal Infrastructure PSU",
+          "count": 100,
+          "share_pct": 1.0
+        }
+      ],
+      "all_categories": [
+        {
+          "category": "National Highways Authority of India (NHAI)",
+          "count": 4113,
+          "share_pct": 41.13
+        },
+        {
+          "category": "Railway Infrastructure Board / DFCCIL",
+          "count": 2402,
+          "share_pct": 24.02
+        },
+        {
+          "category": "National Thermal & Hydro Power Corp (NTPC/NHPC)",
+          "count": 1209,
+          "share_pct": 12.09
+        },
+        {
+          "category": "Gas & Oil Infrastructure Authority (GAIL/IOCL)",
+          "count": 819,
+          "share_pct": 8.19
+        },
+        {
+          "category": "Metro Rail Infrastructure SPV",
+          "count": 600,
+          "share_pct": 6.0
+        },
+        {
+          "category": "National Water Development Agency",
+          "count": 329,
+          "share_pct": 3.29
+        },
+        {
+          "category": "Major Ports Authority",
+          "count": 222,
+          "share_pct": 2.22
+        },
+        {
+          "category": "Airports Authority of India (AAI)",
+          "count": 206,
+          "share_pct": 2.06
+        },
+        {
+          "category": "Coal Infrastructure PSU",
+          "count": 100,
+          "share_pct": 1.0
+        }
+      ]
+    },
+    "project_type": {
+      "cardinality": 5,
+      "top_categories": [
+        {
+          "category": "Rehabilitation & Upgradation",
+          "count": 2062,
+          "share_pct": 20.62
+        },
+        {
+          "category": "Capacity Augmentation / 6-Laning",
+          "count": 2007,
+          "share_pct": 20.07
+        },
+        {
+          "category": "Strategic Interconnection",
+          "count": 1988,
+          "share_pct": 19.88
+        },
+        {
+          "category": "Corridor Modernization",
+          "count": 1980,
+          "share_pct": 19.8
+        },
+        {
+          "category": "Greenfield Construction",
+          "count": 1963,
+          "share_pct": 19.63
+        }
+      ],
+      "all_categories": [
+        {
+          "category": "Rehabilitation & Upgradation",
+          "count": 2062,
+          "share_pct": 20.62
+        },
+        {
+          "category": "Capacity Augmentation / 6-Laning",
+          "count": 2007,
+          "share_pct": 20.07
+        },
+        {
+          "category": "Strategic Interconnection",
+          "count": 1988,
+          "share_pct": 19.88
+        },
+        {
+          "category": "Corridor Modernization",
+          "count": 1980,
+          "share_pct": 19.8
+        },
+        {
+          "category": "Greenfield Construction",
+          "count": 1963,
+          "share_pct": 19.63
+        }
+      ]
+    },
+    "project_status": {
+      "cardinality": 5,
+      "top_categories": [
+        {
+          "category": "COMPLETED",
+          "count": 5409,
+          "share_pct": 54.09
+        },
+        {
+          "category": "DELAYED",
+          "count": 2352,
+          "share_pct": 23.52
+        },
+        {
+          "category": "CRITICAL",
+          "count": 1544,
+          "share_pct": 15.44
+        },
+        {
+          "category": "AT_RISK",
+          "count": 603,
+          "share_pct": 6.03
+        },
+        {
+          "category": "ON_TRACK",
+          "count": 92,
+          "share_pct": 0.92
+        }
+      ],
+      "all_categories": [
+        {
+          "category": "COMPLETED",
+          "count": 5409,
+          "share_pct": 54.09
+        },
+        {
+          "category": "DELAYED",
+          "count": 2352,
+          "share_pct": 23.52
+        },
+        {
+          "category": "CRITICAL",
+          "count": 1544,
+          "share_pct": 15.44
+        },
+        {
+          "category": "AT_RISK",
+          "count": 603,
+          "share_pct": 6.03
+        },
+        {
+          "category": "ON_TRACK",
+          "count": 92,
+          "share_pct": 0.92
+        }
+      ]
+    },
+    "project_stage": {
+      "cardinality": 2,
+      "top_categories": [
+        {
+          "category": "Commissioned",
+          "count": 5409,
+          "share_pct": 54.09
+        },
+        {
+          "category": "Execution",
+          "count": 4591,
+          "share_pct": 45.91
+        }
+      ],
+      "all_categories": [
+        {
+          "category": "Commissioned",
+          "count": 5409,
+          "share_pct": 54.09
+        },
+        {
+          "category": "Execution",
+          "count": 4591,
+          "share_pct": 45.91
+        }
+      ]
+    },
+    "primary_bottleneck": {
+      "cardinality": 10,
+      "top_categories": [
+        {
+          "category": "NONE",
+          "count": 3557,
+          "share_pct": 35.57
+        },
+        {
+          "category": "LAND_ACQUISITION",
+          "count": 1975,
+          "share_pct": 19.75
+        },
+        {
+          "category": "ENVIRONMENTAL_CLEARANCE",
+          "count": 992,
+          "share_pct": 9.92
+        },
+        {
+          "category": "FOREST_CLEARANCE",
+          "count": 838,
+          "share_pct": 8.38
+        },
+        {
+          "category": "CONTRACTOR",
+          "count": 662,
+          "share_pct": 6.62
+        },
+        {
+          "category": "PROCUREMENT",
+          "count": 611,
+          "share_pct": 6.11
+        },
+        {
+          "category": "UTILITY_SHIFTING",
+          "count": 474,
+          "share_pct": 4.74
+        },
+        {
+          "category": "DESIGN_CHANGE",
+          "count": 400,
+          "share_pct": 4.0
+        },
+        {
+          "category": "LEGAL_DISPUTE",
+          "count": 304,
+          "share_pct": 3.04
+        },
+        {
+          "category": "INTERDEPARTMENTAL_DEPENDENCY",
+          "count": 187,
+          "share_pct": 1.87
+        }
+      ],
+      "all_categories": [
+        {
+          "category": "NONE",
+          "count": 3557,
+          "share_pct": 35.57
+        },
+        {
+          "category": "LAND_ACQUISITION",
+          "count": 1975,
+          "share_pct": 19.75
+        },
+        {
+          "category": "ENVIRONMENTAL_CLEARANCE",
+          "count": 992,
+          "share_pct": 9.92
+        },
+        {
+          "category": "FOREST_CLEARANCE",
+          "count": 838,
+          "share_pct": 8.38
+        },
+        {
+          "category": "CONTRACTOR",
+          "count": 662,
+          "share_pct": 6.62
+        },
+        {
+          "category": "PROCUREMENT",
+          "count": 611,
+          "share_pct": 6.11
+        },
+        {
+          "category": "UTILITY_SHIFTING",
+          "count": 474,
+          "share_pct": 4.74
+        },
+        {
+          "category": "DESIGN_CHANGE",
+          "count": 400,
+          "share_pct": 4.0
+        },
+        {
+          "category": "LEGAL_DISPUTE",
+          "count": 304,
+          "share_pct": 3.04
+        },
+        {
+          "category": "INTERDEPARTMENTAL_DEPENDENCY",
+          "count": 187,
+          "share_pct": 1.87
+        }
+      ]
+    },
+    "secondary_bottleneck": {
+      "cardinality": 10,
+      "top_categories": [
+        {
+          "category": "NONE",
+          "count": 7418,
+          "share_pct": 74.18
+        },
+        {
+          "category": "INTERDEPARTMENTAL_DEPENDENCY",
+          "count": 328,
+          "share_pct": 3.28
+        },
+        {
+          "category": "LEGAL_DISPUTE",
+          "count": 319,
+          "share_pct": 3.19
+        },
+        {
+          "category": "DESIGN_CHANGE",
+          "count": 305,
+          "share_pct": 3.05
+        },
+        {
+          "category": "CONTRACTOR",
+          "count": 297,
+          "share_pct": 2.97
+        },
+        {
+          "category": "PROCUREMENT",
+          "count": 293,
+          "share_pct": 2.93
+        },
+        {
+          "category": "UTILITY_SHIFTING",
+          "count": 284,
+          "share_pct": 2.84
+        },
+        {
+          "category": "FOREST_CLEARANCE",
+          "count": 283,
+          "share_pct": 2.83
+        },
+        {
+          "category": "ENVIRONMENTAL_CLEARANCE",
+          "count": 257,
+          "share_pct": 2.57
+        },
+        {
+          "category": "LAND_ACQUISITION",
+          "count": 216,
+          "share_pct": 2.16
+        }
+      ],
+      "all_categories": [
+        {
+          "category": "NONE",
+          "count": 7418,
+          "share_pct": 74.18
+        },
+        {
+          "category": "INTERDEPARTMENTAL_DEPENDENCY",
+          "count": 328,
+          "share_pct": 3.28
+        },
+        {
+          "category": "LEGAL_DISPUTE",
+          "count": 319,
+          "share_pct": 3.19
+        },
+        {
+          "category": "DESIGN_CHANGE",
+          "count": 305,
+          "share_pct": 3.05
+        },
+        {
+          "category": "CONTRACTOR",
+          "count": 297,
+          "share_pct": 2.97
+        },
+        {
+          "category": "PROCUREMENT",
+          "count": 293,
+          "share_pct": 2.93
+        },
+        {
+          "category": "UTILITY_SHIFTING",
+          "count": 284,
+          "share_pct": 2.84
+        },
+        {
+          "category": "FOREST_CLEARANCE",
+          "count": 283,
+          "share_pct": 2.83
+        },
+        {
+          "category": "ENVIRONMENTAL_CLEARANCE",
+          "count": 257,
+          "share_pct": 2.57
+        },
+        {
+          "category": "LAND_ACQUISITION",
+          "count": 216,
+          "share_pct": 2.16
+        }
+      ]
+    },
+    "target_risk_class": {
+      "cardinality": 4,
+      "top_categories": [
+        {
+          "category": "LOW",
+          "count": 3845,
+          "share_pct": 38.45
+        },
+        {
+          "category": "MODERATE",
+          "count": 3273,
+          "share_pct": 32.73
+        },
+        {
+          "category": "HIGH",
+          "count": 1999,
+          "share_pct": 19.99
+        },
+        {
+          "category": "CRITICAL",
+          "count": 883,
+          "share_pct": 8.83
+        }
+      ],
+      "all_categories": [
+        {
+          "category": "LOW",
+          "count": 3845,
+          "share_pct": 38.45
+        },
+        {
+          "category": "MODERATE",
+          "count": 3273,
+          "share_pct": 32.73
+        },
+        {
+          "category": "HIGH",
+          "count": 1999,
+          "share_pct": 19.99
+        },
+        {
+          "category": "CRITICAL",
+          "count": 883,
+          "share_pct": 8.83
+        }
+      ]
+    }
+  }
+}

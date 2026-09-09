@@ -1,0 +1,29 @@
+{
+  "feature_set_version": "features_v1",
+  "features_count": 23,
+  "features": [
+    "ministry",
+    "sector",
+    "state",
+    "region",
+    "implementing_agency",
+    "project_type",
+    "primary_bottleneck",
+    "original_cost_cr",
+    "planned_duration_months",
+    "project_age_months",
+    "duration_elapsed_ratio",
+    "remaining_planned_months",
+    "cumulative_expenditure_cr",
+    "physical_progress_pct",
+    "interim_financial_progress_pct",
+    "progress_decoupling_gap",
+    "expenditure_per_progress_point",
+    "milestone_count",
+    "milestones_completed",
+    "milestones_delayed",
+    "milestones_at_risk",
+    "milestone_delay_rate",
+    "milestone_completion_rate"
+  ]
+}

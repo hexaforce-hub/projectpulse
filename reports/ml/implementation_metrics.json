@@ -1,0 +1,372 @@
+{
+  "baselines": {
+    "dummy_stratified": {
+      "accuracy": 0.3013,
+      "macro_f1": 0.2417,
+      "weighted_f1": 0.3007,
+      "per_class": {
+        "LOW": {
+          "precision": 0.393,
+          "recall": 0.4107,
+          "f1": 0.4017
+        },
+        "MODERATE": {
+          "precision": 0.3348,
+          "recall": 0.3116,
+          "f1": 0.3228
+        },
+        "HIGH": {
+          "precision": 0.1672,
+          "recall": 0.1767,
+          "f1": 0.1718
+        },
+        "CRITICAL": {
+          "precision": 0.0732,
+          "recall": 0.0682,
+          "f1": 0.0706
+        }
+      },
+      "confusion_matrix": {
+        "classes": [
+          "LOW",
+          "MODERATE",
+          "HIGH",
+          "CRITICAL"
+        ],
+        "matrix": [
+          [
+            237,
+            174,
+            115,
+            51
+          ],
+          [
+            189,
+            153,
+            113,
+            36
+          ],
+          [
+            124,
+            96,
+            53,
+            27
+          ],
+          [
+            53,
+            34,
+            36,
+            9
+          ]
+        ]
+      }
+    },
+    "dummy_most_frequent": {
+      "accuracy": 0.3847,
+      "macro_f1": 0.1389,
+      "weighted_f1": 0.2137,
+      "per_class": {
+        "LOW": {
+          "precision": 0.3847,
+          "recall": 1.0,
+          "f1": 0.5556
+        },
+        "MODERATE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "HIGH": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "CRITICAL": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        }
+      },
+      "confusion_matrix": {
+        "classes": [
+          "LOW",
+          "MODERATE",
+          "HIGH",
+          "CRITICAL"
+        ],
+        "matrix": [
+          [
+            577,
+            0,
+            0,
+            0
+          ],
+          [
+            491,
+            0,
+            0,
+            0
+          ],
+          [
+            300,
+            0,
+            0,
+            0
+          ],
+          [
+            132,
+            0,
+            0,
+            0
+          ]
+        ]
+      }
+    },
+    "logistic_regression": {
+      "accuracy": 0.7793,
+      "macro_f1": 0.7408,
+      "weighted_f1": 0.7822,
+      "per_class": {
+        "LOW": {
+          "precision": 0.9333,
+          "recall": 0.8977,
+          "f1": 0.9152
+        },
+        "MODERATE": {
+          "precision": 0.7819,
+          "recall": 0.723,
+          "f1": 0.7513
+        },
+        "HIGH": {
+          "precision": 0.6217,
+          "recall": 0.63,
+          "f1": 0.6258
+        },
+        "CRITICAL": {
+          "precision": 0.5722,
+          "recall": 0.8106,
+          "f1": 0.6708
+        }
+      },
+      "confusion_matrix": {
+        "classes": [
+          "LOW",
+          "MODERATE",
+          "HIGH",
+          "CRITICAL"
+        ],
+        "matrix": [
+          [
+            518,
+            59,
+            0,
+            0
+          ],
+          [
+            36,
+            355,
+            91,
+            9
+          ],
+          [
+            1,
+            39,
+            189,
+            71
+          ],
+          [
+            0,
+            1,
+            24,
+            107
+          ]
+        ]
+      }
+    }
+  },
+  "candidates": {
+    "hist_gradient_boosting": {
+      "accuracy": 0.7873,
+      "macro_f1": 0.7412,
+      "weighted_f1": 0.79,
+      "per_class": {
+        "LOW": {
+          "precision": 0.944,
+          "recall": 0.9064,
+          "f1": 0.9248
+        },
+        "MODERATE": {
+          "precision": 0.7829,
+          "recall": 0.7637,
+          "f1": 0.7732
+        },
+        "HIGH": {
+          "precision": 0.6271,
+          "recall": 0.6167,
+          "f1": 0.6218
+        },
+        "CRITICAL": {
+          "precision": 0.5698,
+          "recall": 0.7424,
+          "f1": 0.6447
+        }
+      },
+      "confusion_matrix": {
+        "classes": [
+          "LOW",
+          "MODERATE",
+          "HIGH",
+          "CRITICAL"
+        ],
+        "matrix": [
+          [
+            523,
+            53,
+            1,
+            0
+          ],
+          [
+            31,
+            375,
+            76,
+            9
+          ],
+          [
+            0,
+            50,
+            185,
+            65
+          ],
+          [
+            0,
+            1,
+            33,
+            98
+          ]
+        ]
+      }
+    },
+    "random_forest": {
+      "accuracy": 0.776,
+      "macro_f1": 0.7303,
+      "weighted_f1": 0.779,
+      "per_class": {
+        "LOW": {
+          "precision": 0.9291,
+          "recall": 0.9081,
+          "f1": 0.9185
+        },
+        "MODERATE": {
+          "precision": 0.7964,
+          "recall": 0.7169,
+          "f1": 0.7546
+        },
+        "HIGH": {
+          "precision": 0.6506,
+          "recall": 0.5833,
+          "f1": 0.6151
+        },
+        "CRITICAL": {
+          "precision": 0.5022,
+          "recall": 0.8561,
+          "f1": 0.6331
+        }
+      },
+      "confusion_matrix": {
+        "classes": [
+          "LOW",
+          "MODERATE",
+          "HIGH",
+          "CRITICAL"
+        ],
+        "matrix": [
+          [
+            524,
+            51,
+            2,
+            0
+          ],
+          [
+            40,
+            352,
+            74,
+            25
+          ],
+          [
+            0,
+            38,
+            175,
+            87
+          ],
+          [
+            0,
+            1,
+            18,
+            113
+          ]
+        ]
+      }
+    }
+  },
+  "test_metrics": {
+    "accuracy": 0.8,
+    "macro_f1": 0.7613,
+    "weighted_f1": 0.8015,
+    "per_class": {
+      "LOW": {
+        "precision": 0.9387,
+        "recall": 0.9045,
+        "f1": 0.9213
+      },
+      "MODERATE": {
+        "precision": 0.7726,
+        "recall": 0.7821,
+        "f1": 0.7773
+      },
+      "HIGH": {
+        "precision": 0.6633,
+        "recall": 0.6633,
+        "f1": 0.6633
+      },
+      "CRITICAL": {
+        "precision": 0.6486,
+        "recall": 0.7218,
+        "f1": 0.6833
+      }
+    },
+    "confusion_matrix": {
+      "classes": [
+        "LOW",
+        "MODERATE",
+        "HIGH",
+        "CRITICAL"
+      ],
+      "matrix": [
+        [
+          521,
+          55,
+          0,
+          0
+        ],
+        [
+          34,
+          384,
+          66,
+          7
+        ],
+        [
+          0,
+          56,
+          199,
+          45
+        ],
+        [
+          0,
+          2,
+          35,
+          96
+        ]
+      ]
+    }
+  }
+}

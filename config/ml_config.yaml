@@ -1,0 +1,78 @@
+# ProjectPulse — Machine Learning Configuration (Phase 4)
+# Ministry of Statistics and Programme Implementation (MoSPI) / IPMD
+# Smart India Hackathon 2026 — Team HexaForce
+
+seed: 42
+
+feature_set_version: "features_v1"
+model_version: "v1.0.0"
+dataset_version: "synthetic_v1"
+
+paths:
+  raw_data: "data/processed/projects_clean.csv"
+  ml_ready_data: "data/processed/ml_ready_projects.csv"
+  predictions_output: "data/processed/predictions.csv"
+  models_dir: "models"
+  reports_dir: "reports/ml"
+
+split:
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+  stratify_by: "target_risk_class"
+
+targets:
+  schedule_delay:
+    binary_threshold_months: 12.0
+    target_binary_col: "future_schedule_delay"
+    target_continuous_col: "target_schedule_delay_months"
+  cost_overrun:
+    binary_threshold_pct: 15.0
+    target_binary_col: "future_cost_overrun"
+    target_continuous_col: "target_cost_overrun_pct"
+  implementation_risk:
+    target_multiclass_col: "target_risk_class"
+    classes: ["LOW", "MODERATE", "HIGH", "CRITICAL"]
+
+risk_scoring:
+  weights:
+    schedule: 0.35
+    cost: 0.35
+    implementation: 0.30
+  bands:
+    low:
+      min: 0.0
+      max: 24.9
+    moderate:
+      min: 25.0
+      max: 49.9
+    high:
+      min: 50.0
+      max: 74.9
+    critical:
+      min: 75.0
+      max: 100.0
+
+prediction_quality:
+  minimum_data_quality: 70.0
+  completeness_weight: 0.50
+  feature_validity_weight: 0.50
+
+models:
+  schedule:
+    classifier_algorithm: "HistGradientBoostingClassifier"
+    regressor_algorithm: "HistGradientBoostingRegressor"
+    n_estimators: 100
+    learning_rate: 0.08
+    max_depth: 6
+  cost:
+    classifier_algorithm: "HistGradientBoostingClassifier"
+    regressor_algorithm: "HistGradientBoostingRegressor"
+    n_estimators: 100
+    learning_rate: 0.08
+    max_depth: 6
+  implementation:
+    classifier_algorithm: "HistGradientBoostingClassifier"
+    n_estimators: 120
+    learning_rate: 0.08
+    max_depth: 6

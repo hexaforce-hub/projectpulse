@@ -1,0 +1,186 @@
+{
+  "timestamp": "2026-09-07T13:24:45.004465",
+  "validator_version": "v0.2.0",
+  "dataset_status": "SYNTHETIC",
+  "levels": {
+    "level_1_schema": {
+      "name": "Level 1: Schema Integrity",
+      "passed": true,
+      "checks": [
+        {
+          "file": "projects_clean.csv",
+          "status": "PASS",
+          "columns_count": 40
+        },
+        {
+          "file": "projects_raw.csv",
+          "status": "PASS",
+          "columns_count": 40
+        },
+        {
+          "file": "ml_ready_projects.csv",
+          "status": "PASS",
+          "columns_count": 24
+        },
+        {
+          "file": "project_milestones.csv",
+          "status": "PASS",
+          "columns_count": 9
+        },
+        {
+          "file": "project_progress.csv",
+          "status": "PASS",
+          "columns_count": 5
+        }
+      ]
+    },
+    "level_2_field_ranges": {
+      "name": "Level 2: Field Range & Domain",
+      "passed": true,
+      "violations": {
+        "invalid_id_format": 0,
+        "cost_below_150_cr": 0,
+        "negative_cost": 0,
+        "negative_expenditure": 0,
+        "invalid_physical_progress": 0,
+        "invalid_financial_progress": 0,
+        "invalid_dates": 0,
+        "invalid_status": 0,
+        "invalid_stage": 0,
+        "invalid_risk_class": 0,
+        "invalid_bottleneck": 0
+      },
+      "total_violations": 0
+    },
+    "level_3_cross_field": {
+      "name": "Level 3: Cross-Field Logic",
+      "passed": true,
+      "violations": {
+        "planned_before_start": 0,
+        "revised_before_planned": 0,
+        "expenditure_exceeds_revised_cost": 0,
+        "cost_overrun_mismatch": 0,
+        "decoupling_gap_mismatch": 0,
+        "completed_milestones_exceed_total": 0,
+        "delayed_milestones_exceed_total": 0,
+        "completed_project_progress_below_100": 0
+      },
+      "total_violations": 0
+    },
+    "level_4_referential_integrity": {
+      "name": "Level 4: Referential Integrity",
+      "passed": true,
+      "checks": {
+        "total_projects": 10000,
+        "unique_project_ids": 10000,
+        "duplicate_project_ids": 0,
+        "orphan_milestone_records": 0,
+        "orphan_progress_records": 0
+      }
+    },
+    "level_5_statistical_sanity": {
+      "name": "Level 5: Statistical Sanity & Missingness",
+      "passed": true,
+      "distributions": {
+        "risk_class_counts": {
+          "CRITICAL": 883,
+          "HIGH": 1999,
+          "MODERATE": 3273,
+          "LOW": 3845
+        },
+        "risk_class_shares_pct": {
+          "CRITICAL": 8.83,
+          "HIGH": 19.99,
+          "MODERATE": 32.73,
+          "LOW": 38.45
+        },
+        "clean_missing_cells": 0,
+        "clean_missingness_rate_pct": 0.0,
+        "raw_missing_cells": 722,
+        "raw_missingness_rate_pct": 0.1805
+      }
+    }
+  },
+  "metrics": {
+    "completeness_score": 100.0,
+    "validity_score": 100.0,
+    "uniqueness_score": 100.0,
+    "consistency_score": 100.0,
+    "overall_score": 100.0,
+    "weights": {
+      "completeness": 0.3,
+      "validity": 0.3,
+      "uniqueness": 0.2,
+      "consistency": 0.2
+    }
+  },
+  "test_cases_validation": {
+    "total_test_cases": 12,
+    "detected_defects": 12,
+    "detection_rate_pct": 100.0,
+    "details": [
+      {
+        "case_id": "TC-ERR-0001",
+        "defect": "NEGATIVE_COST",
+        "detected": true
+      },
+      {
+        "case_id": "TC-ERR-0002",
+        "defect": "COST_BELOW_MOSPI_THRESHOLD",
+        "detected": true
+      },
+      {
+        "case_id": "TC-ERR-0003",
+        "defect": "EXPENDITURE_EXCEEDS_REVISED_COST",
+        "detected": true
+      },
+      {
+        "case_id": "TC-ERR-0004",
+        "defect": "PHYSICAL_PROGRESS_OVER_100",
+        "detected": true
+      },
+      {
+        "case_id": "TC-ERR-0005",
+        "defect": "FINANCIAL_PROGRESS_OVER_100",
+        "detected": true
+      },
+      {
+        "case_id": "TC-ERR-0006",
+        "defect": "PLANNED_BEFORE_START",
+        "detected": true
+      },
+      {
+        "case_id": "TC-ERR-0007",
+        "defect": "REVISED_BEFORE_PLANNED",
+        "detected": true
+      },
+      {
+        "case_id": "PRJ-SYN-000001",
+        "defect": "DUPLICATE_ID",
+        "detected": true
+      },
+      {
+        "case_id": "TC-ERR-0009",
+        "defect": "COMPLETED_EXCEEDS_TOTAL_MILESTONES",
+        "detected": true
+      },
+      {
+        "case_id": "TC-ERR-0010",
+        "defect": "DELAYED_EXCEEDS_TOTAL_MILESTONES",
+        "detected": true
+      },
+      {
+        "case_id": "TC-ERR-0011",
+        "defect": "INVALID_MINISTRY_ENUM",
+        "detected": true
+      },
+      {
+        "case_id": "TC-ERR-0012",
+        "defect": "INVALID_STATUS_ENUM",
+        "detected": true
+      }
+    ]
+  },
+  "overall_quality_score": 100.0,
+  "gate_passed": true
+}

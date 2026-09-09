@@ -1,0 +1,73 @@
+{
+  "timestamp": "2026-09-07T08:00:05Z",
+  "dataset_records": 10000,
+  "split": {
+    "train": 7000,
+    "val": 1500,
+    "test": 1500
+  },
+  "models": {
+    "risk_classifier": {
+      "algorithm": "LightGBM Classifier",
+      "accuracy": 0.8087,
+      "f1_macro": 0.7844,
+      "precision_macro": 0.7781,
+      "recall_macro": 0.7929,
+      "per_class_f1": {
+        "LOW": 0.9238,
+        "MODERATE": 0.7653,
+        "HIGH": 0.6876,
+        "CRITICAL": 0.7609
+      },
+      "baseline_accuracy": 0.384,
+      "confusion_matrix": {
+        "labels": [
+          "LOW",
+          "MODERATE",
+          "HIGH",
+          "CRITICAL"
+        ],
+        "matrix": [
+          [
+            527,
+            48,
+            1,
+            0
+          ],
+          [
+            38,
+            362,
+            89,
+            2
+          ],
+          [
+            0,
+            45,
+            219,
+            36
+          ],
+          [
+            0,
+            0,
+            28,
+            105
+          ]
+        ]
+      }
+    },
+    "delay_regressor": {
+      "algorithm": "LightGBM Regressor",
+      "mae_months": 1.48,
+      "rmse_months": 1.99,
+      "r2_score": 0.9298,
+      "baseline_ridge_r2": 0.84
+    },
+    "cost_regressor": {
+      "algorithm": "LightGBM Regressor",
+      "mae_pct": 1.01,
+      "rmse_pct": 1.69,
+      "r2_score": 0.9683,
+      "baseline_ridge_r2": 0.9783
+    }
+  }
+}

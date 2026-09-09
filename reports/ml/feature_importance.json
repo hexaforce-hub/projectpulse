@@ -1,0 +1,158 @@
+{
+  "schedule_delay_importance": [
+    {
+      "feature": "progress_decoupling_gap",
+      "importance_mean": 0.124,
+      "importance_std": 0.0047
+    },
+    {
+      "feature": "milestones_delayed",
+      "importance_mean": 0.08,
+      "importance_std": 0.0036
+    },
+    {
+      "feature": "planned_duration_months",
+      "importance_mean": 0.0659,
+      "importance_std": 0.0085
+    },
+    {
+      "feature": "physical_progress_pct",
+      "importance_mean": 0.0517,
+      "importance_std": 0.0032
+    },
+    {
+      "feature": "interim_financial_progress_pct",
+      "importance_mean": 0.016,
+      "importance_std": 0.0028
+    },
+    {
+      "feature": "milestones_completed",
+      "importance_mean": 0.014,
+      "importance_std": 0.003
+    },
+    {
+      "feature": "milestones_at_risk",
+      "importance_mean": 0.0079,
+      "importance_std": 0.0013
+    },
+    {
+      "feature": "primary_bottleneck",
+      "importance_mean": 0.0079,
+      "importance_std": 0.0019
+    },
+    {
+      "feature": "original_cost_cr",
+      "importance_mean": 0.0015,
+      "importance_std": 0.0016
+    },
+    {
+      "feature": "cumulative_expenditure_cr",
+      "importance_mean": 0.0011,
+      "importance_std": 0.0011
+    }
+  ],
+  "cost_overrun_importance": [
+    {
+      "feature": "interim_financial_progress_pct",
+      "importance_mean": 0.1088,
+      "importance_std": 0.0107
+    },
+    {
+      "feature": "primary_bottleneck",
+      "importance_mean": 0.0855,
+      "importance_std": 0.0073
+    },
+    {
+      "feature": "physical_progress_pct",
+      "importance_mean": 0.0669,
+      "importance_std": 0.0033
+    },
+    {
+      "feature": "progress_decoupling_gap",
+      "importance_mean": 0.0487,
+      "importance_std": 0.0059
+    },
+    {
+      "feature": "milestones_delayed",
+      "importance_mean": 0.0081,
+      "importance_std": 0.0026
+    },
+    {
+      "feature": "planned_duration_months",
+      "importance_mean": 0.0043,
+      "importance_std": 0.0017
+    },
+    {
+      "feature": "milestones_at_risk",
+      "importance_mean": 0.0016,
+      "importance_std": 0.0012
+    },
+    {
+      "feature": "duration_elapsed_ratio",
+      "importance_mean": 0.0012,
+      "importance_std": 0.0005
+    },
+    {
+      "feature": "project_type",
+      "importance_mean": 0.0007,
+      "importance_std": 0.0008
+    },
+    {
+      "feature": "original_cost_cr",
+      "importance_mean": 0.0007,
+      "importance_std": 0.0014
+    }
+  ],
+  "implementation_risk_importance": [
+    {
+      "feature": "progress_decoupling_gap",
+      "importance_mean": 0.3109,
+      "importance_std": 0.0007
+    },
+    {
+      "feature": "milestones_delayed",
+      "importance_mean": 0.1245,
+      "importance_std": 0.0099
+    },
+    {
+      "feature": "physical_progress_pct",
+      "importance_mean": 0.084,
+      "importance_std": 0.0035
+    },
+    {
+      "feature": "planned_duration_months",
+      "importance_mean": 0.0712,
+      "importance_std": 0.0077
+    },
+    {
+      "feature": "primary_bottleneck",
+      "importance_mean": 0.0403,
+      "importance_std": 0.005
+    },
+    {
+      "feature": "interim_financial_progress_pct",
+      "importance_mean": 0.0289,
+      "importance_std": 0.0039
+    },
+    {
+      "feature": "milestones_at_risk",
+      "importance_mean": 0.0099,
+      "importance_std": 0.003
+    },
+    {
+      "feature": "cumulative_expenditure_cr",
+      "importance_mean": 0.0073,
+      "importance_std": 0.0014
+    },
+    {
+      "feature": "milestones_completed",
+      "importance_mean": 0.0055,
+      "importance_std": 0.0005
+    },
+    {
+      "feature": "duration_elapsed_ratio",
+      "importance_mean": 0.0049,
+      "importance_std": 0.0012
+    }
+  ]
+}

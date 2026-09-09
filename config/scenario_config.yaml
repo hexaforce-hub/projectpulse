@@ -1,0 +1,73 @@
+# ==============================================================================
+# ProjectPulse — Phase 7 Scenario Engine Configuration
+# Sponsoring Ministry: Ministry of Statistics & Programme Implementation (MoSPI)
+# Division: Infrastructure and Project Monitoring Division (IPMD)
+# ==============================================================================
+
+limits:
+  max_modified_features_per_scenario: 10
+  max_sensitivity_points: 10
+  min_sensitivity_points: 3
+  default_sensitivity_points: 5
+  max_comparison_scenarios: 5
+
+thresholds:
+  risk_delta_improved: 5.0     # Baseline risk - Scenario risk > 5.0 => IMPROVED
+  risk_delta_deteriorated: -5.0 # Baseline risk - Scenario risk < -5.0 => DETERIORATED
+  # Absolute change <= 5.0 => STABLE
+
+  extreme_scenario_indicators:
+    max_progress_jump_pct: 30.0
+    zero_delay_milestones_forced: true
+    multiple_simultaneous_cleared: 3
+
+observed_training_bounds:
+  original_cost_cr:
+    min: 150.0
+    max: 120000.0
+  planned_duration_months:
+    min: 6
+    max: 180
+  project_age_months:
+    min: 0
+    max: 180
+  physical_progress_pct:
+    min: 0.0
+    max: 100.0
+  milestone_count:
+    min: 1
+    max: 50
+  milestones_delayed:
+    min: 0
+    max: 40
+  milestones_at_risk:
+    min: 0
+    max: 20
+  progress_decoupling_gap:
+    min: -20.0
+    max: 60.0
+
+forbidden_target_variables:
+  - "revised_cost_cr"
+  - "cost_overrun_cr"
+  - "cost_growth_pct"
+  - "schedule_slippage_months"
+  - "revised_completion_date"
+  - "schedule_revisions_count"
+  - "actual_completion_date"
+  - "final_status"
+  - "final_delay"
+  - "future_cost"
+  - "target_schedule_delay_months"
+  - "target_cost_overrun_pct"
+  - "target_risk_class"
+  - "future_schedule_delay_binary"
+  - "future_delay_months_continuous"
+  - "future_cost_overrun_binary"
+  - "future_cost_overrun_pct_continuous"
+  - "target_risk_class_multiclass"
+
+disclaimers:
+  mandatory_causal: "Hypothetical model scenario. Results represent model sensitivity to the specified input assumptions and should not be interpreted as causal or guaranteed real-world outcomes."
+  synthetic_data: "Scenario analysis currently operates on synthetic PAIMANA-modeled infrastructure data. Results demonstrate technical feasibility and do not represent validated operational impact."
+  human_decision: "All scenario outputs are decision-support estimates for monitoring review. Administrative directives remain strictly subject to competent authority approval."

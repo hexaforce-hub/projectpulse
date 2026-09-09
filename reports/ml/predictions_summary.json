@@ -1,0 +1,18 @@
+{
+  "total_projects": 10000,
+  "risk_distribution": {
+    "LOW": 4109,
+    "MODERATE": 1457,
+    "HIGH": 1121,
+    "CRITICAL": 3313
+  },
+  "average_risk_score": 45.4,
+  "capital_at_risk_cr": 1571720.19,
+  "high_priority_projects_count": 4434,
+  "data_quality_average": 83.3,
+  "model_versions": {
+    "schedule": "schedule_v1",
+    "cost": "cost_v1",
+    "implementation": "implementation_v1"
+  }
+}

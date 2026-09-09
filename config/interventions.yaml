@@ -1,0 +1,151 @@
+# ==============================================================================
+# ProjectPulse — Phase 7 Intervention Catalog Configuration
+# Sponsoring Ministry: Ministry of Statistics & Programme Implementation (MoSPI)
+# Division: Infrastructure and Project Monitoring Division (IPMD)
+# Problem Statement: SIH26103 | Team: HexaForce
+# ==============================================================================
+# Maps administrative intervention categories to legitimate prediction-time features.
+# Every scenario intervention represents a hypothetical sensitivity assumption.
+# ==============================================================================
+
+catalog_metadata:
+  version: "1.0.0"
+  last_updated: "2026-09-08"
+  disclaimer: "Hypothetical model scenario assumptions only. Not an operational directive or guarantee of real-world outcome."
+
+categories:
+  - id: "STATUTORY_CLEARANCES"
+    name: "Statutory & Inter-Ministerial Clearances"
+    description: "Expedited single-window taskforce resolution for land acquisition, environmental/forest clearances, and legal encumbrances."
+    interventions:
+      - id: "resolve_bottleneck"
+        name: "Fast-Track Primary Clearance"
+        feature: "primary_bottleneck"
+        type: "categorical"
+        allowed_values: ["NONE", "LAND_ACQUISITION", "FOREST_CLEARANCE", "ENVIRONMENTAL_CLEARANCE", "LEGAL_DISPUTE", "CONTRACTOR_FAILURE", "EQUIPMENT_SUPPLY", "FUNDS_FLOW", "LAW_AND_ORDER", "DESIGN_CHANGES", "OTHERS"]
+        target_value: "NONE"
+        default_change: "Clearance expedited to eliminate statutory blockage"
+        description: "Assumes primary statutory bottleneck is fully resolved via inter-departmental empowered committee clearance."
+        assumptions:
+          - "Primary statutory encumbrance lifted"
+          - "Other project baseline metrics held constant"
+
+  - id: "MILESTONE_MANAGEMENT"
+    name: "Milestone Float Recovery & Scheduling"
+    description: "Re-sequencing critical path milestones and clearing execution dependencies."
+    interventions:
+      - id: "recover_delayed_milestones"
+        name: "Recover Delayed Critical Path Milestones"
+        feature: "milestones_delayed"
+        type: "integer"
+        direction: "decrease"
+        min_value: 0
+        default_reduction_pct: 50.0  # recover 50% of delayed milestones
+        description: "Hypothetical recovery of critical-path delayed milestones through compressed float scheduling."
+        assumptions:
+          - "Delayed milestones rescheduled and brought back into on-track status"
+          - "Total milestone count remains fixed"
+          - "Milestone completion count increases proportionately"
+
+      - id: "mitigate_at_risk_milestones"
+        name: "Preempt At-Risk Milestone Failures"
+        feature: "milestones_at_risk"
+        type: "integer"
+        direction: "decrease"
+        min_value: 0
+        default_reduction_pct: 100.0 # convert at-risk to safe
+        description: "Proactive resource mobilization to prevent at-risk milestones from turning delayed."
+        assumptions:
+          - "Identified at-risk milestone dependencies mitigated"
+
+  - id: "PROGRESS_ACCELERATION"
+    name: "Physical Construction Acceleration"
+    description: "Augmenting equipment mobilization and site work shifts to boost physical execution velocity."
+    interventions:
+      - id: "boost_physical_progress"
+        name: "Physical Progress Velocity Boost"
+        feature: "physical_progress_pct"
+        type: "float"
+        direction: "increase"
+        min_value: 0.0
+        max_value: 100.0
+        max_allowed_delta: 25.0 # realistic ceiling on sudden progress jump
+        default_delta: 5.0
+        unit: "%"
+        description: "Assumes targeted physical progress acceleration through dual-shift deployment."
+        assumptions:
+          - "Physical progress increases by specified percentage points"
+          - "Overall project budget ceiling held constant"
+
+  - id: "FINANCIAL_GOVERNANCE"
+    name: "Financial-Physical Decoupling Reconciliation"
+    description: "Auditing billing milestones and escrow releases to ensure financial spend strictly reflects verified physical output."
+    interventions:
+      - id: "reconcile_decoupling"
+        name: "Financial Reconciliation & Billing Audit"
+        feature: "cumulative_expenditure_cr"
+        type: "float"
+        direction: "decrease"
+        min_value: 0.0
+        default_gap_narrowing_pct: 50.0
+        description: "Assumes financial expenditure is audited to narrow anomalous divergence over physical work."
+        assumptions:
+          - "Overbilled or advance disbursements reconciled against field inspections"
+          - "Progress decoupling gap narrows toward zero"
+
+  - id: "CONTRACTOR_GOVERNANCE"
+    name: "Contractor Liquidity & Dispute Resolution"
+    description: "Combined intervention mobilizing working capital and resolving vendor disputes."
+    interventions:
+      - id: "contractor_support_package"
+        name: "Contractor Liquidity Mobilization"
+        type: "composite"
+        description: "Joint intervention: resolves contractor bottlenecks, recovers 35% delayed milestones, and stabilizes physical delivery by +3%."
+        sub_actions:
+          - feature: "primary_bottleneck"
+            scenario_value: "NONE"
+          - feature: "milestones_delayed"
+            reduction_ratio: 0.35
+          - feature: "physical_progress_pct"
+            boost_points: 3.0
+
+presets:
+  - id: "PRESET_PROCUREMENT_ACCELERATION"
+    name: "Accelerate Procurement & Approvals"
+    category: "STATUTORY_CLEARANCES"
+    description: "Fast-tracks statutory clearances and procurement blockages to eliminate institutional hold-ups."
+    modifications:
+      - feature: "primary_bottleneck"
+        scenario_value: "NONE"
+
+  - id: "PRESET_MILESTONE_RECOVERY"
+    name: "Recover Delayed Milestones"
+    category: "MILESTONE_MANAGEMENT"
+    description: "Re-baselines critical path to recover 50% of currently delayed milestones."
+    modifications:
+      - feature: "milestones_delayed"
+        reduction_mode: "fraction"
+        fraction: 0.50
+
+  - id: "PRESET_DECOUPLING_RECONCILIATION"
+    name: "Reconcile Spend Decoupling Gap"
+    category: "FINANCIAL_GOVERNANCE"
+    description: "Performs billing reconciliation, narrowing the expenditure-progress gap by 50%."
+    modifications:
+      - feature: "cumulative_expenditure_cr"
+        reduction_mode: "narrow_gap"
+        target_gap_reduction: 0.50
+
+  - id: "PRESET_COMPREHENSIVE_RECOVERY"
+    name: "Comprehensive Turnaround Package"
+    category: "CONTRACTOR_GOVERNANCE"
+    description: "Combines clearance resolution, 50% milestone recovery, and +5% physical progress boost."
+    modifications:
+      - feature: "primary_bottleneck"
+        scenario_value: "NONE"
+      - feature: "milestones_delayed"
+        reduction_mode: "fraction"
+        fraction: 0.50
+      - feature: "physical_progress_pct"
+        reduction_mode: "add"
+        delta: 5.0

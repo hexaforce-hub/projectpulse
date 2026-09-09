@@ -1,0 +1,626 @@
+[
+  {
+    "project_id": "PRJ-SYN-000004",
+    "project_name": "Varanasi-Ranchi-Kolkata Expressway \u2014 Stage-I Commissioning Phase",
+    "ministry": "Ministry of Road Transport & Highways",
+    "department": "Highways & Connectivity Wing",
+    "sector": "Roads & Highways",
+    "state": "Telangana",
+    "implementing_agency": "National Highways Authority of India (NHAI)",
+    "status": "Commissioned",
+    "financials": {
+      "original_cost_cr": 4631.39,
+      "revised_cost_cr": 4928.73,
+      "cumulative_expenditure_cr": 4804.25,
+      "cost_overrun_cr": 297.34
+    },
+    "progress": {
+      "physical_progress_pct": 100.0,
+      "financial_progress_pct": 97.47,
+      "progress_gap_pct": -2.53
+    },
+    "schedule": {
+      "start_date": "2018-11",
+      "planned_completion_date": "2024-09",
+      "revised_completion_date": "2025-08",
+      "delay_duration_months": 11,
+      "schedule_revisions_count": 2
+    },
+    "milestones": [
+      {
+        "id": "01",
+        "name": "Feasibility Study & Detailed Project Report (DPR) Approval",
+        "planned_date": "2019-04-20",
+        "status": "COMPLETED",
+        "delay_days": 17,
+        "dependency": "ADMINISTRATIVE"
+      },
+      {
+        "id": "02",
+        "name": "Statutory Environmental & Forest Clearance Stage-I",
+        "planned_date": "2019-11-19",
+        "status": "COMPLETED",
+        "delay_days": 62,
+        "dependency": "STATUTORY"
+      },
+      {
+        "id": "03",
+        "name": "Land Acquisition 80% ROW Notification (Sec 3D/19)",
+        "planned_date": "2020-06-19",
+        "status": "COMPLETED",
+        "delay_days": 88,
+        "dependency": "LAND_ACQUISITION"
+      },
+      {
+        "id": "04",
+        "name": "EPC Tendering, Technical Evaluation & Contract Award",
+        "planned_date": "2021-01-18",
+        "status": "COMPLETED",
+        "delay_days": 121,
+        "dependency": "PROCUREMENT"
+      },
+      {
+        "id": "05",
+        "name": "Contractor Mobilization, ROW Handover & Utility Relocation",
+        "planned_date": "2021-10-01",
+        "status": "COMPLETED",
+        "delay_days": 143,
+        "dependency": "RIGHT_OF_WAY"
+      },
+      {
+        "id": "06",
+        "name": "Major Substructure, Earthwork & Foundation Works (50%)",
+        "planned_date": "2022-08-17",
+        "status": "COMPLETED",
+        "delay_days": 163,
+        "dependency": "CIVIL_WORKS"
+      },
+      {
+        "id": "07",
+        "name": "Superstructure Erection, Track/Line Laying & Core Fabrication",
+        "planned_date": "2023-07-02",
+        "status": "COMPLETED",
+        "delay_days": 180,
+        "dependency": "CIVIL_WORKS"
+      },
+      {
+        "id": "08",
+        "name": "Equipment Installation, Signaling & Substation Integration",
+        "planned_date": "2024-01-31",
+        "status": "COMPLETED",
+        "delay_days": 220,
+        "dependency": "SYSTEMS_EQUIPMENT"
+      },
+      {
+        "id": "09",
+        "name": "Safety Audit, Statutory Inspection (CRS/DGCA/CEA)",
+        "planned_date": "2024-06-07",
+        "status": "COMPLETED",
+        "delay_days": 252,
+        "dependency": "STATUTORY_INSPECTION"
+      },
+      {
+        "id": "10",
+        "name": "Final Trial Runs, COD Commercial Operation & Handover",
+        "planned_date": "2024-09-01",
+        "status": "COMPLETED",
+        "delay_days": 270,
+        "dependency": "COMMISSIONING"
+      }
+    ],
+    "risk": {
+      "overall_score": 30.8,
+      "level": "LOW",
+      "schedule_score": 30.8,
+      "cost_score": 14.1,
+      "implementation_score": 15.0,
+      "primary_driver": "Bottleneck: None",
+      "drivers": [
+        {
+          "rank": 1,
+          "name": "None",
+          "strength_pct": 52,
+          "evidence": "Reported constraint in Telangana"
+        },
+        {
+          "rank": 2,
+          "name": "Milestone Slippage Rate",
+          "strength_pct": 28,
+          "evidence": "9 milestones delayed"
+        },
+        {
+          "rank": 3,
+          "name": "Decoupling Gap",
+          "strength_pct": 20,
+          "evidence": "Expenditure leads physical progress by -2.53%"
+        }
+      ],
+      "observed_signals": [
+        {
+          "label": "Physical Completion",
+          "value": "100.0%",
+          "context": "Reported work accomplished"
+        },
+        {
+          "label": "Expenditure",
+          "value": "\u20b94804.25 Cr",
+          "context": "97.47% of sanctioned budget"
+        }
+      ],
+      "attribution_note": "Synthetic risk attribution generated for Phase 1/2 demonstration"
+    },
+    "metadata": {
+      "data_source": "MoSPI IPMD PAIMANA Schema",
+      "data_status": "SYNTHETIC",
+      "last_updated": "2026-03-31"
+    }
+  },
+  {
+    "project_id": "PRJ-SYN-000003",
+    "project_name": "Delhi-Mumbai Expressway \u2014 Reach 2 (Ch. 24+000 to 68+500)",
+    "ministry": "Ministry of Road Transport & Highways",
+    "department": "Highways & Connectivity Wing",
+    "sector": "Roads & Highways",
+    "state": "Tamil Nadu",
+    "implementing_agency": "National Highways Authority of India (NHAI)",
+    "status": "Commissioned",
+    "financials": {
+      "original_cost_cr": 456.57,
+      "revised_cost_cr": 587.7,
+      "cumulative_expenditure_cr": 581.4,
+      "cost_overrun_cr": 131.13
+    },
+    "progress": {
+      "physical_progress_pct": 100.0,
+      "financial_progress_pct": 98.93,
+      "progress_gap_pct": -1.07
+    },
+    "schedule": {
+      "start_date": "2018-04",
+      "planned_completion_date": "2020-06",
+      "revised_completion_date": "2021-05",
+      "delay_duration_months": 11,
+      "schedule_revisions_count": 2
+    },
+    "milestones": [
+      {
+        "id": "01",
+        "name": "Feasibility Study & Detailed Project Report (DPR) Approval",
+        "planned_date": "2018-06-03",
+        "status": "COMPLETED",
+        "delay_days": 20,
+        "dependency": "ADMINISTRATIVE"
+      },
+      {
+        "id": "02",
+        "name": "Statutory Environmental & Forest Clearance Stage-I",
+        "planned_date": "2018-08-21",
+        "status": "COMPLETED",
+        "delay_days": 47,
+        "dependency": "STATUTORY"
+      },
+      {
+        "id": "03",
+        "name": "Land Acquisition 80% ROW Notification (Sec 3D/19)",
+        "planned_date": "2018-11-08",
+        "status": "COMPLETED",
+        "delay_days": 89,
+        "dependency": "LAND_ACQUISITION"
+      },
+      {
+        "id": "04",
+        "name": "EPC Tendering, Technical Evaluation & Contract Award",
+        "planned_date": "2019-01-26",
+        "status": "COMPLETED",
+        "delay_days": 110,
+        "dependency": "PROCUREMENT"
+      },
+      {
+        "id": "05",
+        "name": "Contractor Mobilization, ROW Handover & Utility Relocation",
+        "planned_date": "2019-05-02",
+        "status": "COMPLETED",
+        "delay_days": 142,
+        "dependency": "RIGHT_OF_WAY"
+      },
+      {
+        "id": "06",
+        "name": "Major Substructure, Earthwork & Foundation Works (50%)",
+        "planned_date": "2019-08-28",
+        "status": "COMPLETED",
+        "delay_days": 161,
+        "dependency": "CIVIL_WORKS"
+      },
+      {
+        "id": "07",
+        "name": "Superstructure Erection, Track/Line Laying & Core Fabrication",
+        "planned_date": "2019-12-25",
+        "status": "COMPLETED",
+        "delay_days": 192,
+        "dependency": "CIVIL_WORKS"
+      },
+      {
+        "id": "08",
+        "name": "Equipment Installation, Signaling & Substation Integration",
+        "planned_date": "2020-03-13",
+        "status": "COMPLETED",
+        "delay_days": 213,
+        "dependency": "SYSTEMS_EQUIPMENT"
+      },
+      {
+        "id": "09",
+        "name": "Safety Audit, Statutory Inspection (CRS/DGCA/CEA)",
+        "planned_date": "2020-04-30",
+        "status": "COMPLETED",
+        "delay_days": 256,
+        "dependency": "STATUTORY_INSPECTION"
+      },
+      {
+        "id": "10",
+        "name": "Final Trial Runs, COD Commercial Operation & Handover",
+        "planned_date": "2020-06-01",
+        "status": "COMPLETED",
+        "delay_days": 261,
+        "dependency": "COMMISSIONING"
+      }
+    ],
+    "risk": {
+      "overall_score": 49.9,
+      "level": "MODERATE",
+      "schedule_score": 30.8,
+      "cost_score": 63.2,
+      "implementation_score": 85.0,
+      "primary_driver": "Bottleneck: Contractor",
+      "drivers": [
+        {
+          "rank": 1,
+          "name": "Contractor",
+          "strength_pct": 52,
+          "evidence": "Reported constraint in Tamil Nadu"
+        },
+        {
+          "rank": 2,
+          "name": "Milestone Slippage Rate",
+          "strength_pct": 28,
+          "evidence": "9 milestones delayed"
+        },
+        {
+          "rank": 3,
+          "name": "Decoupling Gap",
+          "strength_pct": 20,
+          "evidence": "Expenditure leads physical progress by -1.07%"
+        }
+      ],
+      "observed_signals": [
+        {
+          "label": "Physical Completion",
+          "value": "100.0%",
+          "context": "Reported work accomplished"
+        },
+        {
+          "label": "Expenditure",
+          "value": "\u20b9581.4 Cr",
+          "context": "98.93% of sanctioned budget"
+        }
+      ],
+      "attribution_note": "Synthetic risk attribution generated for Phase 1/2 demonstration"
+    },
+    "metadata": {
+      "data_source": "MoSPI IPMD PAIMANA Schema",
+      "data_status": "SYNTHETIC",
+      "last_updated": "2026-03-31"
+    }
+  },
+  {
+    "project_id": "PRJ-SYN-000002",
+    "project_name": "Varanasi-Ranchi-Kolkata Expressway \u2014 Section I (Km 0.00 to 45.50)",
+    "ministry": "Ministry of Road Transport & Highways",
+    "department": "Highways & Connectivity Wing",
+    "sector": "Roads & Highways",
+    "state": "Rajasthan",
+    "implementing_agency": "National Highways Authority of India (NHAI)",
+    "status": "Ongoing",
+    "financials": {
+      "original_cost_cr": 339.96,
+      "revised_cost_cr": 429.44,
+      "cumulative_expenditure_cr": 236.55,
+      "cost_overrun_cr": 89.48
+    },
+    "progress": {
+      "physical_progress_pct": 47.08,
+      "financial_progress_pct": 55.08,
+      "progress_gap_pct": 8.0
+    },
+    "schedule": {
+      "start_date": "2023-10",
+      "planned_completion_date": "2027-09",
+      "revised_completion_date": "2029-03",
+      "delay_duration_months": 18,
+      "schedule_revisions_count": 3
+    },
+    "milestones": [
+      {
+        "id": "01",
+        "name": "Feasibility Study & Detailed Project Report (DPR) Approval",
+        "planned_date": "2024-01-23",
+        "status": "COMPLETED",
+        "delay_days": 43,
+        "dependency": "ADMINISTRATIVE"
+      },
+      {
+        "id": "02",
+        "name": "Statutory Environmental & Forest Clearance Stage-I",
+        "planned_date": "2024-06-14",
+        "status": "COMPLETED",
+        "delay_days": 87,
+        "dependency": "STATUTORY"
+      },
+      {
+        "id": "03",
+        "name": "Land Acquisition 80% ROW Notification (Sec 3D/19)",
+        "planned_date": "2024-11-04",
+        "status": "COMPLETED",
+        "delay_days": 127,
+        "dependency": "LAND_ACQUISITION"
+      },
+      {
+        "id": "04",
+        "name": "EPC Tendering, Technical Evaluation & Contract Award",
+        "planned_date": "2025-03-27",
+        "status": "COMPLETED",
+        "delay_days": 172,
+        "dependency": "PROCUREMENT"
+      },
+      {
+        "id": "05",
+        "name": "Contractor Mobilization, ROW Handover & Utility Relocation",
+        "planned_date": "2025-09-15",
+        "status": "DELAYED",
+        "delay_days": 540,
+        "dependency": "RIGHT_OF_WAY"
+      },
+      {
+        "id": "06",
+        "name": "Major Substructure, Earthwork & Foundation Works (50%)",
+        "planned_date": "2026-04-18",
+        "status": "NOT_STARTED",
+        "delay_days": 0,
+        "dependency": "CIVIL_WORKS"
+      },
+      {
+        "id": "07",
+        "name": "Superstructure Erection, Track/Line Laying & Core Fabrication",
+        "planned_date": "2026-11-18",
+        "status": "NOT_STARTED",
+        "delay_days": 0,
+        "dependency": "CIVIL_WORKS"
+      },
+      {
+        "id": "08",
+        "name": "Equipment Installation, Signaling & Substation Integration",
+        "planned_date": "2027-04-10",
+        "status": "NOT_STARTED",
+        "delay_days": 0,
+        "dependency": "SYSTEMS_EQUIPMENT"
+      },
+      {
+        "id": "09",
+        "name": "Safety Audit, Statutory Inspection (CRS/DGCA/CEA)",
+        "planned_date": "2027-07-05",
+        "status": "NOT_STARTED",
+        "delay_days": 0,
+        "dependency": "STATUTORY_INSPECTION"
+      },
+      {
+        "id": "10",
+        "name": "Final Trial Runs, COD Commercial Operation & Handover",
+        "planned_date": "2027-09-01",
+        "status": "NOT_STARTED",
+        "delay_days": 0,
+        "dependency": "COMMISSIONING"
+      }
+    ],
+    "risk": {
+      "overall_score": 57.8,
+      "level": "HIGH",
+      "schedule_score": 50.4,
+      "cost_score": 57.9,
+      "implementation_score": 85.0,
+      "primary_driver": "Bottleneck: Environmental Clearance",
+      "drivers": [
+        {
+          "rank": 1,
+          "name": "Environmental Clearance",
+          "strength_pct": 52,
+          "evidence": "Reported constraint in Rajasthan"
+        },
+        {
+          "rank": 2,
+          "name": "Milestone Slippage Rate",
+          "strength_pct": 28,
+          "evidence": "5 milestones delayed"
+        },
+        {
+          "rank": 3,
+          "name": "Decoupling Gap",
+          "strength_pct": 20,
+          "evidence": "Expenditure leads physical progress by 8.0%"
+        }
+      ],
+      "observed_signals": [
+        {
+          "label": "Physical Completion",
+          "value": "47.08%",
+          "context": "Reported work accomplished"
+        },
+        {
+          "label": "Expenditure",
+          "value": "\u20b9236.55 Cr",
+          "context": "55.08% of sanctioned budget"
+        }
+      ],
+      "attribution_note": "Synthetic risk attribution generated for Phase 1/2 demonstration"
+    },
+    "metadata": {
+      "data_source": "MoSPI IPMD PAIMANA Schema",
+      "data_status": "SYNTHETIC",
+      "last_updated": "2026-03-31"
+    }
+  },
+  {
+    "project_id": "PRJ-SYN-000001",
+    "project_name": "Secunderabad-Mahabubnagar Doubling \u2014 Civil Package 1 (Underground Tunnel)",
+    "ministry": "Ministry of Railways",
+    "department": "Project Development Directorate",
+    "sector": "Railways",
+    "state": "Gujarat",
+    "implementing_agency": "Railway Infrastructure Board / DFCCIL",
+    "status": "Ongoing",
+    "financials": {
+      "original_cost_cr": 2957.34,
+      "revised_cost_cr": 3767.95,
+      "cumulative_expenditure_cr": 2433.06,
+      "cost_overrun_cr": 810.61
+    },
+    "progress": {
+      "physical_progress_pct": 63.79,
+      "financial_progress_pct": 64.57,
+      "progress_gap_pct": 0.78
+    },
+    "schedule": {
+      "start_date": "2022-02",
+      "planned_completion_date": "2027-03",
+      "revised_completion_date": "2029-05",
+      "delay_duration_months": 26,
+      "schedule_revisions_count": 4
+    },
+    "milestones": [
+      {
+        "id": "01",
+        "name": "Feasibility Study & Detailed Project Report (DPR) Approval",
+        "planned_date": "2022-06-29",
+        "status": "COMPLETED",
+        "delay_days": 75,
+        "dependency": "ADMINISTRATIVE"
+      },
+      {
+        "id": "02",
+        "name": "Statutory Environmental & Forest Clearance Stage-I",
+        "planned_date": "2022-12-31",
+        "status": "COMPLETED",
+        "delay_days": 135,
+        "dependency": "STATUTORY"
+      },
+      {
+        "id": "03",
+        "name": "Land Acquisition 80% ROW Notification (Sec 3D/19)",
+        "planned_date": "2023-07-05",
+        "status": "COMPLETED",
+        "delay_days": 184,
+        "dependency": "LAND_ACQUISITION"
+      },
+      {
+        "id": "04",
+        "name": "EPC Tendering, Technical Evaluation & Contract Award",
+        "planned_date": "2024-01-06",
+        "status": "COMPLETED",
+        "delay_days": 253,
+        "dependency": "PROCUREMENT"
+      },
+      {
+        "id": "05",
+        "name": "Contractor Mobilization, ROW Handover & Utility Relocation",
+        "planned_date": "2024-08-16",
+        "status": "COMPLETED",
+        "delay_days": 313,
+        "dependency": "RIGHT_OF_WAY"
+      },
+      {
+        "id": "06",
+        "name": "Major Substructure, Earthwork & Foundation Works (50%)",
+        "planned_date": "2025-05-21",
+        "status": "COMPLETED",
+        "delay_days": 375,
+        "dependency": "CIVIL_WORKS"
+      },
+      {
+        "id": "07",
+        "name": "Superstructure Erection, Track/Line Laying & Core Fabrication",
+        "planned_date": "2026-02-23",
+        "status": "DELAYED",
+        "delay_days": 780,
+        "dependency": "CIVIL_WORKS"
+      },
+      {
+        "id": "08",
+        "name": "Equipment Installation, Signaling & Substation Integration",
+        "planned_date": "2026-08-27",
+        "status": "NOT_STARTED",
+        "delay_days": 0,
+        "dependency": "SYSTEMS_EQUIPMENT"
+      },
+      {
+        "id": "09",
+        "name": "Safety Audit, Statutory Inspection (CRS/DGCA/CEA)",
+        "planned_date": "2026-12-16",
+        "status": "NOT_STARTED",
+        "delay_days": 0,
+        "dependency": "STATUTORY_INSPECTION"
+      },
+      {
+        "id": "10",
+        "name": "Final Trial Runs, COD Commercial Operation & Handover",
+        "planned_date": "2027-03-01",
+        "status": "NOT_STARTED",
+        "delay_days": 0,
+        "dependency": "COMMISSIONING"
+      }
+    ],
+    "risk": {
+      "overall_score": 66.4,
+      "level": "CRITICAL",
+      "schedule_score": 72.8,
+      "cost_score": 60.3,
+      "implementation_score": 85.0,
+      "primary_driver": "Bottleneck: Land Acquisition",
+      "drivers": [
+        {
+          "rank": 1,
+          "name": "Land Acquisition",
+          "strength_pct": 52,
+          "evidence": "Reported constraint in Gujarat"
+        },
+        {
+          "rank": 2,
+          "name": "Milestone Slippage Rate",
+          "strength_pct": 28,
+          "evidence": "7 milestones delayed"
+        },
+        {
+          "rank": 3,
+          "name": "Decoupling Gap",
+          "strength_pct": 20,
+          "evidence": "Expenditure leads physical progress by 0.78%"
+        }
+      ],
+      "observed_signals": [
+        {
+          "label": "Physical Completion",
+          "value": "63.79%",
+          "context": "Reported work accomplished"
+        },
+        {
+          "label": "Expenditure",
+          "value": "\u20b92433.06 Cr",
+          "context": "64.57% of sanctioned budget"
+        }
+      ],
+      "attribution_note": "Synthetic risk attribution generated for Phase 1/2 demonstration"
+    },
+    "metadata": {
+      "data_source": "MoSPI IPMD PAIMANA Schema",
+      "data_status": "SYNTHETIC",
+      "last_updated": "2026-03-31"
+    }
+  }
+]

@@ -1,0 +1,74 @@
+{
+  "build_timestamp": "2026-09-07T07:54:46Z",
+  "generator_version": "v0.2.0",
+  "dataset_version": "v0.2.0",
+  "seed": 42,
+  "record_count": 10000,
+  "provenance": {
+    "sponsoring_ministry": "Ministry of Statistics and Programme Implementation (MoSPI)",
+    "division": "Infrastructure and Project Monitoring Division (IPMD)",
+    "reference_system": "PAIMANA (Central Sector Projects \u20b9150 Cr+)",
+    "status": "SYNTHETIC_DEMONSTRATION",
+    "prototype_disclaimer": "This synthetic dataset is generated for SIH26103 prototype demonstration and validation. It does not represent live classified MoSPI records."
+  },
+  "quality_summary": {
+    "prototype_data_quality_score": 100.0,
+    "gate_passed": true,
+    "completeness_score": 100.0,
+    "validity_score": 100.0,
+    "uniqueness_score": 100.0,
+    "consistency_score": 100.0
+  },
+  "artifacts": {
+    "README.md": {
+      "size_bytes": 4812,
+      "lines": 88,
+      "sha256": "d3996305a42cc7afed45453372d017ff7e68cc3b82a34befe326b13c493b4b70"
+    },
+    "examples/example_project.json": {
+      "size_bytes": 19447,
+      "lines": 626,
+      "sha256": "a343a391836a8f5c91e04251c50f46f02f13f327109d67e65c0e4e3a4756ee78"
+    },
+    "processed/ml_ready_projects.csv": {
+      "size_bytes": 2308220,
+      "lines": 10001,
+      "sha256": "9db0f16f2fe80565a0bcb89995c4811e528f4b49e52421badf7cca7c7169c8f1"
+    },
+    "processed/project_milestones.csv": {
+      "size_bytes": 14304819,
+      "lines": 100001,
+      "sha256": "37fb1aaf35ad948d0443e12547d46ada717fc1698c2ec50569ff9bc30cd5e1a2"
+    },
+    "processed/project_progress.csv": {
+      "size_bytes": 389077,
+      "lines": 9001,
+      "sha256": "3eb46da36d5880397b70c0b7140e994dfdacaa2173f6c1eff5a5a9d841d55469"
+    },
+    "processed/projects_clean.csv": {
+      "size_bytes": 4797598,
+      "lines": 10001,
+      "sha256": "60401a6e4e027c6bf8036bd3c575e83b522d9ee878d2ec5a93e59ca220f5083c"
+    },
+    "quality/data_quality_report.json": {
+      "size_bytes": 4948,
+      "lines": 186,
+      "sha256": "b656465ef0be61b7dfd23c583ca676124cb9fdae6fed90f16f05ac652b9dc86c"
+    },
+    "quality/dataset_statistics.json": {
+      "size_bytes": 26935,
+      "lines": 1163,
+      "sha256": "f425ba027b243a1a35ad0011b8774c3852d75adf9b87025b0377566fc6dc4aad"
+    },
+    "raw/projects_raw.csv": {
+      "size_bytes": 4782734,
+      "lines": 10001,
+      "sha256": "a922e79cc1f05d68e5e07d187dbbd857b843fe931851680df54900491d76e558"
+    },
+    "test_cases/data_quality_test_cases.csv": {
+      "size_bytes": 6767,
+      "lines": 13,
+      "sha256": "94fafb5ac3135bdbd4a75199197fdf09997e9b7936835d3aa85ab68939d58a2d"
+    }
+  }
+}

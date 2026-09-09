@@ -1,0 +1,89 @@
+﻿{
+  "seed": 42,
+  "default_record_count": 10000,
+  "generator_version": "v0.2.0",
+  "dataset_version": "v0.2.0",
+  "provenance": {
+    "data_source": "Synthetic demonstration dataset",
+    "data_status": "SYNTHETIC",
+    "schema_basis": "PAIMANA-modeled project monitoring schema"
+  },
+  "ministries": [
+    { "name": "Ministry of Road Transport & Highways", "share": 0.42, "agency": "National Highways Authority of India (NHAI)" },
+    { "name": "Ministry of Railways", "share": 0.24, "agency": "Railway Infrastructure Board / DFCCIL" },
+    { "name": "Ministry of Power", "share": 0.12, "agency": "National Thermal & Hydro Power Corp (NTPC/NHPC)" },
+    { "name": "Ministry of Petroleum & Natural Gas", "share": 0.08, "agency": "Gas & Oil Infrastructure Authority (GAIL/IOCL)" },
+    { "name": "Ministry of Housing & Urban Affairs", "share": 0.06, "agency": "Metro Rail Infrastructure SPV" },
+    { "name": "Ministry of Jal Shakti", "share": 0.03, "agency": "National Water Development Agency" },
+    { "name": "Ministry of Civil Aviation", "share": 0.02, "agency": "Airports Authority of India (AAI)" },
+    { "name": "Ministry of Ports, Shipping & Waterways", "share": 0.02, "agency": "Major Ports Authority" },
+    { "name": "Ministry of Coal", "share": 0.01, "agency": "Coal Infrastructure PSU" }
+  ],
+  "sectors": {
+    "Ministry of Road Transport & Highways": ["Roads & Expressways", "Bridges & Tunnels", "Economic Corridors"],
+    "Ministry of Railways": ["Freight Corridors", "High-Speed Rail", "Track Doubling & Electrification"],
+    "Ministry of Power": ["Ultra-Supercritical Thermal", "Hydroelectric Power", "Renewable Solar & Wind"],
+    "Ministry of Petroleum & Natural Gas": ["Cross-Country Pipelines", "Refinery Expansion", "Strategic Storage"],
+    "Ministry of Housing & Urban Affairs": ["Urban Metro Transit", "Regional Rapid Transit", "Water Augmentation"],
+    "Ministry of Jal Shakti": ["River Valley Projects", "Inter-Basin Linkage", "Groundwater Recharge"],
+    "Ministry of Civil Aviation": ["Greenfield Airports", "Terminal Expansion", "Runway & Cargo Facilities"],
+    "Ministry of Ports, Shipping & Waterways": ["Deep-Draft Berths", "Port Rail Connectivity", "Inland Waterways"],
+    "Ministry of Coal": ["Coal Evacuation Infrastructure", "Pithead Processing Facilities"]
+  },
+  "states": [
+    { "name": "Uttar Pradesh", "region": "North", "weight": 0.12 },
+    { "name": "Maharashtra", "region": "West", "weight": 0.11 },
+    { "name": "Gujarat", "region": "West", "weight": 0.09 },
+    { "name": "Tamil Nadu", "region": "South", "weight": 0.08 },
+    { "name": "Karnataka", "region": "South", "weight": 0.08 },
+    { "name": "Andhra Pradesh", "region": "South", "weight": 0.07 },
+    { "name": "Telangana", "region": "South", "weight": 0.06 },
+    { "name": "Madhya Pradesh", "region": "Central", "weight": 0.07 },
+    { "name": "Rajasthan", "region": "North", "weight": 0.07 },
+    { "name": "Odisha", "region": "East", "weight": 0.06 },
+    { "name": "West Bengal", "region": "East", "weight": 0.05 },
+    { "name": "Bihar", "region": "East", "weight": 0.05 },
+    { "name": "Assam", "region": "Northeast", "weight": 0.04 },
+    { "name": "Jharkhand", "region": "East", "weight": 0.03 },
+    { "name": "Chhattisgarh", "region": "Central", "weight": 0.02 }
+  ],
+  "project_types": [
+    "New Construction",
+    "Capacity Augmentation",
+    "Corridor Modernization",
+    "Rehabilitation & Upgradation",
+    "Strategic Interconnection"
+  ],
+  "bottlenecks": [
+    "NONE",
+    "LAND_ACQUISITION",
+    "ENVIRONMENTAL_CLEARANCE",
+    "FOREST_CLEARANCE",
+    "PROCUREMENT",
+    "CONTRACTOR",
+    "UTILITY_SHIFTING",
+    "DESIGN_CHANGE",
+    "LEGAL_DISPUTE",
+    "INTERDEPARTMENTAL_DEPENDENCY"
+  ],
+  "target_risk_distribution": {
+    "LOW": 0.40,
+    "MODERATE": 0.30,
+    "HIGH": 0.20,
+    "CRITICAL": 0.10
+  },
+  "cost_parameters": {
+    "min_cost_cr": 150.0,
+    "lognormal_mean": 6.8,
+    "lognormal_sigma": 0.95
+  },
+  "duration_parameters": {
+    "min_months": 18,
+    "max_months": 72
+  },
+  "missingness": {
+    "department_missing_pct": 2.5,
+    "sub_sector_missing_pct": 3.0,
+    "secondary_bottleneck_missing_pct": 5.0
+  }
+}
