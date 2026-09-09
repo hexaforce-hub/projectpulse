@@ -1,0 +1,21 @@
+# Vercel Deployment Ignore Rules
+tools/
+python.bat
+run_server.bat
+scratch/
+
+# Database files & backups
+*.db
+*.db.bak
+data/*.db
+data/*.db.bak
+data/processed/
+data/raw/
+
+# ML models
+models/
+
+# Testing & logs
+tests/
+*.log
+.pytest_cache/
