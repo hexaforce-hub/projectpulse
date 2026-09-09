@@ -102,7 +102,9 @@ const AnalyticsView = {
     // Load data from backend
     if (!this.data) {
       try {
-        this.data = await APIClient.getAnalyticsSummary();
+        if (window.APIClient) {
+          this.data = await window.APIClient.getAnalyticsSummary();
+        }
       } catch (err) {
         console.warn("[AnalyticsView] Failed to load live analytics:", err);
       }

@@ -251,11 +251,11 @@ const MinistryView = {
                     <td class="p-3 font-medium text-slate-900 max-w-xs truncate" title="${p.project_name}">${p.project_name}</td>
                     <td class="p-3 text-slate-600">${p.implementing_agency || "NHAI"}</td>
                     <td class="p-3 text-slate-600">${p.state}</td>
-                    <td class="p-3 font-bold text-rose-700 tabular-nums">₹${Math.round(p.cost_overrun_cr || 0).toLocaleString()} Cr</td>
-                    <td class="p-3 tabular-nums text-slate-700">${p.schedule_slippage_months || 0} mos</td>
-                    <td class="p-3">${CommonUI.renderRiskBadge(p.target_risk_class || "HIGH", p.overall_risk_score)}</td>
+                    <td class="p-3 font-bold text-rose-700 tabular-nums">₹${Math.round(p.financials ? (p.financials.cost_overrun_cr || 0) : (p.cost_overrun_cr || 0)).toLocaleString()} Cr</td>
+                    <td class="p-3 tabular-nums text-slate-700">${p.schedule ? (p.schedule.delay_duration_months || 0) : (p.schedule_slippage_months || 0)} mos</td>
+                    <td class="p-3">${CommonUI.renderRiskBadge(p.risk ? p.risk.level : (p.target_risk_class || "HIGH"), p.risk ? p.risk.overall_score : (p.overall_risk_score || 70))}</td>
                     <td class="p-3 text-right">
-                      <a href="#/project/${p.project_id}" class="px-2.5 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded font-semibold hover:bg-blue-100 transition">
+                      <a href="#/projects/${p.project_id}" class="px-2.5 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded font-semibold hover:bg-blue-100 transition">
                         Open Detail
                       </a>
                     </td>
@@ -386,7 +386,7 @@ const MinistryView = {
       try {
         await window.APIClient.createDirective(payload);
         modal.remove();
-        const mainContainer = document.getElementById("main-content");
+        const mainContainer = document.getElementById("main-content-mount") || document.getElementById("main-content");
         if (mainContainer) this.render(mainContainer);
       } catch (err) {
         alert("Failed to issue directive: " + err.message);

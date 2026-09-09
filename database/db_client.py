@@ -45,6 +45,7 @@ class DatabaseClient(ReportsClientMixin):
                 SELECT 
                     COUNT(*) as total_count,
                     SUM(revised_cost_cr) as total_revised_cost,
+                    SUM(CASE WHEN revised_cost_cr > original_cost_cr THEN (revised_cost_cr - original_cost_cr) ELSE 0 END) as total_overrun,
                     SUM(CASE WHEN target_risk_class IN ('HIGH', 'CRITICAL') THEN 1 ELSE 0 END) as review_count,
                     SUM(CASE WHEN target_risk_class IN ('HIGH', 'CRITICAL') THEN revised_cost_cr ELSE 0 END) as capital_at_risk,
                     SUM(CASE WHEN target_risk_class = 'LOW' THEN 1 ELSE 0 END) as low_count,
@@ -56,6 +57,7 @@ class DatabaseClient(ReportsClientMixin):
             row = cursor.fetchone()
             
             total_rev_cost = row["total_revised_cost"] or 0.0
+            total_overrun = row["total_overrun"] or 0.0
             cap_risk = row["capital_at_risk"] or 0.0
             
             return {
@@ -64,6 +66,9 @@ class DatabaseClient(ReportsClientMixin):
                 "total_revised_cost_formatted": self.format_inr_cr(total_rev_cost),
                 "total_revised_cost_raw": round(total_rev_cost, 2),
                 "total_revised_cost_subtext": "Latest revised portfolio exposure",
+                "total_cost_overrun_formatted": self.format_inr_cr(total_overrun),
+                "total_overrun_formatted": self.format_inr_cr(total_overrun),
+                "total_overrun_raw": round(total_overrun, 2),
                 "projects_requiring_review_count": row["review_count"],
                 "projects_requiring_review_subtext": "Elevated predicted risk (High/Critical)",
                 "capital_at_risk_formatted": self.format_inr_cr(cap_risk),

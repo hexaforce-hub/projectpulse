@@ -196,7 +196,7 @@ const EarlyWarningsView = {
     if (refreshBtn) {
       refreshBtn.addEventListener("click", () => {
         this.loadAlerts();
-        APIClient.showToast("Early warning radar refreshed", "info");
+        window.APIClient.showToast("Early warning radar refreshed", "info");
       });
     }
 
@@ -262,7 +262,7 @@ const EarlyWarningsView = {
       if (this.selectedSeverity !== "all") params.severity = this.selectedSeverity;
       if (this.selectedStatus !== "all") params.status = this.selectedStatus;
 
-      const data = await APIClient.getAlerts(params);
+      const data = await window.APIClient.getAlerts(params);
       this.cachedData = data;
       this.renderTable(data);
       this.updateKPIs(data);
@@ -316,8 +316,8 @@ const EarlyWarningsView = {
       return;
     }
 
-    const canTriage = APIClient.currentUser && 
-      (APIClient.currentUser.role === "ADMIN" || APIClient.currentUser.role === "MONITORING_OFFICER");
+    const canTriage = window.APIClient.currentUser && 
+      (window.APIClient.currentUser.role === "ADMIN" || window.APIClient.currentUser.role === "MONITORING_OFFICER");
 
     tbody.innerHTML = items.map(a => {
       let badgeClass = "risk-badge-low";
@@ -423,7 +423,7 @@ const EarlyWarningsView = {
         btn.disabled = true;
         btn.innerText = "...";
         
-        await APIClient.updateAlertStatus(alertId, newStatus, `Officer quick-triage from Early Warning Radar`);
+        await window.APIClient.updateAlertStatus(alertId, newStatus, `Officer quick-triage from Early Warning Radar`);
         await this.loadAlerts();
       });
     });

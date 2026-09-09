@@ -12,7 +12,7 @@ const SettingsView = {
   auditFilterAction: "",
 
   render() {
-    const user = APIClient.currentUser || {
+    const user = (window.APIClient && window.APIClient.currentUser) || {
       name: "Smt. Priya Sharma",
       role: "MONITORING_OFFICER",
       badge: "Monitoring Officer",
@@ -76,7 +76,7 @@ const SettingsView = {
   },
 
   renderSessionTab() {
-    const user = APIClient.currentUser || {
+    const user = (window.APIClient && window.APIClient.currentUser) || {
       name: "Smt. Priya Sharma",
       role: "MONITORING_OFFICER",
       badge: "Monitoring Officer",
@@ -437,7 +437,7 @@ const SettingsView = {
       document.querySelectorAll(".role-switch-btn").forEach(btn => {
         btn.addEventListener("click", async () => {
           const role = btn.dataset.role;
-          await APIClient.switchRole(role);
+          await window.APIClient.switchRole(role);
           // Re-render settings view
           const mount = document.getElementById("settings-tab-mount");
           if (mount) {
@@ -460,7 +460,7 @@ const SettingsView = {
       if (refreshBtn) {
         refreshBtn.addEventListener("click", () => {
           this.loadAuditLogs();
-          APIClient.showToast("Audit logs refreshed", "info");
+          window.APIClient.showToast("Audit logs refreshed", "info");
         });
       }
 
@@ -496,7 +496,7 @@ const SettingsView = {
       };
       if (this.auditFilterAction) params.action = this.auditFilterAction;
 
-      const data = await APIClient.getAuditLogs(params);
+      const data = await window.APIClient.getAuditLogs(params);
       const logs = data.logs || [];
 
       if (logs.length === 0) {

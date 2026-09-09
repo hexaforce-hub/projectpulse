@@ -53,9 +53,9 @@ const Router = {
       mount.innerHTML = window.PortfolioMatrixView.render();
       if (window.PortfolioMatrixView.postRender) window.PortfolioMatrixView.postRender();
       window.AppShell.updateActiveNav("portfolio-matrix");
-    } else if (rootRoute === "projects") {
+    } else if (rootRoute === "projects" || rootRoute === "project") {
       if (segments[1]) {
-        // Project Detail Route: #/projects/PRJ-DEMO-001
+        // Project Detail Route: #/projects/PRJ-DEMO-001 or #/project/PRJ-DEMO-001
         const projectId = decodeURIComponent(segments[1]);
         mount.innerHTML = window.ProjectDetailView.render(projectId);
         if (window.ProjectDetailView.postRender) window.ProjectDetailView.postRender(projectId);
@@ -118,6 +118,12 @@ const Router = {
       mount.innerHTML = window.ReportIntelligenceView.render();
       if (window.ReportIntelligenceView.postRender) window.ReportIntelligenceView.postRender();
       window.AppShell.updateActiveNav("reports");
+    } else if (rootRoute === "what-if") {
+      const qParams = new URLSearchParams(queryString || "");
+      const projectId = qParams.get("project_id") || "PRJ-SYN-000002";
+      mount.innerHTML = window.ProjectDetailView.render(projectId);
+      if (window.ProjectDetailView.postRender) window.ProjectDetailView.postRender(projectId);
+      window.AppShell.updateActiveNav("projects/" + projectId);
     } else {
       // Fallback to Dashboard
       window.location.hash = "#/dashboard";

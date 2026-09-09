@@ -404,6 +404,11 @@ const APIClient = {
     return { total_records: all.length, page: 1, page_size: all.length, items: all };
   },
 
+  // Alias: listProjects → getProjects (used by MinistryView, ProjectManagerView)
+  async listProjects(params = {}) {
+    return this.getProjects(params);
+  },
+
   async getProject(projectId, includeShap = true) {
     if (this.isLive) {
       try {

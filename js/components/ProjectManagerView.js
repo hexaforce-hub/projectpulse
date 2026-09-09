@@ -116,25 +116,25 @@ const ProjectManagerView = {
                 <div class="space-y-2">
                   <div class="flex items-center justify-between">
                     <span class="font-mono text-xs font-bold text-blue-700">${p.project_id}</span>
-                    ${CommonUI.renderRiskBadge(p.target_risk_class || "MODERATE", p.overall_risk_score)}
+                    ${CommonUI.renderRiskBadge(p.risk ? p.risk.level : (p.target_risk_class || "MODERATE"), p.risk ? p.risk.overall_score : (p.overall_risk_score || 50))}
                   </div>
                   <h4 class="font-bold text-slate-900 text-sm line-clamp-2" title="${p.project_name}">
                     ${p.project_name}
                   </h4>
                   <div class="text-xs text-slate-500 flex items-center justify-between pt-1">
                     <span>${p.state}</span>
-                    <span class="font-semibold text-slate-700">₹${Math.round(p.revised_cost_cr || 0).toLocaleString()} Cr</span>
+                    <span class="font-semibold text-slate-700">₹${Math.round((p.financials ? p.financials.revised_cost_cr : p.revised_cost_cr) || 0).toLocaleString()} Cr</span>
                   </div>
                   <div class="pt-2">
-                    ${CommonUI.renderDualProgress(p.physical_progress_pct || 45, p.financial_progress_pct || 58)}
+                    ${CommonUI.renderDualProgress(p.progress ? p.progress.physical_progress_pct : (p.physical_progress_pct || 45), p.progress ? p.progress.financial_progress_pct : (p.financial_progress_pct || 58))}
                   </div>
                 </div>
 
                 <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                  <a href="#/project/${p.project_id}" class="text-xs font-bold text-blue-700 hover:text-blue-900">
+                  <a href="#/projects/${p.project_id}" class="text-xs font-bold text-blue-700 hover:text-blue-900">
                     Open Detail &rarr;
                   </a>
-                  <a href="#/what-if?project_id=${p.project_id}" class="px-2.5 py-1 bg-amber-50 text-amber-900 border border-amber-200 text-xs font-bold rounded-lg hover:bg-amber-100 transition">
+                  <a href="#/projects/${p.project_id}" class="px-2.5 py-1 bg-amber-50 text-amber-900 border border-amber-200 text-xs font-bold rounded-lg hover:bg-amber-100 transition">
                     Simulate
                   </a>
                 </div>
