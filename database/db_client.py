@@ -17,6 +17,8 @@ from pathlib import Path
 
 from database.reports_client import ReportsClientMixin
 
+from database.connection import get_db_connection, get_database_backend_type
+
 DEFAULT_DB_PATH = Path(__file__).parent.parent / "data" / "projectpulse.db"
 
 class DatabaseClient(ReportsClientMixin):
@@ -24,10 +26,7 @@ class DatabaseClient(ReportsClientMixin):
         self.db_path = str(db_path or DEFAULT_DB_PATH)
         
     def _get_connection(self):
-        conn = sqlite3.connect(self.db_path)
-        conn.row_factory = sqlite3.Row
-        conn.execute("PRAGMA foreign_keys = ON;")
-        return conn
+        return get_db_connection(self.db_path)
 
     def format_inr_cr(self, val):
         """Format number in Indian Crore or Lakh Crore notation."""

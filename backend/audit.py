@@ -15,18 +15,17 @@ import time
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any
+from database.connection import get_db_connection
 
-DB_PATH = Path(__file__).parent.parent / "data" / "projectpulse.db"
+DEFAULT_DB_PATH = Path(__file__).parent.parent / "data" / "projectpulse.db"
 
 class AuditManager:
     def __init__(self, db_path: Optional[Path] = None):
-        self.db_path = str(db_path or DB_PATH)
+        self.db_path = db_path or DEFAULT_DB_PATH
         self._init_table()
 
     def _get_conn(self):
-        conn = sqlite3.connect(self.db_path)
-        conn.row_factory = sqlite3.Row
-        return conn
+        return get_db_connection(self.db_path)
 
     def _init_table(self):
         with self._get_conn() as conn:

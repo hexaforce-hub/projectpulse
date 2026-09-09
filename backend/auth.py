@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 from pydantic import BaseModel
 from fastapi import HTTPException, Header, status, Depends
+from database.connection import get_db_connection
 
 DB_PATH = Path(__file__).parent.parent / "data" / "projectpulse.db"
 
@@ -454,8 +455,7 @@ def authorize_project_scope(project_id: str, user: dict):
         user_ministry = user.get("scope_value", "")
         # Query project's ministry from database
         try:
-            conn = sqlite3.connect(DB_PATH)
-            conn.row_factory = sqlite3.Row
+            conn = get_db_connection()
             cursor = conn.cursor()
             cursor.execute("SELECT ministry FROM projects WHERE project_id = ?", (project_id,))
             row = cursor.fetchone()
@@ -484,7 +484,7 @@ def authorize_project_scope(project_id: str, user: dict):
         if not assigned:
             # Check project_assignments table in SQLite
             try:
-                conn = sqlite3.connect(DB_PATH)
+                conn = get_db_connection()
                 cursor = conn.cursor()
                 cursor.execute("SELECT project_id FROM project_assignments WHERE user_id = ? AND status = 'ACTIVE'", (user.get("user_id"),))
                 assigned = [r[0] for r in cursor.fetchall()]
