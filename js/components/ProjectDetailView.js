@@ -51,6 +51,9 @@ const ProjectDetailView = {
           </div>
         </div>
 
+        <!-- Role-Aware Adaptive Intelligence & Direct Action Flight Deck -->
+        <div id="dtl-role-adaptive-banner" class="animate-fade-in"></div>
+
         <!-- Above the Fold: Summary Card + Risk Overview -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
@@ -676,11 +679,223 @@ const ProjectDetailView = {
     // Load Audit History for this project
     this.loadProjectAuditHistory(pId);
 
+    // Render Role-Tailored Adaptive Intelligence Flight Deck
+    this.renderRoleAdaptiveBanner(pId, project);
+
     // Setup What-If Simulator
     this.setupWhatIfSimulator(pId, project);
 
     // Setup Warning Triage Buttons
     this.setupWarningTriage(pId);
+  },
+
+  renderRoleAdaptiveBanner(pId, project) {
+    const bannerMount = document.getElementById("dtl-role-adaptive-banner");
+    if (!bannerMount) return;
+
+    const user = (window.APIClient && window.APIClient.currentUser) ? window.APIClient.currentUser : { role: "ADMIN", name: "Institutional User" };
+    const role = (user.role || "ADMIN").toUpperCase();
+    const projName = (project && project.project_name) ? project.project_name : "Corridor Project";
+    const ministry = (project && project.ministry) ? project.ministry : "Central Ministry";
+
+    let html = "";
+
+    if (role === "NATIONAL_LEADER" || role === "MINISTER") {
+      html = `
+        <div class="p-4 rounded-xl bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-900 text-white border border-indigo-800 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center font-bold text-xs border border-indigo-400/30">🏛️</span>
+              <span class="text-xs font-bold uppercase tracking-wider text-indigo-300">National Executive Flight Deck • ${user.name}</span>
+              <span class="px-2 py-0.2 rounded text-[10px] font-extrabold bg-indigo-500/20 text-indigo-200 border border-indigo-400/30">MINISTERIAL OVERSIGHT</span>
+            </div>
+            <p class="text-sm font-semibold text-slate-100">National Governance Authority Active for ${pId}</p>
+            <p class="text-xs text-slate-300 max-w-3xl">
+              You hold statutory authority to issue enforceable downward directives to ${ministry} and executing project directors. Inter-ministerial coordination reviews and cabinet escalations can be executed directly from this portal.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 flex-shrink-0">
+            <a href="#/directives" class="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-colors shadow-sm flex items-center gap-1.5">
+              <span>📜</span> Issue Binding Directive
+            </a>
+            <a href="#/ministry" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-colors flex items-center gap-1.5">
+              <span>🏛️</span> Ministry Command
+            </a>
+            <button type="button" onclick="document.getElementById('whatif-simulator-container')?.scrollIntoView({ behavior: 'smooth' })" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-colors flex items-center gap-1.5">
+              <span>⚡</span> Policy What-If
+            </button>
+          </div>
+        </div>
+      `;
+    } else if (role === "MINISTRY_OFFICIAL" || role === "OFFICIAL") {
+      html = `
+        <div class="p-4 rounded-xl bg-gradient-to-r from-cyan-950 via-slate-900 to-cyan-900 text-white border border-cyan-800 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-300 flex items-center justify-center font-bold text-xs border border-cyan-400/30">🏢</span>
+              <span class="text-xs font-bold uppercase tracking-wider text-cyan-300">Ministry Secretarial Oversight • ${user.name}</span>
+              <span class="px-2 py-0.2 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-200 border border-cyan-400/30">SECRETARY DESK</span>
+            </div>
+            <p class="text-sm font-semibold text-slate-100">${ministry} Executive Control Desk</p>
+            <p class="text-xs text-slate-300 max-w-3xl">
+              Surveillance jurisdiction over state clearances, forest approvals, and implementing agency milestones. Issue department-level compliance notices and track resolution SLAs.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 flex-shrink-0">
+            <a href="#/ministry" class="px-3 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition-colors shadow-sm flex items-center gap-1.5">
+              <span>🏛️</span> Ministry Command Center
+            </a>
+            <a href="#/directives" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-colors flex items-center gap-1.5">
+              <span>📜</span> Issue Directive
+            </a>
+            <button type="button" onclick="document.getElementById('whatif-simulator-container')?.scrollIntoView({ behavior: 'smooth' })" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-colors flex items-center gap-1.5">
+              <span>⚡</span> Fast-Track Scenario
+            </button>
+          </div>
+        </div>
+      `;
+    } else if (role === "PROJECT_MANAGER" || role === "PM") {
+      html = `
+        <div class="p-4 rounded-xl bg-gradient-to-r from-sky-950 via-slate-900 to-sky-900 text-white border border-sky-800 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-sky-500/20 text-sky-300 flex items-center justify-center font-bold text-xs border border-sky-400/30">🛣️</span>
+              <span class="text-xs font-bold uppercase tracking-wider text-sky-300">Corridor Project Director Desk • ${user.name}</span>
+              <span class="px-2 py-0.2 rounded text-[10px] font-bold bg-sky-500/20 text-sky-200 border border-sky-400/30">PROJECT DIRECTOR</span>
+            </div>
+            <p class="text-sm font-semibold text-slate-100">Operational Jurisdiction for ${pId}</p>
+            <p class="text-xs text-slate-300 max-w-3xl">
+              You are assigned direct execution responsibility for this corridor. Review package contractor claims, track intermediate CPM milestones, resolve contractor liquidity/RoW impasses, and test recovery packages in What-If simulator.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 flex-shrink-0">
+            <a href="#/my-projects" class="px-3 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold transition-colors shadow-sm flex items-center gap-1.5">
+              <span>🛣️</span> Corridors Desk
+            </a>
+            <button type="button" onclick="document.getElementById('whatif-simulator-container')?.scrollIntoView({ behavior: 'smooth' })" class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-colors shadow-sm flex items-center gap-1.5">
+              <span>⚡</span> Run What-If Simulator
+            </button>
+            <a href="#/engineer" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-colors flex items-center gap-1.5">
+              <span>👷</span> Engineering Station
+            </a>
+          </div>
+        </div>
+      `;
+    } else if (role === "ENGINEER") {
+      html = `
+        <div class="p-4 rounded-xl bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-900 text-white border border-emerald-800 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-xs border border-emerald-400/30">👷</span>
+              <span class="text-xs font-bold uppercase tracking-wider text-emerald-300">Site & Technical Engineer Station • ${user.name}</span>
+              <span class="px-2 py-0.2 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-200 border border-emerald-400/30">EXECUTIVE RESIDENT ENGINEER</span>
+            </div>
+            <p class="text-sm font-semibold text-slate-100">Technical Verification & Critical Path CPM Station</p>
+            <p class="text-xs text-slate-300 max-w-3xl">
+              Inspect physical checkpoint completion, log structural defect tickets, review civil drawings and geotechnical reports, and verify contractor payment certificate decoupling gaps.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 flex-shrink-0">
+            <a href="#/engineer" class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-colors shadow-sm flex items-center gap-1.5">
+              <span>👷</span> Engineering Station
+            </a>
+            <a href="#/engineer" class="px-3 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition-colors shadow-sm flex items-center gap-1.5">
+              <span>📝</span> Log Site Defect
+            </a>
+            <a href="#/field" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-colors flex items-center gap-1.5">
+              <span>🚜</span> Field Tasks
+            </a>
+          </div>
+        </div>
+      `;
+    } else if (role === "FIELD_WORKER" || role === "FIELD") {
+      html = `
+        <div class="p-4 rounded-xl bg-gradient-to-r from-amber-950 via-slate-900 to-amber-900 text-white border border-amber-800 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-xs border border-amber-400/30">🚜</span>
+              <span class="text-xs font-bold uppercase tracking-wider text-amber-300">Field Operations Station • ${user.name}</span>
+              <span class="px-2 py-0.2 rounded text-[10px] font-bold bg-amber-500/20 text-amber-200 border border-amber-400/30">SITE SUPERVISOR</span>
+            </div>
+            <p class="text-sm font-semibold text-slate-100">Ground Telemetry & Daily Task Execution</p>
+            <p class="text-xs text-slate-300 max-w-3xl">
+              Touch-optimized mobile station active. Update daily task status (TODO / IN_PROGRESS / BLOCKED / COMPLETED), report material shortages, submit photo evidence, and flag emergency stop-work conditions.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 flex-shrink-0">
+            <a href="#/field" class="px-3 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition-colors shadow-sm flex items-center gap-1.5">
+              <span>🚜</span> Open Field Workstation
+            </a>
+            <a href="#/field" class="px-3 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition-colors shadow-sm flex items-center gap-1.5">
+              <span>🛑</span> Report Work Stoppage
+            </a>
+          </div>
+        </div>
+      `;
+    } else if (role === "ANALYST") {
+      html = `
+        <div class="p-4 rounded-xl bg-gradient-to-r from-violet-950 via-slate-900 to-violet-900 text-white border border-violet-800 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-violet-500/20 text-violet-300 flex items-center justify-center font-bold text-xs border border-violet-400/30">📊</span>
+              <span class="text-xs font-bold uppercase tracking-wider text-violet-300">Predictive Risk & Model Audit • ${user.name}</span>
+              <span class="px-2 py-0.2 rounded text-[10px] font-bold bg-violet-500/20 text-violet-200 border border-violet-400/30">DATA SCIENCE</span>
+            </div>
+            <p class="text-sm font-semibold text-slate-100">LightGBM Predictive Inference & SHAP Attribution Audit</p>
+            <p class="text-xs text-slate-300 max-w-3xl">
+              Inspect multi-target model sensitivities (Schedule Delay Months, Cost Probability %, Implementation Distress). Run multi-point numerical sweeps to assess non-causal elasticities across project levers.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 flex-shrink-0">
+            <button type="button" onclick="document.getElementById('btn-run-sensitivity')?.click()" class="px-3 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold transition-colors shadow-sm flex items-center gap-1.5">
+              <span>📊</span> Run Sensitivity Sweep
+            </button>
+            <a href="#/compare" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-colors flex items-center gap-1.5">
+              <span>⚖️</span> Peer Benchmarking
+            </a>
+            <a href="#/analytics" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-colors flex items-center gap-1.5">
+              <span>📈</span> Portfolio Matrix
+            </a>
+          </div>
+        </div>
+      `;
+    } else {
+      // ADMIN or default institutional
+      html = `
+        <div class="p-4 rounded-xl bg-gradient-to-r from-purple-950 via-slate-900 to-purple-900 text-white border border-purple-800 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-300 flex items-center justify-center font-bold text-xs border border-purple-400/30">🛡️</span>
+              <span class="text-xs font-bold uppercase tracking-wider text-purple-300">Central Administrative Superuser • ${user.name}</span>
+              <span class="px-2 py-0.2 rounded text-[10px] font-bold bg-purple-500/20 text-purple-200 border border-purple-400/30">FULL ACCESS</span>
+            </div>
+            <p class="text-sm font-semibold text-slate-100">MoSPI / IPMD National Infrastructure Surveillance</p>
+            <p class="text-xs text-slate-300 max-w-3xl">
+              Unrestricted national access across all 10,000 projects, early warning alerts, downward directives, and immutable SQLite governance ledgers.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 flex-shrink-0">
+            <a href="#/ministry" class="px-3 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition-colors shadow-sm flex items-center gap-1.5">
+              <span>🏛️</span> Ministry
+            </a>
+            <a href="#/my-projects" class="px-3 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold transition-colors shadow-sm flex items-center gap-1.5">
+              <span>🛣️</span> Corridors
+            </a>
+            <a href="#/engineer" class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-colors shadow-sm flex items-center gap-1.5">
+              <span>👷</span> Engineer
+            </a>
+            <a href="#/field" class="px-3 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition-colors shadow-sm flex items-center gap-1.5">
+              <span>🚜</span> Field
+            </a>
+            <a href="#/directives" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-colors flex items-center gap-1.5">
+              <span>📜</span> Directives
+            </a>
+          </div>
+        </div>
+      `;
+    }
+
+    bannerMount.innerHTML = html;
   },
 
   populateProjectDOM(p) {

@@ -190,24 +190,32 @@ const APIClient = {
 
     // Client fallback role switch
     const rolesMap = {
-      ADMIN: { username: "admin", name: "Dr. Rajesh Kumar", role: "ADMIN", badge: "Central Admin", designation: "Joint Secretary & Mission Director" },
-      MONITORING_OFFICER: { username: "officer", name: "Smt. Priya Sharma", role: "MONITORING_OFFICER", badge: "Monitoring Officer", designation: "Director (Infrastructure Monitoring)" },
-      ANALYST: { username: "analyst", name: "Shri Amitav Ghosh", role: "ANALYST", badge: "Senior Analyst", designation: "Senior Data Scientist & Policy Analyst" },
-      VIEWER: { username: "viewer", name: "Shri Vikram Mehta", role: "VIEWER", badge: "Observer", designation: "Central Sector Observer" }
+      NATIONAL_LEADER: { user_id: "USR-MINISTER-01", username: "minister", name: "Dr. Jitendra Singh", role: "NATIONAL_LEADER", badge: "National Leadership", designation: "Union Minister of State (IC)", division: "MoSPI", ministry: "National", scope_type: "NATIONAL", scope_value: "ALL", assigned_projects: [] },
+      MINISTER: { user_id: "USR-MINISTER-01", username: "minister", name: "Dr. Jitendra Singh", role: "NATIONAL_LEADER", badge: "National Leadership", designation: "Union Minister of State (IC)", division: "MoSPI", ministry: "National", scope_type: "NATIONAL", scope_value: "ALL", assigned_projects: [] },
+      MINISTRY_OFFICIAL: { user_id: "USR-OFFICIAL-01", username: "official", name: "Shri Anurag Jain, IAS", role: "MINISTRY_OFFICIAL", badge: "Ministry Secretary", designation: "Secretary to Government of India", division: "DoRTH", ministry: "Ministry of Road Transport & Highways", scope_type: "MINISTRY", scope_value: "Ministry of Road Transport & Highways", assigned_projects: [] },
+      OFFICIAL: { user_id: "USR-OFFICIAL-01", username: "official", name: "Shri Anurag Jain, IAS", role: "MINISTRY_OFFICIAL", badge: "Ministry Secretary", designation: "Secretary to Government of India", division: "DoRTH", ministry: "Ministry of Road Transport & Highways", scope_type: "MINISTRY", scope_value: "Ministry of Road Transport & Highways", assigned_projects: [] },
+      ANALYST: { user_id: "USR-ANALYST-01", username: "analyst", name: "Shri Amitav Ghosh", role: "ANALYST", badge: "Senior Analyst", designation: "Senior Data Scientist & Policy Analyst", division: "IPMD Analytics Unit", ministry: "MoSPI / IPMD", scope_type: "PORTFOLIO", scope_value: "ALL_ANALYTICS", assigned_projects: [] },
+      PROJECT_MANAGER: { user_id: "USR-PM-01", username: "pm", name: "Shri R.K. Singla", role: "PROJECT_MANAGER", badge: "Project Manager", designation: "Chief General Manager & Project Director", division: "NHAI Corridor PIU", ministry: "Ministry of Road Transport & Highways", scope_type: "PROJECT", scope_value: "PRJ-SYN-000002,PRJ-SYN-000003,PRJ-SYN-000004", assigned_projects: ["PRJ-SYN-000002", "PRJ-SYN-000003", "PRJ-SYN-000004"] },
+      PM: { user_id: "USR-PM-01", username: "pm", name: "Shri R.K. Singla", role: "PROJECT_MANAGER", badge: "Project Manager", designation: "Chief General Manager & Project Director", division: "NHAI Corridor PIU", ministry: "Ministry of Road Transport & Highways", scope_type: "PROJECT", scope_value: "PRJ-SYN-000002,PRJ-SYN-000003,PRJ-SYN-000004", assigned_projects: ["PRJ-SYN-000002", "PRJ-SYN-000003", "PRJ-SYN-000004"] },
+      ENGINEER: { user_id: "USR-ENGINEER-01", username: "engineer", name: "Er. Neha Verma", role: "ENGINEER", badge: "Site Engineer", designation: "Executive Resident Engineer (Civil)", division: "NHAI Corridor PIU", ministry: "Ministry of Road Transport & Highways", scope_type: "PROJECT", scope_value: "PRJ-SYN-000002", assigned_projects: ["PRJ-SYN-000002"] },
+      FIELD_WORKER: { user_id: "USR-FIELD-01", username: "field", name: "Shri Rajesh Gurjar", role: "FIELD_WORKER", badge: "Field Operations", designation: "Senior Site Supervisor (PKG-3)", division: "NH Field Unit", ministry: "Ministry of Road Transport & Highways", scope_type: "SITE", scope_value: "PRJ-SYN-000002", assigned_projects: ["PRJ-SYN-000002"] },
+      FIELD: { user_id: "USR-FIELD-01", username: "field", name: "Shri Rajesh Gurjar", role: "FIELD_WORKER", badge: "Field Operations", designation: "Senior Site Supervisor (PKG-3)", division: "NH Field Unit", ministry: "Ministry of Road Transport & Highways", scope_type: "SITE", scope_value: "PRJ-SYN-000002", assigned_projects: ["PRJ-SYN-000002"] },
+      ADMIN: { user_id: "USR-ADMIN-01", username: "admin", name: "Dr. Rajesh Kumar", role: "ADMIN", badge: "Central Admin", designation: "Joint Secretary & Mission Director", division: "MoSPI / IPMD", ministry: "MoSPI", scope_type: "SYSTEM", scope_value: "ALL", assigned_projects: [] },
+      MONITORING_OFFICER: { user_id: "USR-OFFICER-01", username: "officer", name: "Smt. Priya Sharma", role: "MONITORING_OFFICER", badge: "Monitoring Officer", designation: "Director (Infrastructure Monitoring)", division: "MoSPI / IPMD Surveillance Desk", ministry: "MoSPI", scope_type: "NATIONAL", scope_value: "ALL", assigned_projects: [] },
+      VIEWER: { user_id: "USR-VIEWER-01", username: "viewer", name: "Shri Vikram Mehta", role: "VIEWER", badge: "Observer", designation: "Central Sector Observer", division: "NITI Aayog", ministry: "National", scope_type: "NATIONAL", scope_value: "ALL", assigned_projects: [] }
     };
 
     const sel = rolesMap[roleName.toUpperCase()] || rolesMap["MONITORING_OFFICER"];
     this.currentUser = {
       ...sel,
-      division: "MoSPI / IPMD Oversight Desk",
       permissions: {
         can_view_dashboard: true,
         can_view_projects: true,
         can_view_warnings: true,
         can_manage_warnings: sel.role === "ADMIN" || sel.role === "MONITORING_OFFICER",
         can_run_scenarios: true,
-        can_save_scenarios: sel.role !== "VIEWER",
-        can_view_analytics: true,
+        can_save_scenarios: sel.role !== "VIEWER" && sel.role !== "FIELD_WORKER",
+        can_view_analytics: sel.role !== "FIELD_WORKER",
         can_view_audit: sel.role === "ADMIN" || sel.role === "MONITORING_OFFICER"
       }
     };
@@ -232,12 +240,20 @@ const APIClient = {
       }
       if (userBadgeMount) {
         let color = "bg-blue-100 text-blue-800 border-blue-200";
-        if (this.currentUser.role === "ADMIN") color = "bg-purple-100 text-purple-800 border-purple-200";
-        else if (this.currentUser.role === "MONITORING_OFFICER") color = "bg-emerald-100 text-emerald-800 border-emerald-200";
-        else if (this.currentUser.role === "ANALYST") color = "bg-amber-100 text-amber-800 border-amber-200";
+        if (this.currentUser.role === "NATIONAL_LEADER") color = "bg-indigo-100 text-indigo-900 border-indigo-300 font-extrabold";
+        else if (this.currentUser.role === "MINISTRY_OFFICIAL") color = "bg-cyan-100 text-cyan-900 border-cyan-300 font-bold";
+        else if (this.currentUser.role === "ADMIN") color = "bg-purple-100 text-purple-800 border-purple-200";
+        else if (this.currentUser.role === "PROJECT_MANAGER") color = "bg-sky-100 text-sky-800 border-sky-300";
+        else if (this.currentUser.role === "ENGINEER") color = "bg-emerald-100 text-emerald-800 border-emerald-300";
+        else if (this.currentUser.role === "FIELD_WORKER") color = "bg-amber-100 text-amber-900 border-amber-300";
+        else if (this.currentUser.role === "MONITORING_OFFICER") color = "bg-teal-100 text-teal-800 border-teal-200";
+        else if (this.currentUser.role === "ANALYST") color = "bg-violet-100 text-violet-800 border-violet-200";
         else if (this.currentUser.role === "VIEWER") color = "bg-slate-100 text-slate-800 border-slate-200";
         userBadgeMount.className = `px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider ${color}`;
         userBadgeMount.innerText = this.currentUser.role.replace("_", " ");
+      }
+      if (window.AppShell && window.AppShell.updateNavForRole) {
+        window.AppShell.updateNavForRole(this.currentUser.role);
       }
     }
   },
@@ -681,6 +697,391 @@ const APIClient = {
           ? "Highly recommended for immediate Empowered Committee ratification. Delivers substantial fiscal and schedule recovery." 
           : "Standard policy adjustment."
       }
+    };
+  },
+
+  // -------------------------------------------------------------
+  // Phase 10: Mock Fallback Datasets & API Methods
+  // -------------------------------------------------------------
+  mockTasks: [
+    { task_id: "TSK-001", project_id: "PRJ-SYN-000002", project_name: "Varanasi-Ranchi-Kolkata Expressway — Section I", milestone_id: "MS-DEMO-05", site_id: "SITE-KRISHNA-BRIDGE", assigned_to: "USR-FIELD-01", task_type: "CIVIL_CONSTRUCTION", title: "Pier Cap P7 Concrete Reinforcement Inspection", description: "Verify rebar spacing and coordinate load cell calibration before high water surge", priority: "HIGH", status: "IN_PROGRESS", due_date: "2026-09-15", completed_at: null, evidence_url: "https://evidence.projectpulse.gov.in/pier-p7-log.pdf", remarks: "Monsoon flood level monitoring active; pump dewatering installed." },
+    { task_id: "TSK-002", project_id: "PRJ-SYN-000002", project_name: "Varanasi-Ranchi-Kolkata Expressway — Section I", milestone_id: "MS-DEMO-06", site_id: "SITE-PKG-3-FOREST", assigned_to: "USR-FIELD-01", task_type: "LAND_CLEARANCE", title: "Forest Boundary Demarcation & Tree Felling Audit", description: "Complete pillar tagging across Chainage 142+000 to 148+500 with DFO team", priority: "CRITICAL", status: "BLOCKED", due_date: "2026-09-12", completed_at: null, evidence_url: null, remarks: "Forest Range Officer signature pending on Joint Inspection Memo." },
+    { task_id: "TSK-003", project_id: "PRJ-SYN-000002", project_name: "Varanasi-Ranchi-Kolkata Expressway — Section I", milestone_id: "MS-DEMO-08", site_id: "SITE-PAVING-SEC-A", assigned_to: "USR-FIELD-01", task_type: "INSPECTION", title: "PQC Paving Slump & Core Sampling (Km 120-125)", description: "Measure flexural strength of pavement quality concrete batches 14 through 22", priority: "MEDIUM", status: "COMPLETED", due_date: "2026-09-08", completed_at: "2026-09-08 17:30:00", evidence_url: "https://evidence.projectpulse.gov.in/core-sample-cert.pdf", remarks: "Compressive strength 45.2 MPa achieved. Approved for curing." },
+    { task_id: "TSK-004", project_id: "PRJ-SYN-000002", project_name: "Varanasi-Ranchi-Kolkata Expressway — Section I", milestone_id: "MS-DEMO-07", site_id: "SITE-VIADUCT-NORTH", assigned_to: "USR-FIELD-01", task_type: "SAFETY_CHECK", title: "Pre-Cast Segment Gantry Crane Load Proofing", description: "Inspect hydraulic tension jacks and guide cables on launching girder G-2", priority: "HIGH", status: "TODO", due_date: "2026-09-18", completed_at: null, evidence_url: null, remarks: "Awaiting mobile crane contractor mobilization." },
+    { task_id: "TSK-005", project_id: "PRJ-SYN-000002", project_name: "Varanasi-Ranchi-Kolkata Expressway — Section I", milestone_id: "MS-DEMO-05", site_id: "SITE-KRISHNA-BRIDGE", assigned_to: "USR-ENGINEER-01", task_type: "TECHNICAL_DOCUMENT", title: "Foundation Soil Profile Core Test Report Ratification", description: "Review geotechnical stratigraphy for Pier P8-P12 riverbed foundations", priority: "HIGH", status: "IN_PROGRESS", due_date: "2026-09-16", completed_at: null, evidence_url: "https://evidence.projectpulse.gov.in/soil-profile-p8.pdf", remarks: "Found soft clay seam at -18m; requires 3m additional socketing into bedrock." },
+    { task_id: "TSK-006", project_id: "PRJ-SYN-000002", project_name: "Varanasi-Ranchi-Kolkata Expressway — Section I", milestone_id: "MS-DEMO-06", site_id: "SITE-PKG-3-FOREST", assigned_to: "USR-ENGINEER-01", task_type: "CLEARANCE_SUBMISSION", title: "PARIVESH Portal Form-C Compliance Submission", description: "Upload Compensatory Afforestation Land (CAL) survey maps and GPS coordinates to MoEFCC", priority: "CRITICAL", status: "IN_PROGRESS", due_date: "2026-09-14", completed_at: null, evidence_url: null, remarks: "Maps endorsed by District Collector; awaiting final digital signature." }
+  ],
+  mockIssues: [
+    { issue_id: "ISS-001", project_id: "PRJ-SYN-000002", project_name: "Varanasi-Ranchi-Kolkata Expressway — Section I", milestone_id: "MS-DEMO-06", reported_by: "USR-FIELD-01", reported_by_name: "Shri Rajesh Gurjar", category: "FOREST_CLEARANCE", severity: "CRITICAL", title: "Forest Department Stage-II Handover Stalled at Chainage 144", description: "Local forest ranger halted tree removal awaiting formal Compensatory Afforestation fee credit confirmation.", status: "OPEN", assigned_to: "USR-ENGINEER-01", created_at: "2026-09-02 11:30:00", updated_at: null, resolution: null, evidence: "https://evidence.projectpulse.gov.in/forest-halt-notice.pdf" },
+    { issue_id: "ISS-002", project_id: "PRJ-SYN-000002", project_name: "Varanasi-Ranchi-Kolkata Expressway — Section I", milestone_id: "MS-DEMO-05", reported_by: "USR-ENGINEER-01", reported_by_name: "Er. Neha Verma", category: "DESIGN_CHANGE", severity: "HIGH", title: "River Bed Scour Depth Recalculation for Monsoon 2026", description: "Central Water Commission updated flood discharge estimates requiring 1.8m deeper pier foundations.", status: "IN_PROGRESS", assigned_to: "USR-PM-01", created_at: "2026-08-25 14:15:00", updated_at: null, resolution: null, evidence: "https://evidence.projectpulse.gov.in/scour-depth-cwc.pdf" },
+    { issue_id: "ISS-003", project_id: "PRJ-SYN-000002", project_name: "Varanasi-Ranchi-Kolkata Expressway — Section I", milestone_id: "MS-DEMO-07", reported_by: "USR-PM-01", reported_by_name: "Shri R.K. Singla", category: "CONTRACTOR", severity: "HIGH", title: "EPC Concessionaire Working Capital Liquidity Strain", description: "Main contractor facing cash flow bottleneck due to delayed mobilization advance bank guarantee.", status: "ESCALATED", assigned_to: "USR-OFFICIAL-01", created_at: "2026-08-28 09:40:00", updated_at: null, resolution: null, evidence: "https://evidence.projectpulse.gov.in/contractor-claim.pdf" }
+  ],
+  mockDirectives: [
+    { directive_id: "DIR-NAT-2026-01", issued_by: "Dr. Jitendra Singh", issuer_role: "NATIONAL_LEADER", target_scope: "NATIONAL", target_id: "ALL", title: "National Infrastructure Acceleration Mandate — PM GatiShakti De-confliction", instructions: "All Central Sector Megaprojects facing statutory clearance delays over 90 days must be submitted to the Empowered Group of Secretaries (EGoS) for single-window resolution.", priority: "IMMEDIATE_ESCALATION", status: "ACTIVE", created_at: "2026-08-15", compliance_notes: "34 projects forwarded to EGoS registry including NH-44 and EDFC-II." },
+    { directive_id: "DIR-MIN-2026-04", issued_by: "Shri Anurag Jain, IAS", issuer_role: "MINISTRY_OFFICIAL", target_scope: "MINISTRY", target_id: "Ministry of Road Transport & Highways", title: "Special Taskforce on Land Acquisition & RoW Handover for Strategic Corridors", instructions: "Project Directors must convene weekly coordination meetings with State Revenue Commissioners. Unresolved revenue awards to be settled via direct consent formula within 45 days.", priority: "URGENT", status: "ACKNOWLEDGED", created_at: "2026-08-20", compliance_notes: "Direct consent compensation disbursed in 4 districts of Telangana." },
+    { directive_id: "DIR-PRJ-2026-11", issued_by: "Shri R.K. Singla", issuer_role: "PROJECT_MANAGER", target_scope: "PROJECT", target_id: "PRJ-SYN-000002", title: "Site Mobilization Directive: Double-Shift Execution on Krishna River Viaduct", instructions: "Concessionaire ordered to mobilize additional 250 MT crane and auxiliary power generators to catch up on monsoon substructure delays before November COD target.", priority: "URGENT", status: "COMPLIED", created_at: "2026-09-01", compliance_notes: "Second shift crane operational as of September 4, 2026." }
+  ],
+  mockDocuments: [
+    { document_id: "DOC-001", project_id: "PRJ-SYN-000002", document_type: "APPROVAL", title: "Cabinet Committee on Economic Affairs (CCEA) Sanction Order", file_path: "/docs/NH44/CCEA_Sanction_2022.pdf", uploaded_by: "MoRTH Secretarial Desk", uploaded_at: "2022-09-10", version: "1.0", access_scope: "PUBLIC", file_size_kb: 2450 },
+    { document_id: "DOC-002", project_id: "PRJ-SYN-000002", document_type: "PROJECT_PLAN", title: "Detailed Project Report (DPR) Volume I - Engineering Feasibility", file_path: "/docs/NH44/DPR_Vol1_Technical.pdf", uploaded_by: "NHAI Planning Wing", uploaded_at: "2022-11-15", version: "2.1", access_scope: "PROJECT_TEAM", file_size_kb: 14820 },
+    { document_id: "DOC-003", project_id: "PRJ-SYN-000002", document_type: "COMPLIANCE_DOCUMENT", title: "MoEFCC Stage-I Forest Clearance In-Principle Approval", file_path: "/docs/NH44/MoEFCC_Stage1_Clearance.pdf", uploaded_by: "State Forest Liaison Officer", uploaded_at: "2023-04-12", version: "1.0", access_scope: "MINISTRY", file_size_kb: 1850 },
+    { document_id: "DOC-004", project_id: "PRJ-SYN-000002", document_type: "MILESTONE_EVIDENCE", title: "Subgrade Earthwork Section A Completion Certificate", file_path: "/docs/NH44/Subgrade_SecA_Cert.pdf", uploaded_by: "Er. Neha Verma", uploaded_at: "2024-01-05", version: "1.0", access_scope: "PROJECT_TEAM", file_size_kb: 3200 },
+    { document_id: "DOC-005", project_id: "PRJ-SYN-000002", document_type: "SITE_EVIDENCE", title: "Geotechnical Bore Hole Stratigraphy Logs (Krishna River Bed)", file_path: "/docs/NH44/Geotech_Krishna_BoreLogs.pdf", uploaded_by: "Er. Neha Verma", uploaded_at: "2024-06-18", version: "1.2", access_scope: "PROJECT_TEAM", file_size_kb: 8940 }
+  ],
+  mockNotifications: [
+    { notification_id: "NOTIF-001", user_id: "USR-MINISTER-01", title: "National Risk Escalation", message: "3 megaprojects entered Critical Risk tier across Road and Rail corridors.", type: "ALERT", project_id: "PRJ-SYN-000002", read_status: 0, created_at: "2026-09-09 10:00:00" },
+    { notification_id: "NOTIF-002", user_id: "USR-OFFICIAL-01", title: "Ministerial Directive Received", message: "National Infrastructure Acceleration Mandate issued by Cabinet Secretariat.", type: "DIRECTIVE", project_id: "PRJ-SYN-000002", read_status: 0, created_at: "2026-09-09 09:30:00" },
+    { notification_id: "NOTIF-003", user_id: "USR-PM-01", title: "High Priority Issue Logged", message: "Forest Stage-II Handover Stalled at Chainage 144 on NH-44.", type: "ALERT", project_id: "PRJ-SYN-000002", read_status: 0, created_at: "2026-09-09 08:45:00" },
+    { notification_id: "NOTIF-004", user_id: "USR-ENGINEER-01", title: "Task Re-assignment", message: "Compensatory Afforestation Land submission due in 48 hours.", type: "TASK", project_id: "PRJ-SYN-000002", read_status: 0, created_at: "2026-09-09 08:00:00" },
+    { notification_id: "NOTIF-005", user_id: "USR-FIELD-01", title: "Daily Task Due", message: "Pier Cap P7 Concrete Reinforcement Inspection scheduled for completion today.", type: "TASK", project_id: "PRJ-SYN-000002", read_status: 0, created_at: "2026-09-09 07:30:00" }
+  ],
+
+  async getMinistrySummary(ministry = null) {
+    if (this.isLive) {
+      try {
+        const url = ministry 
+          ? `${this.baseUrl}/api/ministry/summary?ministry=${encodeURIComponent(ministry)}`
+          : `${this.baseUrl}/api/ministry/summary`;
+        const res = await fetch(url, { headers: this.getAuthHeaders() });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] Ministry summary fetch error:", e);
+      }
+    }
+    return this.fallbackMinistrySummary(ministry || "Ministry of Road Transport & Highways");
+  },
+
+  fallbackMinistrySummary(ministryName) {
+    return {
+      ministry_name: ministryName,
+      tracked_projects_count: 4113,
+      total_revised_cost_formatted: "₹ 16,84,200.0 Cr",
+      total_revised_cost_raw: 1684200.0,
+      total_overrun_formatted: "₹ 2,14,500.0 Cr",
+      total_overrun_raw: 214500.0,
+      projects_requiring_review_count: 742,
+      capital_at_risk_formatted: "₹ 3,42,800.0 Cr",
+      avg_physical_progress: 58.4,
+      avg_financial_progress: 69.2,
+      avg_slippage_months: 14.6,
+      risk_distribution: { low: 1840, moderate: 1531, high: 612, critical: 130 },
+      sectors: [
+        { sector: "Roads & Highways", project_count: 3950, total_cost: 1620000.0, high_risk_count: 710 },
+        { sector: "Bridges & Tunnels", project_count: 163, total_cost: 64200.0, high_risk_count: 32 }
+      ],
+      states: [
+        { state: "Uttar Pradesh", project_count: 512, total_cost: 210000.0, high_risk_count: 94 },
+        { state: "Maharashtra", project_count: 480, total_cost: 195000.0, high_risk_count: 82 },
+        { state: "Bihar", project_count: 380, total_cost: 154000.0, high_risk_count: 88 },
+        { state: "Rajasthan", project_count: 340, total_cost: 138000.0, high_risk_count: 62 },
+        { state: "Madhya Pradesh", project_count: 320, total_cost: 129000.0, high_risk_count: 58 }
+      ]
+    };
+  },
+
+  async listTasks(params = {}) {
+    if (this.isLive) {
+      try {
+        const q = new URLSearchParams();
+        if (params.project_id) q.set("project_id", params.project_id);
+        if (params.assigned_to) q.set("assigned_to", params.assigned_to);
+        if (params.status) q.set("status", params.status);
+        const res = await fetch(`${this.baseUrl}/api/tasks?${q.toString()}`, { headers: this.getAuthHeaders() });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] List tasks error:", e);
+      }
+    }
+    let tasks = [...this.mockTasks];
+    if (params.project_id) tasks = tasks.filter(t => t.project_id === params.project_id);
+    if (params.assigned_to) tasks = tasks.filter(t => t.assigned_to === params.assigned_to);
+    if (params.status) tasks = tasks.filter(t => t.status === params.status);
+    return { status: "success", count: tasks.length, tasks };
+  },
+
+  async updateTask(taskId, payload) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/tasks/${encodeURIComponent(taskId)}`, {
+          method: "PATCH",
+          headers: this.getAuthHeaders(),
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          this.showToast(`Task ${taskId} updated: ${payload.status}`, "success");
+          return await res.json();
+        }
+      } catch (e) {
+        console.warn("[ProjectPulse API] Task update error:", e);
+      }
+    }
+    const t = this.mockTasks.find(x => x.task_id === taskId);
+    if (t) {
+      if (payload.status) t.status = payload.status;
+      if (payload.remarks) t.remarks = payload.remarks;
+      if (payload.evidence_url) t.evidence_url = payload.evidence_url;
+      if (payload.status === "COMPLETED") t.completed_at = new Date().toISOString().replace("T", " ").substring(0, 19);
+    }
+    this.showToast(`Task ${taskId} updated: ${payload.status}`, "success");
+    return { status: "success", task: t };
+  },
+
+  async listIssues(params = {}) {
+    if (this.isLive) {
+      try {
+        const q = new URLSearchParams();
+        if (params.project_id) q.set("project_id", params.project_id);
+        if (params.status) q.set("status", params.status);
+        const res = await fetch(`${this.baseUrl}/api/issues?${q.toString()}`, { headers: this.getAuthHeaders() });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] List issues error:", e);
+      }
+    }
+    let issues = [...this.mockIssues];
+    if (params.project_id) issues = issues.filter(i => i.project_id === params.project_id);
+    if (params.status) issues = issues.filter(i => i.status === params.status);
+    return { status: "success", count: issues.length, issues };
+  },
+
+  async createIssue(payload) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/issues`, {
+          method: "POST",
+          headers: this.getAuthHeaders(),
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          this.showToast("Technical issue logged successfully", "success");
+          return await res.json();
+        }
+      } catch (e) {
+        console.warn("[ProjectPulse API] Create issue error:", e);
+      }
+    }
+    const newIssue = {
+      issue_id: `ISS-${Math.floor(1000 + Math.random() * 9000)}`,
+      project_id: payload.project_id,
+      project_name: "Varanasi-Ranchi-Kolkata Expressway — Section I",
+      milestone_id: payload.milestone_id || "MS-DEMO-04",
+      reported_by: this.currentUser ? this.currentUser.user_id : "USR-ENGINEER-01",
+      reported_by_name: this.currentUser ? this.currentUser.name : "Er. Neha Verma",
+      category: payload.category || "TECHNICAL",
+      severity: payload.severity || "HIGH",
+      title: payload.title,
+      description: payload.description,
+      status: "OPEN",
+      assigned_to: "USR-PM-01",
+      created_at: new Date().toISOString().replace("T", " ").substring(0, 19),
+      evidence: payload.evidence || null
+    };
+    this.mockIssues.unshift(newIssue);
+    this.showToast("Technical issue logged successfully", "success");
+    return { status: "success", issue: newIssue };
+  },
+
+  async updateIssue(issueId, payload) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/issues/${encodeURIComponent(issueId)}`, {
+          method: "PATCH",
+          headers: this.getAuthHeaders(),
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          this.showToast(`Issue ${issueId} updated`, "success");
+          return await res.json();
+        }
+      } catch (e) {
+        console.warn("[ProjectPulse API] Update issue error:", e);
+      }
+    }
+    const issue = this.mockIssues.find(i => i.issue_id === issueId);
+    if (issue) {
+      if (payload.status) issue.status = payload.status;
+      if (payload.resolution) issue.resolution = payload.resolution;
+      issue.updated_at = new Date().toISOString().replace("T", " ").substring(0, 19);
+    }
+    this.showToast(`Issue ${issueId} updated`, "success");
+    return { status: "success", issue };
+  },
+
+  async listDocuments(params = {}) {
+    if (this.isLive) {
+      try {
+        const q = new URLSearchParams();
+        if (params.project_id) q.set("project_id", params.project_id);
+        if (params.access_scope) q.set("access_scope", params.access_scope);
+        const res = await fetch(`${this.baseUrl}/api/documents?${q.toString()}`, { headers: this.getAuthHeaders() });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] List documents error:", e);
+      }
+    }
+    let docs = [...this.mockDocuments];
+    if (params.project_id) docs = docs.filter(d => d.project_id === params.project_id);
+    return { status: "success", count: docs.length, documents: docs };
+  },
+
+  async listDirectives(params = {}) {
+    if (this.isLive) {
+      try {
+        const q = new URLSearchParams();
+        if (params.target_scope) q.set("target_scope", params.target_scope);
+        if (params.target_id) q.set("target_id", params.target_id);
+        if (params.status) q.set("status", params.status);
+        const res = await fetch(`${this.baseUrl}/api/directives?${q.toString()}`, { headers: this.getAuthHeaders() });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] List directives error:", e);
+      }
+    }
+    return { status: "success", count: this.mockDirectives.length, directives: this.mockDirectives };
+  },
+
+  async createDirective(payload) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/directives`, {
+          method: "POST",
+          headers: this.getAuthHeaders(),
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          this.showToast("Policy directive issued successfully", "success");
+          return await res.json();
+        }
+      } catch (e) {
+        console.warn("[ProjectPulse API] Create directive error:", e);
+      }
+    }
+    const newDir = {
+      directive_id: `DIR-${Math.floor(1000 + Math.random() * 9000)}`,
+      issued_by: this.currentUser ? this.currentUser.name : "Union Minister",
+      issuer_role: this.currentUser ? this.currentUser.role : "NATIONAL_LEADER",
+      target_scope: payload.target_scope,
+      target_id: payload.target_id,
+      title: payload.title,
+      instructions: payload.instructions,
+      priority: payload.priority || "HIGH",
+      status: "ACTIVE",
+      created_at: new Date().toISOString().substring(0, 10),
+      compliance_notes: ""
+    };
+    this.mockDirectives.unshift(newDir);
+    this.showToast("Policy directive issued successfully", "success");
+    return { status: "success", directive: newDir };
+  },
+
+  async updateDirectiveStatus(directiveId, payload) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/directives/${encodeURIComponent(directiveId)}/status`, {
+          method: "PATCH",
+          headers: this.getAuthHeaders(),
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          this.showToast(`Directive updated: ${payload.status}`, "success");
+          return await res.json();
+        }
+      } catch (e) {
+        console.warn("[ProjectPulse API] Directive status update error:", e);
+      }
+    }
+    const d = this.mockDirectives.find(x => x.directive_id === directiveId);
+    if (d) {
+      d.status = payload.status;
+      if (payload.compliance_notes) d.compliance_notes = payload.compliance_notes;
+    }
+    this.showToast(`Directive updated: ${payload.status}`, "success");
+    return { status: "success", directive: d };
+  },
+
+  async listNotifications(unreadOnly = false) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/notifications?unread_only=${unreadOnly}`, { headers: this.getAuthHeaders() });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] Notifications error:", e);
+      }
+    }
+    return { status: "success", count: this.mockNotifications.length, notifications: this.mockNotifications };
+  },
+
+  async markNotificationRead(notificationId) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/notifications/${encodeURIComponent(notificationId)}/read`, {
+          method: "PATCH",
+          headers: this.getAuthHeaders()
+        });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] Mark read error:", e);
+      }
+    }
+    const note = this.mockNotifications.find(n => n.notification_id === notificationId);
+    if (note) note.read_status = 1;
+    return { status: "success", notification_id: notificationId };
+  },
+
+  async getAIBrief(params = {}) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/ai/brief`, { headers: this.getAuthHeaders() });
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] AI Brief error:", e);
+      }
+    }
+    const role = this.currentUser ? this.currentUser.role : "MONITORING_OFFICER";
+    if (role === "NATIONAL_LEADER") {
+      return {
+        title: "National Infrastructure Strategic Briefing",
+        role: role,
+        target: "Union Cabinet & Apex Leadership",
+        summary: "10,000 Central Sector Projects monitored under MoSPI IPMD. Total Capital at Risk in High/Critical band is ₹1,63,607.7 Cr across 1,847 flagged projects. Primary macro systemic risk driver: Land Acquisition clearances (38.2%) and Forest Clearances (22.5%).",
+        action_recommendation: "Recommend convening PMG (Project Monitoring Group) apex review for top 10 highway and rail corridors currently exhibiting severe progress decoupling.",
+        disclaimer: "AI briefing generated from deterministic IPMD telemetry and LightGBM predictive models. Non-causal sensitivity indicators."
+      };
+    } else if (role === "MINISTRY_OFFICIAL") {
+      return {
+        title: "Ministry Executive Intelligence Brief: MoRTH",
+        role: role,
+        target: "Ministry Secretary & Heads of Implementing Agencies",
+        summary: "MoRTH portfolio analysis highlights 2 critical corridors with decoupling gap exceeding 25 percentage points. 3 state boundary land acquisition clearances pending beyond 180 days.",
+        action_recommendation: "Expedite ROW clearance in NH-44 Package-3 corridor to avert estimated ₹42.5 Cr monthly escalation liability.",
+        disclaimer: "AI briefing generated from deterministic IPMD telemetry and LightGBM predictive models. Non-causal sensitivity indicators."
+      };
+    } else if (role === "PROJECT_MANAGER") {
+      return {
+        title: "Operational Project Manager Intervention Brief",
+        role: role,
+        target: "Project Director / PIU Heads",
+        summary: "Assigned project PRJ-SYN-000002 is experiencing acute critical path bottleneck on Forest Clearance Section-IV. Milestone 4 is currently 42 days overdue.",
+        action_recommendation: "Initiate contractor liquidity advance and mobilize joint survey team with State Forest Department to clear Section 4.5km ROW.",
+        disclaimer: "AI counterfactual sensitivity model. Actual schedule impacts depend on contractor performance and regulatory execution."
+      };
+    } else if (role === "ENGINEER" || role === "FIELD_WORKER") {
+      return {
+        title: "Site Engineering & Operational Execution Brief",
+        role: role,
+        target: "Site Resident Engineer & Field Supervisors",
+        summary: "Site telemetry for Varanasi-Ranchi-Kolkata Expressway: 3 open issues requiring technical signoff. Pier Cap P7 inspection pending high water surge.",
+        action_recommendation: "Complete safety barrier check and submit geo-tagged compaction density test reports for Chainage 42+500.",
+        disclaimer: "Operational telemetry feed. Physical progress validated against field geo-coordinates."
+      };
+    }
+    return {
+      title: "Institutional Infrastructure Risk Intelligence Brief",
+      role: role,
+      target: "Monitoring & Evaluation Division",
+      summary: "10,000 Central Sector projects evaluated with TreeSHAP feature attribution. Predictive accuracy: 88.4% ROC-AUC on 90-day delay classification.",
+      action_recommendation: "Review early warning radar triage queue for 12 new high-priority escalation signals.",
+      disclaimer: "Decision support system complementing PAIMANA. All predictions require administrative verification."
     };
   }
 };

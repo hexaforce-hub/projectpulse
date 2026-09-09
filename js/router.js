@@ -14,7 +14,12 @@ const Router = {
     analytics: window.AnalyticsView,
     compare: window.ProjectCompareView,
     "data-quality": window.DataQualityView,
-    settings: window.SettingsView
+    settings: window.SettingsView,
+    ministry: window.MinistryView,
+    "my-projects": window.ProjectManagerView,
+    engineer: window.EngineerView,
+    field: window.FieldView,
+    directives: window.DirectivesView
   },
 
   init() {
@@ -81,6 +86,21 @@ const Router = {
       mount.innerHTML = window.SettingsView.render();
       if (window.SettingsView.postRender) window.SettingsView.postRender();
       window.AppShell.updateActiveNav("settings");
+    } else if (rootRoute === "ministry") {
+      if (window.MinistryView) window.MinistryView.render(mount);
+      window.AppShell.updateActiveNav("ministry");
+    } else if (rootRoute === "my-projects") {
+      if (window.ProjectManagerView) window.ProjectManagerView.render(mount);
+      window.AppShell.updateActiveNav("my-projects");
+    } else if (rootRoute === "engineer") {
+      if (window.EngineerView) window.EngineerView.render(mount);
+      window.AppShell.updateActiveNav("engineer");
+    } else if (rootRoute === "field") {
+      if (window.FieldView) window.FieldView.render(mount);
+      window.AppShell.updateActiveNav("field");
+    } else if (rootRoute === "directives") {
+      if (window.DirectivesView) window.DirectivesView.render(mount);
+      window.AppShell.updateActiveNav("directives");
     } else {
       // Fallback to Dashboard
       window.location.hash = "#/dashboard";

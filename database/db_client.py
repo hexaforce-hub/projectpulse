@@ -81,7 +81,7 @@ class DatabaseClient:
                 }
             }
 
-    def list_projects(self, page=1, page_size=20, search="", ministry="", sector="", risk_level="", sort_by="overall_risk_score", sort_order="desc", bottleneck="", state=""):
+    def list_projects(self, page=1, page_size=20, search="", ministry="", sector="", risk_level="", sort_by="overall_risk_score", sort_order="desc", bottleneck="", state="", allowed_project_ids=None):
         """Returns paginated project summaries with multi-attribute filtering."""
         with self._get_connection() as conn:
             cursor = conn.cursor()
@@ -113,6 +113,14 @@ class DatabaseClient:
             if state and state != "ALL":
                 where_clauses.append("state = ?")
                 params.append(state)
+                
+            if allowed_project_ids is not None:
+                if len(allowed_project_ids) == 0:
+                    where_clauses.append("1=0")
+                else:
+                    placeholders = ",".join(["?"] * len(allowed_project_ids))
+                    where_clauses.append(f"project_id IN ({placeholders})")
+                    params.extend(allowed_project_ids)
                 
             where_sql = " AND ".join(where_clauses)
             
@@ -450,3 +458,293 @@ class DatabaseClient:
             """, (limit,))
             rows = cursor.fetchall()
             return [dict(r) for r in rows]
+
+    # -------------------------------------------------------------
+    # Phase 10: Ministry Command Center & Scope Methods
+    # -------------------------------------------------------------
+    def get_ministry_summary(self, ministry_name: str):
+        """Returns portfolio aggregation specifically for one Ministry."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT 
+                    COUNT(*) as total_count,
+                    SUM(revised_cost_cr) as total_revised_cost,
+                    SUM(cost_overrun_cr) as total_overrun,
+                    SUM(CASE WHEN target_risk_class IN ('HIGH', 'CRITICAL') THEN 1 ELSE 0 END) as review_count,
+                    SUM(CASE WHEN target_risk_class IN ('HIGH', 'CRITICAL') THEN revised_cost_cr ELSE 0 END) as capital_at_risk,
+                    SUM(CASE WHEN target_risk_class = 'LOW' THEN 1 ELSE 0 END) as low_count,
+                    SUM(CASE WHEN target_risk_class = 'MODERATE' THEN 1 ELSE 0 END) as moderate_count,
+                    SUM(CASE WHEN target_risk_class = 'HIGH' THEN 1 ELSE 0 END) as high_count,
+                    SUM(CASE WHEN target_risk_class = 'CRITICAL' THEN 1 ELSE 0 END) as critical_count,
+                    ROUND(AVG(physical_progress_pct), 1) as avg_physical_progress,
+                    ROUND(AVG(financial_progress_pct), 1) as avg_financial_progress,
+                    ROUND(AVG(schedule_slippage_months), 1) as avg_slippage_months
+                FROM projects
+                WHERE ministry = ?
+            """, (ministry_name,))
+            row = cursor.fetchone()
+            
+            if not row or row["total_count"] == 0:
+                # Fallback to general stats if ministry not found
+                return self.get_dashboard_summary()
+                
+            tot_cost = row["total_revised_cost"] or 0.0
+            overrun = row["total_overrun"] or 0.0
+            cap_risk = row["capital_at_risk"] or 0.0
+            
+            # Sector breakdown for this ministry
+            cursor.execute("""
+                SELECT sector, COUNT(*) as project_count, SUM(revised_cost_cr) as total_cost,
+                       SUM(CASE WHEN target_risk_class IN ('HIGH', 'CRITICAL') THEN 1 ELSE 0 END) as high_risk_count
+                FROM projects
+                WHERE ministry = ?
+                GROUP BY sector
+                ORDER BY total_cost DESC
+            """, (ministry_name,))
+            sectors = [dict(r) for r in cursor.fetchall()]
+            
+            # State breakdown for this ministry
+            cursor.execute("""
+                SELECT state, COUNT(*) as project_count, SUM(revised_cost_cr) as total_cost,
+                       SUM(CASE WHEN target_risk_class IN ('HIGH', 'CRITICAL') THEN 1 ELSE 0 END) as high_risk_count
+                FROM projects
+                WHERE ministry = ?
+                GROUP BY state
+                ORDER BY total_cost DESC
+                LIMIT 10
+            """, (ministry_name,))
+            states = [dict(r) for r in cursor.fetchall()]
+
+            return {
+                "ministry_name": ministry_name,
+                "tracked_projects_count": row["total_count"],
+                "total_revised_cost_formatted": self.format_inr_cr(tot_cost),
+                "total_revised_cost_raw": round(tot_cost, 2),
+                "total_overrun_formatted": self.format_inr_cr(overrun),
+                "total_overrun_raw": round(overrun, 2),
+                "projects_requiring_review_count": row["review_count"],
+                "capital_at_risk_formatted": self.format_inr_cr(cap_risk),
+                "avg_physical_progress": row["avg_physical_progress"],
+                "avg_financial_progress": row["avg_financial_progress"],
+                "avg_slippage_months": row["avg_slippage_months"],
+                "risk_distribution": {
+                    "low": row["low_count"],
+                    "moderate": row["moderate_count"],
+                    "high": row["high_count"],
+                    "critical": row["critical_count"]
+                },
+                "sectors": sectors,
+                "states": states
+            }
+
+    # -------------------------------------------------------------
+    # Phase 10: Tasks, Issues, Documents, Directives & Notifications
+    # -------------------------------------------------------------
+    def list_tasks(self, project_id=None, assigned_to=None, status=None):
+        """Returns tasks filtered by project, assignee, or status."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            clauses = ["1=1"]
+            params = []
+            if project_id:
+                clauses.append("t.project_id = ?")
+                params.append(project_id)
+            if assigned_to:
+                clauses.append("t.assigned_to = ?")
+                params.append(assigned_to)
+            if status:
+                clauses.append("t.status = ?")
+                params.append(status)
+                
+            sql = f"""
+                SELECT t.*, p.project_name
+                FROM tasks t
+                JOIN projects p ON t.project_id = p.project_id
+                WHERE {' AND '.join(clauses)}
+                ORDER BY CASE t.priority WHEN 'CRITICAL' THEN 1 WHEN 'HIGH' THEN 2 WHEN 'MEDIUM' THEN 3 ELSE 4 END
+            """
+            cursor.execute(sql, params)
+            return [dict(r) for r in cursor.fetchall()]
+
+    def update_task(self, task_id: str, status: str = None, remarks: str = None, evidence_url: str = None, completed_at: str = None):
+        """Updates operational task execution status and evidence."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            updates = []
+            params = []
+            if status:
+                updates.append("status = ?")
+                params.append(status)
+            if remarks is not None:
+                updates.append("remarks = ?")
+                params.append(remarks)
+            if evidence_url is not None:
+                updates.append("evidence_url = ?")
+                params.append(evidence_url)
+            if completed_at is not None:
+                updates.append("completed_at = ?")
+                params.append(completed_at)
+                
+            if not updates:
+                return None
+            params.append(task_id)
+            cursor.execute(f"UPDATE tasks SET {', '.join(updates)} WHERE task_id = ?", params)
+            conn.commit()
+            
+            cursor.execute("SELECT * FROM tasks WHERE task_id = ?", (task_id,))
+            row = cursor.fetchone()
+            return dict(row) if row else None
+
+    def list_issues(self, project_id=None, status=None):
+        """Returns technical & operational site issues."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            clauses = ["1=1"]
+            params = []
+            if project_id:
+                clauses.append("i.project_id = ?")
+                params.append(project_id)
+            if status:
+                clauses.append("i.status = ?")
+                params.append(status)
+            sql = f"""
+                SELECT i.*, p.project_name, u.name as reported_by_name, u.designation as reported_by_designation
+                FROM issues i
+                JOIN projects p ON i.project_id = p.project_id
+                LEFT JOIN users u ON i.reported_by = u.user_id
+                WHERE {' AND '.join(clauses)}
+                ORDER BY i.created_at DESC
+            """
+            cursor.execute(sql, params)
+            return [dict(r) for r in cursor.fetchall()]
+
+    def create_issue(self, issue_dict: dict):
+        """Logs a new site/technical issue."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO issues (
+                    issue_id, project_id, milestone_id, reported_by, category,
+                    severity, title, description, status, assigned_to, created_at, resolution, evidence
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                issue_dict["issue_id"], issue_dict["project_id"], issue_dict.get("milestone_id"),
+                issue_dict["reported_by"], issue_dict["category"], issue_dict["severity"],
+                issue_dict["title"], issue_dict["description"], issue_dict.get("status", "OPEN"),
+                issue_dict.get("assigned_to"), issue_dict.get("created_at", datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")),
+                issue_dict.get("resolution"), issue_dict.get("evidence")
+            ))
+            conn.commit()
+            return issue_dict
+
+    def update_issue(self, issue_id: str, status: str = None, resolution: str = None):
+        """Updates issue status or logs formal resolution."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            updates = []
+            params = []
+            if status:
+                updates.append("status = ?")
+                params.append(status)
+            if resolution is not None:
+                updates.append("resolution = ?")
+                params.append(resolution)
+            updates.append("updated_at = ?")
+            params.append(datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"))
+            params.append(issue_id)
+            cursor.execute(f"UPDATE issues SET {', '.join(updates)} WHERE issue_id = ?", params)
+            conn.commit()
+            cursor.execute("SELECT * FROM issues WHERE issue_id = ?", (issue_id,))
+            row = cursor.fetchone()
+            return dict(row) if row else None
+
+    def list_documents(self, project_id=None, access_scope=None):
+        """Returns authorized project documents."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            clauses = ["1=1"]
+            params = []
+            if project_id:
+                clauses.append("project_id = ?")
+                params.append(project_id)
+            if access_scope and access_scope != "ALL":
+                clauses.append("access_scope = ?")
+                params.append(access_scope)
+            cursor.execute(f"SELECT * FROM documents WHERE {' AND '.join(clauses)} ORDER BY uploaded_at DESC", params)
+            return [dict(r) for r in cursor.fetchall()]
+
+    def list_directives(self, target_scope=None, target_id=None, status=None):
+        """Returns downward policy directives and governance instructions."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            clauses = ["1=1"]
+            params = []
+            if target_scope:
+                clauses.append("(target_scope = ? OR target_scope = 'NATIONAL')")
+                params.append(target_scope)
+            if target_id and target_id != "ALL":
+                clauses.append("(target_id = ? OR target_id = 'ALL')")
+                params.append(target_id)
+            if status:
+                clauses.append("status = ?")
+                params.append(status)
+            cursor.execute(f"SELECT * FROM directives WHERE {' AND '.join(clauses)} ORDER BY created_at DESC", params)
+            return [dict(r) for r in cursor.fetchall()]
+
+    def create_directive(self, d_dict: dict):
+        """Issues a new downward directive."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO directives (
+                    directive_id, issued_by, issuer_role, target_scope, target_id,
+                    title, instructions, priority, status, created_at, compliance_notes
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                d_dict["directive_id"], d_dict["issued_by"], d_dict.get("issuer_role", "NATIONAL_LEADER"),
+                d_dict["target_scope"], d_dict["target_id"], d_dict["title"],
+                d_dict["instructions"], d_dict["priority"], d_dict.get("status", "ACTIVE"),
+                d_dict.get("created_at", datetime.utcnow().strftime("%Y-%m-%d")), d_dict.get("compliance_notes", "")
+            ))
+            conn.commit()
+            return d_dict
+
+    def update_directive_status(self, directive_id: str, status: str, compliance_notes: str = None):
+        """Acknowledges or marks compliance on a directive."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            if compliance_notes:
+                cursor.execute("UPDATE directives SET status = ?, compliance_notes = ? WHERE directive_id = ?", (status, compliance_notes, directive_id))
+            else:
+                cursor.execute("UPDATE directives SET status = ? WHERE directive_id = ?", (status, directive_id))
+            conn.commit()
+            cursor.execute("SELECT * FROM directives WHERE directive_id = ?", (directive_id,))
+            row = cursor.fetchone()
+            return dict(row) if row else None
+
+    def list_notifications(self, user_id: str, unread_only: bool = False):
+        """Returns scoped notifications for an active user."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            if unread_only:
+                cursor.execute("SELECT * FROM notifications WHERE user_id = ? AND read_status = 0 ORDER BY created_at DESC", (user_id,))
+            else:
+                cursor.execute("SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC", (user_id,))
+            return [dict(r) for r in cursor.fetchall()]
+
+    def mark_notification_read(self, notification_id: str):
+        """Marks a notification as read."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE notifications SET read_status = 1 WHERE notification_id = ?", (notification_id,))
+            conn.commit()
+            return {"status": "success", "notification_id": notification_id}
+
+    def get_assigned_project_ids(self, user_id: str):
+        """Returns list of project IDs assigned to a user."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT project_id FROM project_assignments WHERE user_id = ? AND status = 'ACTIVE'", (user_id,))
+            return [r["project_id"] for r in cursor.fetchall()]
+

@@ -44,8 +44,8 @@ const AppShell = {
               </button>
             </div>
 
-            <!-- Grouped Navigation Links -->
-            <nav class="flex-1 px-3 py-3 space-y-4 overflow-y-auto">
+            <!-- Grouped Navigation Links (Rendered Dynamically by Role) -->
+            <nav id="sidebar-nav-container" class="flex-1 px-3 py-3 space-y-4 overflow-y-auto">
               
               <!-- Group 1: Command & Portfolio -->
               <div>
@@ -211,7 +211,7 @@ const AppShell = {
               </div>
               <button id="btn-close-mobile-drawer" class="text-slate-500 hover:text-slate-800 text-lg p-1.5" aria-label="Close menu">✕</button>
             </div>
-            <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+            <nav id="mobile-drawer-nav-container" class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
               <a href="#/dashboard" class="mobile-nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">
                 <span>📊</span> Command Center
               </a>
@@ -261,40 +261,64 @@ const AppShell = {
 
               <div class="p-2 max-h-80 overflow-y-auto space-y-1 text-xs" id="palette-results-list">
                 <!-- Dynamic or default command items -->
-                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2.5 py-1">Quick Navigation</div>
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2.5 py-1">Quick Navigation & Workspaces</div>
                 <a href="#/dashboard" class="palette-item flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-100 text-slate-700">
                   <span class="flex items-center gap-2"><span>📊</span> <span>National Command Center</span></span>
                   <span class="text-[10px] text-slate-400">#/dashboard</span>
+                </a>
+                <a href="#/ministry" class="palette-item flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-100 text-slate-700">
+                  <span class="flex items-center gap-2"><span>🏛️</span> <span>Ministry Command Center (MoRTH)</span></span>
+                  <span class="text-[10px] text-slate-400">#/ministry</span>
+                </a>
+                <a href="#/my-projects" class="palette-item flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-100 text-slate-700">
+                  <span class="flex items-center gap-2"><span>🛣️</span> <span>Corridors Project Manager Workspace</span></span>
+                  <span class="text-[10px] text-slate-400">#/my-projects</span>
+                </a>
+                <a href="#/engineer" class="palette-item flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-100 text-slate-700">
+                  <span class="flex items-center gap-2"><span>👷</span> <span>Site & Technical Engineering Station</span></span>
+                  <span class="text-[10px] text-slate-400">#/engineer</span>
+                </a>
+                <a href="#/field" class="palette-item flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-100 text-slate-700">
+                  <span class="flex items-center gap-2"><span>🚜</span> <span>Field Operations & Ground Workstation</span></span>
+                  <span class="text-[10px] text-slate-400">#/field</span>
+                </a>
+                <a href="#/directives" class="palette-item flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-100 text-slate-700">
+                  <span class="flex items-center gap-2"><span>📜</span> <span>National Directives & Escalations</span></span>
+                  <span class="text-[10px] text-slate-400">#/directives</span>
                 </a>
                 <a href="#/portfolio-matrix" class="palette-item flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-100 text-slate-700">
                   <span class="flex items-center gap-2"><span>🎯</span> <span>Portfolio Risk vs Outlay Matrix</span></span>
                   <span class="text-[10px] text-slate-400">#/portfolio-matrix</span>
                 </a>
+                <a href="#/early-warnings" class="palette-item flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-100 text-slate-700">
+                  <span class="flex items-center gap-2"><span>⚠️</span> <span>Early Warning Radar</span></span>
+                  <span class="text-[10px] text-slate-400">#/early-warnings</span>
+                </a>
                 <a href="#/bottlenecks" class="palette-item flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-100 text-slate-700">
                   <span class="flex items-center gap-2"><span>📍</span> <span>Bottleneck Intelligence Observatory</span></span>
                   <span class="text-[10px] text-slate-400">#/bottlenecks</span>
                 </a>
-                <a href="#/compare" class="palette-item flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-100 text-slate-700">
-                  <span class="flex items-center gap-2"><span>⚖️</span> <span>Project Peer Benchmarking</span></span>
-                  <span class="text-[10px] text-slate-400">#/compare</span>
-                </a>
-                <a href="#/data-quality" class="palette-item flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-100 text-slate-700">
-                  <span class="flex items-center gap-2"><span>🛡️</span> <span>Data Quality & Decoupling Observatory</span></span>
-                  <span class="text-[10px] text-slate-400">#/data-quality</span>
+                <a href="#/analytics" class="palette-item flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-100 text-slate-700">
+                  <span class="flex items-center gap-2"><span>📈</span> <span>Portfolio Analytics (LightGBM)</span></span>
+                  <span class="text-[10px] text-slate-400">#/analytics</span>
                 </a>
 
-                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2.5 pt-2 pb-1">Sample Project Dossiers</div>
-                <a href="#/projects/PRJ-DEMO-001" class="palette-item flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-100 text-slate-700">
-                  <span class="flex items-center gap-2"><span>🛣️</span> <span>NH-44 Strategic Corridor Project (Hero)</span></span>
-                  <span class="text-[10px] font-mono text-purple-700 bg-purple-50 px-1 rounded">PRJ-DEMO-001</span>
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2.5 pt-2 pb-1">Primary Indexed Projects</div>
+                <a href="#/projects/PRJ-SYN-000002" class="palette-item flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-100 text-slate-700">
+                  <span class="flex items-center gap-2"><span>🛣️</span> <span>Varanasi-Ranchi-Kolkata Expressway (PKG-3)</span></span>
+                  <span class="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-1 rounded">PRJ-SYN-000002</span>
                 </a>
-                <a href="#/projects/PRJ-DEMO-002" class="palette-item flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-100 text-slate-700">
-                  <span class="flex items-center gap-2"><span>🚆</span> <span>Eastern Dedicated Freight Corridor (EDFC-II)</span></span>
-                  <span class="text-[10px] font-mono text-blue-700 bg-blue-50 px-1 rounded">PRJ-DEMO-002</span>
+                <a href="#/projects/PRJ-SYN-000003" class="palette-item flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-100 text-slate-700">
+                  <span class="flex items-center gap-2"><span>🛣️</span> <span>Delhi-Mumbai Expressway Spur (MoRTH)</span></span>
+                  <span class="text-[10px] font-mono text-blue-700 bg-blue-50 px-1 rounded">PRJ-SYN-000003</span>
                 </a>
-                <a href="#/projects/PRJ-DEMO-003" class="palette-item flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-100 text-slate-700">
-                  <span class="flex items-center gap-2"><span>🚇</span> <span>Mumbai Metro Line 3 Underground Corridor</span></span>
-                  <span class="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-1 rounded">PRJ-DEMO-003</span>
+                <a href="#/projects/PRJ-SYN-000004" class="palette-item flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-100 text-slate-700">
+                  <span class="flex items-center gap-2"><span>🛣️</span> <span>Varanasi-Ranchi-Kolkata Stage-I</span></span>
+                  <span class="text-[10px] font-mono text-purple-700 bg-purple-50 px-1 rounded">PRJ-SYN-000004</span>
+                </a>
+                <a href="#/projects/PRJ-SYN-000001" class="palette-item flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-100 text-slate-700">
+                  <span class="flex items-center gap-2"><span>🚆</span> <span>Secunderabad-Mahabubnagar Doubling (Railways)</span></span>
+                  <span class="text-[10px] font-mono text-amber-700 bg-amber-50 px-1 rounded">PRJ-SYN-000001</span>
                 </a>
               </div>
 
@@ -318,52 +342,88 @@ const AppShell = {
                 <button id="btn-close-role-switcher" class="text-slate-400 hover:text-slate-700 text-sm p-1">✕</button>
               </div>
 
-              <div class="space-y-2">
-                <!-- Admin -->
-                <button data-switch-role="ADMIN" class="btn-role-opt w-full text-left p-3 rounded-lg border border-slate-200 hover:border-purple-300 hover:bg-purple-50/50 flex items-start gap-3 transition-colors">
-                  <span class="w-8 h-8 rounded-full bg-purple-100 text-purple-800 flex items-center justify-center font-bold text-xs flex-shrink-0">JS</span>
+              <div class="space-y-2 max-h-[460px] overflow-y-auto pr-1">
+                <!-- 1. National Leadership (Minister) -->
+                <button data-switch-role="NATIONAL_LEADER" class="btn-role-opt w-full text-left p-3 rounded-lg border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/50 flex items-start gap-3 transition-colors">
+                  <span class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-900 flex items-center justify-center font-bold text-xs flex-shrink-0">JS</span>
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between">
-                      <span class="text-xs font-bold text-slate-900">Dr. Rajesh Kumar (ADMIN)</span>
-                      <span class="text-[9px] bg-purple-100 text-purple-800 font-bold px-1.5 py-0.2 rounded">Full Access</span>
+                      <span class="text-xs font-bold text-slate-900">Dr. Jitendra Singh (MINISTER)</span>
+                      <span class="text-[9px] bg-indigo-100 text-indigo-900 font-bold px-1.5 py-0.2 rounded border border-indigo-200">National Scope</span>
                     </div>
-                    <div class="text-[11px] text-slate-500">Joint Secretary & Mission Director • Full audit, system settings & user administration</div>
+                    <div class="text-[11px] text-slate-500">Union Minister of State (IC) MoSPI • Macro governance, directives & inter-ministerial reviews</div>
                   </div>
                 </button>
 
-                <!-- Monitoring Officer -->
-                <button data-switch-role="MONITORING_OFFICER" class="btn-role-opt w-full text-left p-3 rounded-lg border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50 flex items-start gap-3 transition-colors">
-                  <span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs flex-shrink-0">PS</span>
+                <!-- 2. Ministry Official (Secretary) -->
+                <button data-switch-role="MINISTRY_OFFICIAL" class="btn-role-opt w-full text-left p-3 rounded-lg border border-slate-200 hover:border-cyan-400 hover:bg-cyan-50/50 flex items-start gap-3 transition-colors">
+                  <span class="w-8 h-8 rounded-full bg-cyan-100 text-cyan-900 flex items-center justify-center font-bold text-xs flex-shrink-0">AJ</span>
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between">
-                      <span class="text-xs font-bold text-slate-900">Smt. Priya Sharma (OFFICER)</span>
-                      <span class="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.2 rounded">Recommended Demo</span>
+                      <span class="text-xs font-bold text-slate-900">Shri Anurag Jain, IAS (SECRETARY)</span>
+                      <span class="text-[9px] bg-cyan-100 text-cyan-900 font-bold px-1.5 py-0.2 rounded border border-cyan-200">Ministry Scope</span>
                     </div>
-                    <div class="text-[11px] text-slate-500">Director IPMD • Early warning triage, What-If simulator saves & audit review</div>
+                    <div class="text-[11px] text-slate-500">Secretary, MoRTH • Ministry portfolio command, corridor escalations & clearance tracking</div>
                   </div>
                 </button>
 
-                <!-- Analyst -->
-                <button data-switch-role="ANALYST" class="btn-role-opt w-full text-left p-3 rounded-lg border border-slate-200 hover:border-amber-300 hover:bg-amber-50/50 flex items-start gap-3 transition-colors">
-                  <span class="w-8 h-8 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs flex-shrink-0">AG</span>
+                <!-- 3. Policy & ML Analyst -->
+                <button data-switch-role="ANALYST" class="btn-role-opt w-full text-left p-3 rounded-lg border border-slate-200 hover:border-violet-400 hover:bg-violet-50/50 flex items-start gap-3 transition-colors">
+                  <span class="w-8 h-8 rounded-full bg-violet-100 text-violet-900 flex items-center justify-center font-bold text-xs flex-shrink-0">AG</span>
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between">
                       <span class="text-xs font-bold text-slate-900">Shri Amitav Ghosh (ANALYST)</span>
-                      <span class="text-[9px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.2 rounded">Data Science</span>
+                      <span class="text-[9px] bg-violet-100 text-violet-900 font-bold px-1.5 py-0.2 rounded border border-violet-200">Portfolio ML Scope</span>
                     </div>
-                    <div class="text-[11px] text-slate-500">Senior Policy Analyst • Deep ML explainability & scenario sensitivity sweeps</div>
+                    <div class="text-[11px] text-slate-500">Senior Policy Analyst • Deep ML explainability, LightGBM sensitivity sweeps & benchmarking</div>
                   </div>
                 </button>
 
-                <!-- Viewer -->
-                <button data-switch-role="VIEWER" class="btn-role-opt w-full text-left p-3 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 flex items-start gap-3 transition-colors">
-                  <span class="w-8 h-8 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs flex-shrink-0">VM</span>
+                <!-- 4. Project Manager (Corridors) -->
+                <button data-switch-role="PROJECT_MANAGER" class="btn-role-opt w-full text-left p-3 rounded-lg border border-slate-200 hover:border-sky-400 hover:bg-sky-50/50 flex items-start gap-3 transition-colors">
+                  <span class="w-8 h-8 rounded-full bg-sky-100 text-sky-900 flex items-center justify-center font-bold text-xs flex-shrink-0">RS</span>
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between">
-                      <span class="text-xs font-bold text-slate-900">Shri Vikram Mehta (VIEWER)</span>
-                      <span class="text-[9px] bg-slate-100 text-slate-700 font-bold px-1.5 py-0.2 rounded">Read-Only</span>
+                      <span class="text-xs font-bold text-slate-900">Shri R.K. Singla (PROJECT MANAGER)</span>
+                      <span class="text-[9px] bg-sky-100 text-sky-900 font-bold px-1.5 py-0.2 rounded border border-sky-200">Multi-Project Scope</span>
                     </div>
-                    <div class="text-[11px] text-slate-500">Central Sector Observer • Read-only portfolio monitoring without triage rights</div>
+                    <div class="text-[11px] text-slate-500">Chief Project Director (NHAI PIU) • 3 assigned corridors, contractor triage & What-If simulator</div>
+                  </div>
+                </button>
+
+                <!-- 5. Site & Technical Engineer -->
+                <button data-switch-role="ENGINEER" class="btn-role-opt w-full text-left p-3 rounded-lg border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/50 flex items-start gap-3 transition-colors">
+                  <span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-900 flex items-center justify-center font-bold text-xs flex-shrink-0">NV</span>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-bold text-slate-900">Er. Neha Verma (SITE ENGINEER)</span>
+                      <span class="text-[9px] bg-emerald-100 text-emerald-900 font-bold px-1.5 py-0.2 rounded border border-emerald-200">Single Project Scope</span>
+                    </div>
+                    <div class="text-[11px] text-slate-500">Executive Resident Engineer (Civil) • Expressway CPM milestones, technical issue logging & docs</div>
+                  </div>
+                </button>
+
+                <!-- 6. Field Operations Supervisor -->
+                <button data-switch-role="FIELD_WORKER" class="btn-role-opt w-full text-left p-3 rounded-lg border border-slate-200 hover:border-amber-400 hover:bg-amber-50/50 flex items-start gap-3 transition-colors">
+                  <span class="w-8 h-8 rounded-full bg-amber-100 text-amber-900 flex items-center justify-center font-bold text-xs flex-shrink-0">RG</span>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-bold text-slate-900">Shri Rajesh Gurjar (FIELD SUPERVISOR)</span>
+                      <span class="text-[9px] bg-amber-100 text-amber-900 font-bold px-1.5 py-0.2 rounded border border-amber-200">Site Task Scope</span>
+                    </div>
+                    <div class="text-[11px] text-slate-500">Senior Site Operations Supervisor • Ground telemetry, daily labor tasks & work stop alerts</div>
+                  </div>
+                </button>
+
+                <!-- 7. Central Admin & Mission Director -->
+                <button data-switch-role="ADMIN" class="btn-role-opt w-full text-left p-3 rounded-lg border border-slate-200 hover:border-purple-400 hover:bg-purple-50/50 flex items-start gap-3 transition-colors">
+                  <span class="w-8 h-8 rounded-full bg-purple-100 text-purple-900 flex items-center justify-center font-bold text-xs flex-shrink-0">RK</span>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-bold text-slate-900">Dr. Rajesh Kumar (ADMIN)</span>
+                      <span class="text-[9px] bg-purple-100 text-purple-900 font-bold px-1.5 py-0.2 rounded border border-purple-200">System Superuser</span>
+                    </div>
+                    <div class="text-[11px] text-slate-500">Joint Secretary & Mission Director • Full audit, system settings, RBAC management & all views</div>
                   </div>
                 </button>
               </div>
@@ -380,6 +440,8 @@ const AppShell = {
     `;
 
     this.bindEvents();
+    const activeRole = (window.APIClient && window.APIClient.currentUser) ? window.APIClient.currentUser.role : "ADMIN";
+    this.updateNavForRole(activeRole);
     if (window.APIClient) window.APIClient.updateUserInterface();
   },
 
@@ -517,16 +579,277 @@ const AppShell = {
         if (window.APIClient) {
           await window.APIClient.switchRole(role);
         }
+        this.updateNavForRole(role);
+
+        // Auto-navigate to persona's primary operational flight deck
+        const homeRoutes = {
+          NATIONAL_LEADER: "#/dashboard",
+          MINISTRY_OFFICIAL: "#/ministry",
+          ANALYST: "#/analytics",
+          PROJECT_MANAGER: "#/my-projects",
+          ENGINEER: "#/engineer",
+          FIELD_WORKER: "#/field",
+          ADMIN: "#/dashboard",
+          MONITORING_OFFICER: "#/dashboard",
+          VIEWER: "#/dashboard"
+        };
+        const targetHash = homeRoutes[role.toUpperCase()] || "#/dashboard";
+        if (window.location.hash !== targetHash) {
+          window.location.hash = targetHash;
+        } else if (window.Router) {
+          window.Router.renderCurrentRoute();
+        }
+
         closeModal();
       });
     });
+  },
+
+  getNavGroups(role) {
+    const r = (role || "ADMIN").toUpperCase();
+
+    if (r === "NATIONAL_LEADER" || r === "MINISTER") {
+      return [
+        {
+          heading: "National Command",
+          items: [
+            { route: "dashboard", icon: "📊", label: "National Command Center" },
+            { route: "directives", icon: "📜", label: "Directives & Escalations", badge: "Action" },
+            { route: "portfolio-matrix", icon: "🎯", label: "Risk vs Outlay Matrix" },
+            { route: "projects", icon: "📁", label: "Central Projects Registry" }
+          ]
+        },
+        {
+          heading: "Portfolio Surveillance",
+          items: [
+            { route: "early-warnings", icon: "⚠️", label: "Early Warning Radar", badge: "14k" },
+            { route: "ministry", icon: "🏛️", label: "Ministry Oversight Desk" },
+            { route: "analytics", icon: "📈", label: "Portfolio Analytics" },
+            { route: "bottlenecks", icon: "📍", label: "Bottlenecks Intel" }
+          ]
+        },
+        {
+          heading: "Governance",
+          items: [
+            { route: "data-quality", icon: "🛡️", label: "Data Quality & Decoupling" },
+            { route: "settings", icon: "⚙️", label: "Governance & System" }
+          ]
+        }
+      ];
+    }
+
+    if (r === "MINISTRY_OFFICIAL" || r === "OFFICIAL") {
+      return [
+        {
+          heading: "Ministry Command",
+          items: [
+            { route: "ministry", icon: "🏛️", label: "Ministry Command Center", badge: "MoRTH" },
+            { route: "directives", icon: "📜", label: "Downward Directives" },
+            { route: "projects", icon: "📁", label: "Ministry Projects (4,113)" }
+          ]
+        },
+        {
+          heading: "Risk & Corridor Execution",
+          items: [
+            { route: "my-projects", icon: "🛣️", label: "Corridor Pipeline" },
+            { route: "early-warnings", icon: "⚠️", label: "Early Warning Radar", badge: "P1" },
+            { route: "bottlenecks", icon: "📍", label: "Bottlenecks Intel" },
+            { route: "portfolio-matrix", icon: "🎯", label: "Risk vs Outlay Matrix" }
+          ]
+        },
+        {
+          heading: "Governance & Gaps",
+          items: [
+            { route: "data-quality", icon: "🛡️", label: "Data Quality & Gaps" },
+            { route: "settings", icon: "⚙️", label: "Ministry Settings & Audit" }
+          ]
+        }
+      ];
+    }
+
+    if (r === "PROJECT_MANAGER" || r === "PM") {
+      return [
+        {
+          heading: "Corridor Management",
+          items: [
+            { route: "my-projects", icon: "🛣️", label: "My Corridors (3 Active)", badge: "Active" },
+            { route: "projects", icon: "📁", label: "Corridors Registry" },
+            { route: "directives", icon: "📜", label: "Directives & Action Items" }
+          ]
+        },
+        {
+          heading: "Engineering & Field Desk",
+          items: [
+            { route: "engineer", icon: "👷", label: "Site Engineering Station" },
+            { route: "field", icon: "🚜", label: "Field Ground Tasks" },
+            { route: "early-warnings", icon: "⚠️", label: "Corridor Warnings Queue" },
+            { route: "bottlenecks", icon: "📍", label: "Bottlenecks Intel" }
+          ]
+        },
+        {
+          heading: "Quality & Review",
+          items: [
+            { route: "data-quality", icon: "🛡️", label: "Data Quality Check" }
+          ]
+        }
+      ];
+    }
+
+    if (r === "ENGINEER") {
+      return [
+        {
+          heading: "Site Engineering Desk",
+          items: [
+            { route: "engineer", icon: "👷", label: "Expressway Engineering", badge: "Live" },
+            { route: "projects", icon: "📁", label: "Assigned Corridor Project" },
+            { route: "field", icon: "🚜", label: "Field Tasks Progress" }
+          ]
+        },
+        {
+          heading: "Compliance & Safety",
+          items: [
+            { route: "directives", icon: "📜", label: "Compliance Directives" },
+            { route: "early-warnings", icon: "⚠️", label: "Project Early Warnings" },
+            { route: "bottlenecks", icon: "📍", label: "Site Bottlenecks" }
+          ]
+        }
+      ];
+    }
+
+    if (r === "FIELD_WORKER" || r === "FIELD") {
+      return [
+        {
+          heading: "Field Workstation",
+          items: [
+            { route: "field", icon: "🚜", label: "My Ground Tasks Desk", badge: "Today" },
+            { route: "engineer", icon: "👷", label: "Engineering Dossier" }
+          ]
+        },
+        {
+          heading: "Safety & Urgent Alerts",
+          items: [
+            { route: "early-warnings", icon: "⚠️", label: "Active Stoppage Alerts" }
+          ]
+        }
+      ];
+    }
+
+    if (r === "ANALYST") {
+      return [
+        {
+          heading: "Predictive Analytics Suite",
+          items: [
+            { route: "analytics", icon: "📈", label: "Portfolio Analytics", badge: "ML" },
+            { route: "dashboard", icon: "📊", label: "National Command Center" },
+            { route: "portfolio-matrix", icon: "🎯", label: "Risk vs Outlay Matrix" },
+            { route: "compare", icon: "⚖️", label: "Peer Benchmarking" }
+          ]
+        },
+        {
+          heading: "Data Integrity & Risk",
+          items: [
+            { route: "data-quality", icon: "🛡️", label: "Data Quality Observatory" },
+            { route: "early-warnings", icon: "⚠️", label: "Early Warning Radar" },
+            { route: "bottlenecks", icon: "📍", label: "Bottlenecks Intel" },
+            { route: "projects", icon: "📁", label: "Projects Registry" }
+          ]
+        }
+      ];
+    }
+
+    // Default / ADMIN / MONITORING_OFFICER: Full access
+    return [
+      {
+        heading: "Command & Portfolios",
+        items: [
+          { route: "dashboard", icon: "📊", label: "National Command Center" },
+          { route: "ministry", icon: "🏛️", label: "Ministry Command Center" },
+          { route: "my-projects", icon: "🛣️", label: "Corridors Workspace" },
+          { route: "engineer", icon: "👷", label: "Site Engineering" },
+          { route: "field", icon: "🚜", label: "Field Operations" },
+          { route: "portfolio-matrix", icon: "🎯", label: "Risk vs Outlay Matrix" },
+          { route: "projects", icon: "📁", label: "Projects Registry" }
+        ]
+      },
+      {
+        heading: "Intelligence Suite",
+        items: [
+          { route: "early-warnings", icon: "⚠️", label: "Early Warning Radar", badge: "14k" },
+          { route: "bottlenecks", icon: "📍", label: "Bottlenecks Intel" },
+          { route: "analytics", icon: "📈", label: "Portfolio Analytics" },
+          { route: "compare", icon: "⚖️", label: "Peer Benchmarking" }
+        ]
+      },
+      {
+        heading: "Governance & Directives",
+        items: [
+          { route: "directives", icon: "📜", label: "National Directives" },
+          { route: "data-quality", icon: "🛡️", label: "Data Quality & Gaps" },
+          { route: "settings", icon: "⚙️", label: "System & Governance" }
+        ]
+      }
+    ];
+  },
+
+  renderSidebarNav(role) {
+    const container = document.getElementById("sidebar-nav-container");
+    if (!container) return;
+    const groups = this.getNavGroups(role);
+
+    container.innerHTML = groups.map(grp => `
+      <div>
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 pb-1.5 sidebar-heading">
+          ${grp.heading}
+        </div>
+        <div class="space-y-0.5">
+          ${grp.items.map(it => `
+            <a href="#/${it.route}" data-route="${it.route}" class="nav-item flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-slate-700 hover:bg-slate-100">
+              <span class="text-base">${it.icon}</span>
+              <span class="sidebar-text">${it.label}</span>
+              ${it.badge ? `<span class="ml-auto text-[10px] bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded-full sidebar-badge">${it.badge}</span>` : ''}
+            </a>
+          `).join("")}
+        </div>
+      </div>
+    `).join("");
+
+    const currentHash = (window.location.hash || "#/dashboard").replace("#/", "").split("?")[0];
+    this.updateActiveNav(currentHash);
+  },
+
+  renderMobileNav(role) {
+    const container = document.getElementById("mobile-drawer-nav-container");
+    if (!container) return;
+    const groups = this.getNavGroups(role);
+
+    container.innerHTML = groups.flatMap(grp => grp.items).map(it => `
+      <a href="#/${it.route}" class="mobile-nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">
+        <span>${it.icon}</span> ${it.label}
+      </a>
+    `).join("");
+
+    const backdrop = document.getElementById("mobile-drawer-backdrop");
+    const drawer = document.getElementById("mobile-drawer");
+    document.querySelectorAll(".mobile-nav-link").forEach(link => {
+      link.addEventListener("click", () => {
+        if (drawer && backdrop) {
+          drawer.classList.add("-translate-x-full");
+          backdrop.classList.add("hidden");
+        }
+      });
+    });
+  },
+
+  updateNavForRole(role) {
+    this.renderSidebarNav(role);
+    this.renderMobileNav(role);
   },
 
   updateActiveNav(activeRoute) {
     const navItems = document.querySelectorAll(".nav-item");
     navItems.forEach(item => {
       const route = item.dataset.route;
-      if (route === activeRoute || (activeRoute.startsWith("projects") && route === "projects")) {
+      if (route === activeRoute || (activeRoute && activeRoute.startsWith("projects") && route === "projects")) {
         item.classList.add("bg-blue-50", "text-blue-900", "font-semibold");
         item.classList.remove("text-slate-700");
       } else {
@@ -547,10 +870,15 @@ const AppShell = {
         "analytics": "Portfolio Analytics",
         "compare": "Peer Benchmarking",
         "data-quality": "Data Quality Observatory",
-        "settings": "System & Governance"
+        "settings": "System & Governance",
+        "ministry": "Ministry Command Center (MoRTH)",
+        "my-projects": "Corridors Project Manager Workspace",
+        "engineer": "Site & Technical Engineering Station",
+        "field": "Field Operations & Ground Station",
+        "directives": "National Directives & Escalations"
       };
 
-      if (activeRoute.startsWith("projects/")) {
+      if (activeRoute && activeRoute.startsWith("projects/")) {
         breadcrumbPage.innerText = "Project Dossier";
       } else {
         breadcrumbPage.innerText = routeMap[activeRoute] || "National Command Center";
