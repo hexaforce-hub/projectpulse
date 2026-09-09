@@ -639,3 +639,91 @@ p, .text-body {
   filter: contrast(1.15);
 }
 
+/* Slide-Over Drawer */
+.astra-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 90;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.astra-drawer-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: 480px;
+  background: #ffffff;
+  box-shadow: -4px 0 25px rgba(0, 0, 0, 0.15);
+  border-left: 1px solid var(--border);
+  z-index: 95;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.astra-drawer-panel.open {
+  transform: translateX(0);
+}
+
+/* Filter Chips */
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+  color: #1e40af;
+  line-height: 1.2;
+}
+
+.filter-chip button {
+  cursor: pointer;
+  color: #60a5fa;
+  border: none;
+  background: none;
+  font-weight: bold;
+}
+
+.filter-chip button:hover {
+  color: #1e3a8a;
+}
+
+/* Executive Health Strip Pillar */
+.health-pillar {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: #ffffff;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.health-pillar:hover {
+  border-color: #94a3b8;
+  background: #f8fafc;
+}
+
+.health-pillar.status-healthy {
+  border-left: 4px solid var(--risk-low);
+}
+
+.health-pillar.status-watch {
+  border-left: 4px solid var(--risk-medium);
+}
+
+.health-pillar.status-risk {
+  border-left: 4px solid var(--risk-critical);
+}
+
+

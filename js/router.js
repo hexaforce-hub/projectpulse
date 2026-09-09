@@ -1,6 +1,6 @@
 // ==========================================================================
-// PROJECTPULSE — Client-Side Router (Phase 9.5)
-// Robust Hash-Based Navigation with Browser Back/Forward & Direct URL Access
+// PROJECTPULSE / ASTRA — Client-Side Router (Phase 9.5 Overhaul)
+// Robust Hash-Based Navigation with Role-Aware Landing & Breadcrumb Synchronization
 // ==========================================================================
 
 const Router = {
@@ -32,8 +32,29 @@ const Router = {
   },
 
   handleRoute() {
-    let hash = window.location.hash || "#/dashboard";
-    if (hash === "#" || hash === "#/") hash = "#/dashboard";
+    let hash = window.location.hash || "";
+
+    // Role-Aware Auto-Landing when hash is empty or root
+    if (!hash || hash === "#" || hash === "#/") {
+      const user = (window.APIClient && window.APIClient.currentUser) ? window.APIClient.currentUser : null;
+      const role = user ? (user.role || "").toUpperCase() : "";
+      if (role === "MINISTRY_OFFICIAL" || role === "OFFICIAL") {
+        window.location.hash = "#/ministry";
+        return;
+      } else if (role === "PROJECT_MANAGER" || role === "PM") {
+        window.location.hash = "#/my-projects";
+        return;
+      } else if (role === "ENGINEER") {
+        window.location.hash = "#/engineer";
+        return;
+      } else if (role === "FIELD_WORKER" || role === "FIELD") {
+        window.location.hash = "#/field";
+        return;
+      } else {
+        window.location.hash = "#/dashboard";
+        return;
+      }
+    }
 
     // Strip hash prefix and split off any query string
     const cleanHash = hash.replace("#/", "");
@@ -44,15 +65,27 @@ const Router = {
     const mount = document.getElementById("main-content-mount");
     if (!mount) return;
 
+    // Helper to safely update breadcrumbs via AppShell
+    const updateCrumbs = (crumbs) => {
+      if (window.AppShell && window.AppShell.updateBreadcrumbs) {
+        window.AppShell.updateBreadcrumbs(crumbs);
+      }
+    };
+
     // Route matching
     if (rootRoute === "dashboard" || rootRoute === "") {
       mount.innerHTML = window.DashboardView.render();
       if (window.DashboardView.postRender) window.DashboardView.postRender();
       window.AppShell.updateActiveNav("dashboard");
+      updateCrumbs([]);
     } else if (rootRoute === "portfolio-matrix") {
       mount.innerHTML = window.PortfolioMatrixView.render();
       if (window.PortfolioMatrixView.postRender) window.PortfolioMatrixView.postRender();
       window.AppShell.updateActiveNav("portfolio-matrix");
+      updateCrumbs([
+        { label: "Intelligence", href: "#/portfolio-matrix" },
+        { label: "Portfolio Risk Matrix", href: "#/portfolio-matrix" }
+      ]);
     } else if (rootRoute === "projects" || rootRoute === "project") {
       if (segments[1]) {
         // Project Detail Route: #/projects/PRJ-DEMO-001 or #/project/PRJ-DEMO-001
@@ -60,70 +93,147 @@ const Router = {
         mount.innerHTML = window.ProjectDetailView.render(projectId);
         if (window.ProjectDetailView.postRender) window.ProjectDetailView.postRender(projectId);
         window.AppShell.updateActiveNav("projects/" + projectId);
+        updateCrumbs([
+          { label: "Portfolio", href: "#/projects" },
+          { label: "Projects Registry", href: "#/projects" },
+          { label: projectId, href: `#/projects/${projectId}` }
+        ]);
       } else {
         // Projects List Route: #/projects
         mount.innerHTML = window.ProjectsView.render();
         if (window.ProjectsView.postRender) window.ProjectsView.postRender();
         window.AppShell.updateActiveNav("projects");
+        updateCrumbs([
+          { label: "Portfolio", href: "#/projects" },
+          { label: "Central Projects Registry", href: "#/projects" }
+        ]);
       }
     } else if (rootRoute === "early-warnings") {
       mount.innerHTML = window.EarlyWarningsView.render();
       if (window.EarlyWarningsView.postRender) window.EarlyWarningsView.postRender();
       window.AppShell.updateActiveNav("early-warnings");
+      updateCrumbs([
+        { label: "Intelligence", href: "#/early-warnings" },
+        { label: "Surveillance Radar & Alerts", href: "#/early-warnings" }
+      ]);
     } else if (rootRoute === "bottlenecks") {
       mount.innerHTML = window.BottleneckView.render();
       if (window.BottleneckView.postRender) window.BottleneckView.postRender();
       window.AppShell.updateActiveNav("bottlenecks");
+      updateCrumbs([
+        { label: "Intelligence", href: "#/bottlenecks" },
+        { label: "Root-Cause Bottlenecks", href: "#/bottlenecks" }
+      ]);
     } else if (rootRoute === "analytics") {
       mount.innerHTML = window.AnalyticsView.render();
       if (window.AnalyticsView.postRender) window.AnalyticsView.postRender();
       window.AppShell.updateActiveNav("analytics");
+      updateCrumbs([
+        { label: "Intelligence", href: "#/analytics" },
+        { label: "Predictive Risk Analytics", href: "#/analytics" }
+      ]);
     } else if (rootRoute === "compare") {
       mount.innerHTML = window.ProjectCompareView.render();
       if (window.ProjectCompareView.postRender) window.ProjectCompareView.postRender();
       window.AppShell.updateActiveNav("compare");
+      updateCrumbs([
+        { label: "Intelligence", href: "#/compare" },
+        { label: "Peer Comparison & Benchmarking", href: "#/compare" }
+      ]);
     } else if (rootRoute === "data-quality") {
       mount.innerHTML = window.DataQualityView.render();
       if (window.DataQualityView.postRender) window.DataQualityView.postRender();
       window.AppShell.updateActiveNav("data-quality");
+      updateCrumbs([
+        { label: "Governance", href: "#/data-quality" },
+        { label: "Data Quality & Contract Audit", href: "#/data-quality" }
+      ]);
     } else if (rootRoute === "settings") {
       mount.innerHTML = window.SettingsView.render();
       if (window.SettingsView.postRender) window.SettingsView.postRender();
       window.AppShell.updateActiveNav("settings");
+      updateCrumbs([
+        { label: "Governance", href: "#/settings" },
+        { label: "Surveillance Settings", href: "#/settings" }
+      ]);
     } else if (rootRoute === "ministry") {
       if (window.MinistryView) window.MinistryView.render(mount);
       window.AppShell.updateActiveNav("ministry");
+      updateCrumbs([
+        { label: "Decisions", href: "#/ministry" },
+        { label: "Ministry Secretarial Desk", href: "#/ministry" }
+      ]);
     } else if (rootRoute === "my-projects") {
       if (window.ProjectManagerView) window.ProjectManagerView.render(mount);
       window.AppShell.updateActiveNav("my-projects");
+      updateCrumbs([
+        { label: "Decisions", href: "#/my-projects" },
+        { label: "Corridor Project Director Desk", href: "#/my-projects" }
+      ]);
     } else if (rootRoute === "engineer") {
       if (window.EngineerView) window.EngineerView.render(mount);
       window.AppShell.updateActiveNav("engineer");
+      updateCrumbs([
+        { label: "Execution", href: "#/engineer" },
+        { label: "Site & Technical Engineer Station", href: "#/engineer" }
+      ]);
     } else if (rootRoute === "field") {
       if (window.FieldView) window.FieldView.render(mount);
       window.AppShell.updateActiveNav("field");
+      updateCrumbs([
+        { label: "Execution", href: "#/field" },
+        { label: "Field Operations Station", href: "#/field" }
+      ]);
     } else if (rootRoute === "directives") {
       if (window.DirectivesView) window.DirectivesView.render(mount);
       window.AppShell.updateActiveNav("directives");
+      updateCrumbs([
+        { label: "Decisions", href: "#/directives" },
+        { label: "Secretarial Directives", href: "#/directives" }
+      ]);
     } else if (rootRoute === "onboarding") {
       if (window.ProjectOnboardingView) window.ProjectOnboardingView.render(mount);
       window.AppShell.updateActiveNav("onboarding");
+      updateCrumbs([
+        { label: "Execution", href: "#/onboarding" },
+        { label: "Project Onboarding & Ingestion", href: "#/onboarding" }
+      ]);
     } else if (rootRoute === "execution") {
       if (window.ExecutionControlView) window.ExecutionControlView.render(mount);
       window.AppShell.updateActiveNav("execution");
+      updateCrumbs([
+        { label: "Execution", href: "#/execution" },
+        { label: "Execution Control Desk", href: "#/execution" }
+      ]);
     } else if (rootRoute === "field-officer") {
       if (window.FieldOfficerDesk) window.FieldOfficerDesk.render(mount);
       window.AppShell.updateActiveNav("field-officer");
+      updateCrumbs([
+        { label: "Execution", href: "#/field-officer" },
+        { label: "Field Officer Inspection Desk", href: "#/field-officer" }
+      ]);
     } else if (rootRoute === "reports") {
       mount.innerHTML = window.ReportIntelligenceView.render();
       if (window.ReportIntelligenceView.postRender) window.ReportIntelligenceView.postRender();
       window.AppShell.updateActiveNav("reports");
+      updateCrumbs([
+        { label: "Portfolio", href: "#/reports" },
+        { label: "Reporting Intelligence", href: "#/reports" }
+      ]);
     } else if (rootRoute === "what-if") {
       const qParams = new URLSearchParams(queryString || "");
       const projectId = qParams.get("project_id") || "PRJ-SYN-000002";
       mount.innerHTML = window.ProjectDetailView.render(projectId);
-      if (window.ProjectDetailView.postRender) window.ProjectDetailView.postRender(projectId);
+      if (window.ProjectDetailView.postRender) {
+        window.ProjectDetailView.postRender(projectId).then(() => {
+          if (window.ProjectDetailView.switchTab) window.ProjectDetailView.switchTab("whatif");
+        });
+      }
       window.AppShell.updateActiveNav("projects/" + projectId);
+      updateCrumbs([
+        { label: "Decisions", href: "#/what-if" },
+        { label: "What-If Simulator", href: `#/what-if?project_id=${projectId}` }
+      ]);
     } else {
       // Fallback to Dashboard
       window.location.hash = "#/dashboard";
@@ -139,3 +249,4 @@ const Router = {
 };
 
 window.Router = Router;
+

@@ -105,6 +105,162 @@ const CommonUI = {
         <div class="h-4 bg-slate-200 rounded w-16"></div>
       </div>
     `).join("");
+  },
+
+  // Dynamic Breadcrumb Component (Section 8)
+  renderBreadcrumbs(items = []) {
+    if (!items || items.length === 0) return "";
+    return `
+      <nav class="flex items-center gap-1.5 text-xs text-slate-500 overflow-x-auto whitespace-nowrap py-1" aria-label="Breadcrumb">
+        <a href="#/dashboard" class="hover:text-blue-700 font-medium transition-colors flex items-center gap-1">
+          <span>🏛️</span>
+          <span>Command Center</span>
+        </a>
+        ${items.map((item, idx) => {
+          const isLast = idx === items.length - 1;
+          return `
+            <span class="text-slate-300">/</span>
+            ${isLast 
+              ? `<span class="font-semibold text-slate-900 truncate max-w-[240px]" aria-current="page">${item.label}</span>`
+              : `<a href="${item.href || '#'}" class="hover:text-blue-700 transition-colors truncate max-w-[200px]">${item.label}</a>`
+            }
+          `;
+        }).join('')}
+      </nav>
+    `;
+  },
+
+  // Standardized Government Status Badge (Section 53)
+  renderStatusBadge(status = "ON TRACK") {
+    const s = String(status).toUpperCase();
+    let bg = "bg-slate-100 text-slate-700 border-slate-200";
+    let dot = "bg-slate-500";
+
+    if (s.includes("ON TRACK") || s.includes("COMPLETED") || s.includes("HEALTHY")) {
+      bg = "bg-emerald-50 text-emerald-800 border-emerald-200";
+      dot = "bg-emerald-600";
+    } else if (s.includes("WATCH") || s.includes("MODERATE") || s.includes("REVIEW")) {
+      bg = "bg-amber-50 text-amber-800 border-amber-200";
+      dot = "bg-amber-600";
+    } else if (s.includes("HIGH") || s.includes("CRITICAL") || s.includes("BLOCKED") || s.includes("STOPPAGE")) {
+      bg = "bg-rose-50 text-rose-800 border-rose-200";
+      dot = "bg-rose-600";
+    } else if (s.includes("STALE")) {
+      bg = "bg-slate-100 text-slate-600 border-slate-300";
+      dot = "bg-slate-400";
+    }
+
+    return `
+      <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold border ${bg}">
+        <span class="w-1.5 h-1.5 rounded-full ${dot}"></span>
+        ${s}
+      </span>
+    `;
+  },
+
+  // 5-Pillar Project Health Strip (Section 21)
+  renderHealthStrip(health = {}) {
+    const pillars = [
+      { key: "schedule", label: "Schedule", status: health.schedule || "WATCH", subtext: health.scheduleText || "+4 mos drift" },
+      { key: "financial", label: "Financial", status: health.financial || "HEALTHY", subtext: health.financialText || "Within budget" },
+      { key: "progress", label: "Progress", status: health.progress || "WATCH", subtext: health.progressText || "62% Physical" },
+      { key: "execution", label: "Execution", status: health.execution || "WATCH", subtext: health.executionText || "Pier 4 Delayed" },
+      { key: "data", label: "Data Quality", status: health.data || "HEALTHY", subtext: health.dataText || "Verified QA" }
+    ];
+
+    return `
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        ${pillars.map(p => {
+          let borderClass = "status-healthy";
+          let badgeColor = "text-emerald-700 bg-emerald-50";
+          if (p.status === "WATCH") {
+            borderClass = "status-watch";
+            badgeColor = "text-amber-700 bg-amber-50";
+          } else if (p.status === "RISK" || p.status === "CRITICAL" || p.status === "HIGH") {
+            borderClass = "status-risk";
+            badgeColor = "text-rose-700 bg-rose-50";
+          }
+          return `
+            <div class="health-pillar ${borderClass}" onclick="CommonUI.onHealthPillarClick('${p.key}')">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">${p.label}</span>
+                <span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded ${badgeColor}">${p.status}</span>
+              </div>
+              <div class="text-xs font-semibold text-slate-800 mt-1 truncate">${p.subtext}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  },
+
+  onHealthPillarClick(key) {
+    if (window.ProjectDetailView && window.ProjectDetailView.switchTab) {
+      const tabMap = { schedule: "timeline", financial: "plan-vs-actual", progress: "progress-trend", execution: "execution", data: "audit" };
+      window.ProjectDetailView.switchTab(tabMap[key] || "overview");
+    }
+  },
+
+  // Filter Chips Bar (Section 16)
+  renderFilterChips(chips = [], onRemoveFnName = "ProjectsView.removeFilter", onClearAllFnName = "ProjectsView.clearAllFilters") {
+    if (!chips || chips.length === 0) return "";
+    return `
+      <div class="flex items-center gap-2 flex-wrap py-2 border-b border-slate-100">
+        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Active Filters:</span>
+        ${chips.map(c => `
+          <span class="filter-chip">
+            <span>${c.label}: <strong>${c.value}</strong></span>
+            <button onclick="${onRemoveFnName}('${c.key}')" title="Remove filter" aria-label="Remove filter ${c.label}">×</button>
+          </span>
+        `).join('')}
+        <button onclick="${onClearAllFnName}()" class="text-xs text-blue-700 hover:text-blue-900 font-semibold underline ml-1 cursor-pointer">
+          Clear all
+        </button>
+      </div>
+    `;
+  },
+
+  // Slide-over Side Drawer (Section 34)
+  openDrawer(title, contentHtml) {
+    let backdrop = document.getElementById("astra-global-drawer-backdrop");
+    let panel = document.getElementById("astra-global-drawer-panel");
+
+    if (!backdrop) {
+      backdrop = document.createElement("div");
+      backdrop.id = "astra-global-drawer-backdrop";
+      backdrop.className = "astra-drawer-backdrop";
+      backdrop.onclick = () => CommonUI.closeDrawer();
+      document.body.appendChild(backdrop);
+    }
+
+    if (!panel) {
+      panel = document.createElement("div");
+      panel.id = "astra-global-drawer-panel";
+      panel.className = "astra-drawer-panel";
+      document.body.appendChild(panel);
+    }
+
+    panel.innerHTML = `
+      <div class="h-16 px-5 border-b border-slate-200 flex items-center justify-between flex-shrink-0 bg-slate-50">
+        <h3 class="font-bold text-slate-900 text-sm tracking-tight">${title}</h3>
+        <button onclick="CommonUI.closeDrawer()" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-200 transition text-base">✕</button>
+      </div>
+      <div class="flex-1 overflow-y-auto p-5 space-y-4">
+        ${contentHtml}
+      </div>
+    `;
+
+    backdrop.style.display = "block";
+    requestAnimationFrame(() => panel.classList.add("open"));
+  },
+
+  closeDrawer() {
+    const backdrop = document.getElementById("astra-global-drawer-backdrop");
+    const panel = document.getElementById("astra-global-drawer-panel");
+    if (panel) panel.classList.remove("open");
+    if (backdrop) {
+      setTimeout(() => { backdrop.style.display = "none"; }, 200);
+    }
   }
 };
 

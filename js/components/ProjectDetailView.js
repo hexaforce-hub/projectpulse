@@ -6,6 +6,8 @@
 // ==========================================================================
 
 const ProjectDetailView = {
+  activeTab: "overview",
+
   render(projectId) {
     const allProjects = window.MOCK_PROJECTS || [];
     const fallback = allProjects.find(p => p.project_id === projectId) || allProjects[0] || {};
@@ -14,329 +16,398 @@ const ProjectDetailView = {
     const isHero = pId === "PRJ-DEMO-001" || pId === "PRJ-SYN-000001";
 
     return `
-      <div class="max-w-[1440px] mx-auto space-y-6">
+      <div class="max-w-[1440px] mx-auto space-y-5">
         
-        <!-- Top Navigation Bar & Identity Breadcrumb -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
-          <div class="flex items-center gap-3">
-            <a href="#/projects" class="btn btn-secondary btn-sm" title="Return to Projects list">
-              ← Back to Registry
-            </a>
-            <div>
-              <div class="flex items-center gap-2">
-                <span id="dtl-project-id" class="font-mono text-caption text-slate-500 uppercase font-bold">${pId}</span>
+        <!-- Breadcrumbs Navigation -->
+        <div class="border-b border-slate-200 pb-3">
+          <div class="mb-2">
+            ${CommonUI.renderBreadcrumbs([
+              { label: "Portfolio", href: "#/projects" },
+              { label: "Central Projects Registry", href: "#/projects" },
+              { label: pId, href: `#/projects/${pId}` }
+            ])}
+          </div>
+
+          <!-- Executive Header: Identity, Status, Outlay & Primary Actions -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <span id="dtl-project-id" class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-900 border border-blue-200 uppercase tracking-wide">
+                  ${pId}
+                </span>
                 <span class="text-slate-300">•</span>
-                <span id="dtl-project-status" class="text-caption font-semibold text-orange-700">
-                  Critical Execution Review
+                <span id="dtl-project-status">
+                  ${CommonUI.renderStatusBadge("CRITICAL REVIEW")}
                 </span>
                 ${isHero ? `
                   <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200">
-                    HERO DEMO PROJECT
+                    HERO BENCHMARK PROJECT
                   </span>
                 ` : ''}
+                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                  MoSPI PAIMANA Standard
+                </span>
               </div>
-              <h1 id="dtl-project-name" class="text-page-title mt-0.5">
+              <h1 id="dtl-project-name" class="text-2xl font-bold text-slate-900 tracking-tight mt-1">
                 ${fallback.project_name || "NH-44 Strategic Corridor Development Project"}
               </h1>
+              <div class="text-xs text-slate-500 flex flex-wrap items-center gap-x-3 gap-y-1 mt-0.5">
+                <span><strong>Ministry:</strong> <span id="dtl-header-ministry">${fallback.ministry || 'Ministry of Road Transport and Highways'}</span></span>
+                <span class="text-slate-300">•</span>
+                <span><strong>Agency:</strong> <span id="dtl-header-agency">${fallback.implementing_agency || 'NHAI'}</span></span>
+                <span class="text-slate-300">•</span>
+                <span><strong>Location:</strong> <span id="dtl-header-state">${fallback.state || 'Telangana / Andhra Pradesh'}</span></span>
+              </div>
             </div>
-          </div>
 
-          <div class="flex items-center gap-2">
-            <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-50 text-blue-800 border border-blue-200" title="Data Contract Specification Standard">
-              MoSPI PAIMANA Standard
-            </span>
-            <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
-              SYNTHETIC PROTOTYPE DATA
-            </span>
+            <!-- Executive Quick Actions -->
+            <div class="flex flex-wrap items-center gap-2 flex-shrink-0">
+              <a href="#/projects" class="btn btn-secondary btn-sm flex items-center gap-1 text-xs" title="Return to Projects Explorer">
+                <span>←</span>
+                <span>Registry</span>
+              </a>
+              <button onclick="ProjectDetailView.switchTab('whatif')" class="btn btn-secondary btn-sm flex items-center gap-1.5 text-xs">
+                <span>⚡</span>
+                <span>What-If Test</span>
+              </button>
+              <a href="#/directives?project_id=${pId}&action=new" class="btn btn-primary btn-sm flex items-center gap-1.5 text-xs">
+                <span>📜</span>
+                <span>Issue Directive</span>
+              </a>
+              <button onclick="ProjectDetailView.exportDossier('${pId}')" class="btn btn-secondary btn-sm flex items-center gap-1 text-xs" title="Download official project dossier">
+                <span>📥</span>
+                <span>Export</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- Role-Aware Adaptive Intelligence & Direct Action Flight Deck -->
+        <!-- Role-Aware Adaptive Flight Deck -->
         <div id="dtl-role-adaptive-banner" class="animate-fade-in"></div>
 
-        <!-- Above the Fold: Summary Card + Risk Overview -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-          <!-- Left: Project Summary Specifications (7 Cols) -->
-          <div class="lg:col-span-7 gov-card space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-              <div class="flex items-center gap-2">
-                <h3 class="text-card-title">Project Summary & Sanction Details</h3>
-                <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-slate-100 text-slate-700 uppercase tracking-wider">
-                  OBSERVED
-                </span>
-              </div>
-              <span class="text-caption text-slate-400 font-mono">Central Sector ₹150 Cr+</span>
-            </div>
-
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-y-3.5 gap-x-4 text-caption">
-              <div>
-                <span class="text-slate-400 block text-[11px]">Central Ministry</span>
-                <span id="dtl-ministry" class="font-medium text-slate-900 block truncate">
-                  ${fallback.ministry || "Ministry of Road Transport and Highways"}
-                </span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[11px]">Sector / Department</span>
-                <span id="dtl-sector" class="font-medium text-slate-900 block truncate">
-                  ${fallback.sector || "Roads & Highways"}
-                </span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[11px]">Implementing Agency</span>
-                <span id="dtl-agency" class="font-medium text-slate-900 block">
-                  ${fallback.implementing_agency || "NHAI"}
-                </span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[11px]">State / Region</span>
-                <span id="dtl-state" class="font-medium text-slate-900 block">
-                  ${fallback.state || "Telangana / Andhra Pradesh"}
-                </span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[11px]">Sanctioned Start Date</span>
-                <span id="dtl-start-date" class="font-medium text-slate-900 block tabular-nums">2022-09</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[11px]">Original Completion</span>
-                <span id="dtl-plan-date" class="font-medium text-slate-900 block tabular-nums">2025-06</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[11px]">Revised Target Date</span>
-                <span id="dtl-rev-date" class="font-semibold text-orange-700 block tabular-nums">2027-02 (20 mo delay)</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[11px]">Original Approved Cost</span>
-                <span id="dtl-orig-cost" class="font-medium text-slate-900 block tabular-nums">₹1,250.0 Cr</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[11px]">Current Revised Cost</span>
-                <span id="dtl-rev-cost" class="font-semibold text-slate-900 block tabular-nums">₹1,840.5 Cr</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[11px]">Cumulative Expenditure</span>
-                <span id="dtl-expenditure" class="font-medium text-slate-900 block tabular-nums">₹1,472.4 Cr</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[11px]">Reported Cost Growth</span>
-                <span id="dtl-cost-growth" class="font-semibold text-red-700 block tabular-nums">+47.2% (+₹590.5 Cr)</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[11px]">Schedule Extensions</span>
-                <span id="dtl-extensions" class="font-medium text-slate-900 block tabular-nums">2 formal revisions</span>
-              </div>
-            </div>
+        <!-- Level 2: 5-Pillar Executive Health Strip (Interactive) -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">5-Pillar Health Surveillance (Click pillar to jump to detail)</span>
+            <span class="text-[10px] text-slate-400">PAIMANA Telemetry Cycle: July 2026</span>
           </div>
-
-          <!-- Right: Risk Overview Panel (5 Cols) -->
-          <div class="lg:col-span-5 gov-card flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
-                <div class="flex items-center gap-2">
-                  <h3 class="text-card-title">Predicted Risk Intelligence</h3>
-                  <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-blue-100 text-blue-800 uppercase tracking-wider">
-                    PREDICTED
-                  </span>
-                </div>
-                <span id="dtl-risk-badge">
-                  <span class="risk-badge risk-badge-critical">CRITICAL (78.5)</span>
-                </span>
-              </div>
-
-              <!-- Main Score Display -->
-              <div class="text-center py-3 bg-slate-50 rounded-xl border border-slate-200/80 mb-4">
-                <div class="text-caption text-slate-500 font-medium">Composite Project Risk Score</div>
-                <div id="dtl-score-val" class="text-4xl font-bold text-slate-900 tabular-nums tracking-tight my-1 font-mono">
-                  78.5 <span class="text-lg text-slate-400 font-normal">/ 100</span>
-                </div>
-                <div id="dtl-risk-headline" class="text-caption text-red-700 font-semibold">
-                  Severe predicted schedule slippage and cost escalation
-                </div>
-                <div id="dtl-risk-note" class="text-[11px] text-slate-400 mt-1 max-w-sm mx-auto">
-                  Multi-target ensemble: LightGBM Regressor + HistGradientBoosting Classifier
-                </div>
-              </div>
-
-              <!-- Sub-Risk Predictions -->
-              <div class="grid grid-cols-3 gap-2 text-center text-caption">
-                <div class="p-2 bg-white rounded border border-slate-200">
-                  <span class="text-[10px] text-slate-500 block">Schedule Delay</span>
-                  <strong id="dtl-sub-schedule" class="text-base text-slate-900 tabular-nums">20.0 mos</strong>
-                </div>
-                <div class="p-2 bg-white rounded border border-slate-200">
-                  <span class="text-[10px] text-slate-500 block">Cost Overrun</span>
-                  <strong id="dtl-sub-cost" class="text-base text-slate-900 tabular-nums">84.2% prob</strong>
-                </div>
-                <div class="p-2 bg-white rounded border border-slate-200">
-                  <span class="text-[10px] text-slate-500 block">Impl. Distress</span>
-                  <strong id="dtl-sub-impl" class="text-base text-slate-900 tabular-nums">85.0%</strong>
-                </div>
-              </div>
-            </div>
-
-            <!-- Primary Driver Tag -->
-            <div class="mt-4 pt-3 border-t border-slate-100 text-caption text-slate-600 flex items-center justify-between">
-              <span>Primary Driver: <strong id="dtl-primary-driver" class="text-slate-900">Land Acquisition & RoW</strong></span>
-              <span class="text-[11px] text-slate-400">TreeSHAP Attributed</span>
-            </div>
+          <div id="dtl-health-strip-mount">
+            ${CommonUI.renderHealthStrip({
+              schedule: "CRITICAL",
+              scheduleText: "+20 mos drift",
+              financial: "WATCH",
+              financialText: "+47.2% Overrun",
+              progress: "RISK",
+              progressText: "42.5% Physical",
+              execution: "WATCH",
+              executionText: "4 Delayed MS",
+              data: "HEALTHY",
+              dataText: "Verified QA"
+            })}
           </div>
-
         </div>
 
-        <!-- Middle Section: Financial vs Physical Progress Decoupling + Observed Signals -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-          <!-- Financial vs Physical Progress Decoupling (6 Cols) -->
-          <div class="lg:col-span-6 gov-card space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-              <div>
-                <div class="flex items-center gap-2">
-                  <h3 class="text-card-title">Progress Decoupling Surveillance</h3>
-                  <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-100 text-amber-800 uppercase tracking-wider">
-                    DERIVED
-                  </span>
-                </div>
-                <p class="text-caption text-slate-500">Expenditure disbursement vs certified physical execution</p>
-              </div>
-              <span id="dtl-gap-badge" class="px-2 py-0.5 rounded text-[11px] font-bold bg-red-100 text-red-800 border border-red-200 font-mono">
-                Decoupling: +37.5 pp
+        <!-- Level 3: "Why This Project Needs Attention" Diagnosis Banner (Progressive Disclosure) -->
+        <div class="gov-card bg-amber-50/50 border-amber-200 p-4 space-y-3 shadow-xs">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-base">⚠️</span>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-amber-900">Why This Project Needs Attention</h3>
+              <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-200/60 text-amber-900 uppercase">
+                AUTOMATED SURVEILLANCE
               </span>
             </div>
-
-            <div class="space-y-4">
-              <!-- Physical Progress Bar -->
-              <div class="space-y-1">
-                <div class="flex justify-between text-caption font-medium">
-                  <span class="text-slate-700">Certified Physical Progress</span>
-                  <span id="dtl-phys-prog-val" class="font-bold text-slate-900 tabular-nums">42.5%</span>
-                </div>
-                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                  <div id="dtl-phys-prog-bar" class="bg-blue-700 h-full rounded-full transition-all" style="width: 42.5%;"></div>
-                </div>
-              </div>
-
-              <!-- Financial Expenditure Bar -->
-              <div class="space-y-1">
-                <div class="flex justify-between text-caption font-medium">
-                  <span class="text-slate-700">Disbursed Expenditure Progress</span>
-                  <span id="dtl-fin-prog-val" class="font-bold text-slate-900 tabular-nums">80.0%</span>
-                </div>
-                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                  <div id="dtl-fin-prog-bar" class="bg-amber-600 h-full rounded-full transition-all" style="width: 80.0%;"></div>
-                </div>
-              </div>
-
-              <!-- Administrative Advisory -->
-              <div class="p-3 bg-amber-50 rounded-lg border border-amber-200 text-caption text-amber-950 flex items-start gap-2">
-                <span class="text-base flex-shrink-0">⚠️</span>
-                <div>
-                  <strong>Execution Decoupling Mismatch:</strong> Expenditure is significantly leading certified physical progress on-site. MoSPI IPMD surveillance flagged this pattern as an early warning trigger for contract re-negotiation or billing disputes.
-                </div>
-              </div>
-            </div>
+            <button type="button" onclick="ProjectDetailView.toggleExplainability()" class="text-xs font-bold text-amber-900 hover:text-amber-950 underline cursor-pointer">
+              <span id="dtl-explain-btn-text">Show Root Cause Decomposition ▾</span>
+            </button>
           </div>
 
-          <!-- Observed Signal Breakdown (6 Cols) -->
-          <div class="lg:col-span-6 gov-card space-y-3">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-              <div class="flex items-center gap-2">
-                <h3 class="text-card-title">Key Operational Execution Signals</h3>
-                <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-slate-100 text-slate-700 uppercase tracking-wider">
-                  OBSERVED
-                </span>
+          <p id="dtl-attention-summary" class="text-xs text-amber-950 leading-relaxed font-medium">
+            Automated surveillance triggered: project demonstrates critical path slippage (+20 months delay) with primary bottleneck attributed to Land Acquisition & RoW. Financial disbursement significantly leads certified physical execution (+37.5 pp decoupling gap).
+          </p>
+
+          <!-- Collapsible Explainability Decomposition Panel -->
+          <div id="dtl-explainability-panel" class="hidden pt-3 border-t border-amber-200/80 space-y-3">
+            <div class="flex items-center justify-between text-[11px] text-amber-900">
+              <span class="font-semibold">TreeSHAP Explainability Decomposition (Multi-target LightGBM + HistGradientBoosting)</span>
+              <span class="font-mono text-slate-500">Σ Relative Impact = 100%</span>
+            </div>
+            <div id="dtl-drivers-container" class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+              <!-- TreeSHAP drivers injected dynamically -->
+            </div>
+            <div class="text-[10px] text-slate-500 italic">
+              * Feature contributions represent Shapley values from the trained ensemble model; not a causal certainty or administrative verdict.
+            </div>
+          </div>
+        </div>
+
+        <!-- Level 4: Clean Tab Navigation Bar -->
+        <div class="border-b border-slate-200 bg-white px-2 rounded-t-lg pt-1">
+          <nav class="flex space-x-2 sm:space-x-4 text-xs font-semibold" aria-label="Project Tabs">
+            <button type="button" onclick="ProjectDetailView.switchTab('overview')" id="tab-btn-overview" 
+                    class="tab-btn border-b-2 border-blue-800 text-blue-900 pb-3 px-2.5 flex items-center gap-1.5 transition font-bold">
+              <span>📊</span>
+              <span>Overview & Plan vs Actual</span>
+            </button>
+            <button type="button" onclick="ProjectDetailView.switchTab('milestones')" id="tab-btn-milestones" 
+                    class="tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-800 pb-3 px-2.5 flex items-center gap-1.5 transition font-medium">
+              <span>⏱️</span>
+              <span>Critical Path Milestones</span>
+              <span id="tab-badge-milestones" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700">8</span>
+            </button>
+            <button type="button" onclick="ProjectDetailView.switchTab('warnings')" id="tab-btn-warnings" 
+                    class="tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-800 pb-3 px-2.5 flex items-center gap-1.5 transition font-medium">
+              <span>🚨</span>
+              <span>Surveillance Radar</span>
+              <span id="tab-badge-warnings" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800">1</span>
+            </button>
+            <button type="button" onclick="ProjectDetailView.switchTab('whatif')" id="tab-btn-whatif" 
+                    class="tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-800 pb-3 px-2.5 flex items-center gap-1.5 transition font-medium">
+              <span>⚡</span>
+              <span>What-If Simulator</span>
+            </button>
+            <button type="button" onclick="ProjectDetailView.switchTab('audit')" id="tab-btn-audit" 
+                    class="tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-800 pb-3 px-2.5 flex items-center gap-1.5 transition font-medium">
+              <span>🛡️</span>
+              <span>Governance & Audit Trail</span>
+            </button>
+          </nav>
+        </div>
+
+        <!-- ====================================================================== -->
+        <!-- TAB PANE 1: Overview & Plan vs Actual                                   -->
+        <!-- ====================================================================== -->
+        <div id="tab-pane-overview" class="space-y-6">
+          
+          <!-- Sanction Details & Predicted Risk Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left: Project Summary Specifications (7 Cols) -->
+            <div class="lg:col-span-7 gov-card space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <div class="flex items-center gap-2">
+                  <h3 class="text-card-title">Project Summary & Sanction Details</h3>
+                  <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-slate-100 text-slate-700 uppercase tracking-wider">
+                    OBSERVED
+                  </span>
+                </div>
+                <span class="text-caption text-slate-400 font-mono">Central Sector ₹150 Cr+</span>
               </div>
-              <span class="text-caption font-mono text-slate-400">Quarterly Return</span>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-y-3.5 gap-x-4 text-caption">
+                <div>
+                  <span class="text-slate-400 block text-[11px]">Central Ministry</span>
+                  <span id="dtl-ministry" class="font-medium text-slate-900 block truncate">
+                    ${fallback.ministry || "Ministry of Road Transport and Highways"}
+                  </span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[11px]">Sector / Department</span>
+                  <span id="dtl-sector" class="font-medium text-slate-900 block truncate">
+                    ${fallback.sector || "Roads & Highways"}
+                  </span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[11px]">Implementing Agency</span>
+                  <span id="dtl-agency" class="font-medium text-slate-900 block">
+                    ${fallback.implementing_agency || "NHAI"}
+                  </span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[11px]">State / Region</span>
+                  <span id="dtl-state" class="font-medium text-slate-900 block">
+                    ${fallback.state || "Telangana / Andhra Pradesh"}
+                  </span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[11px]">Sanctioned Start Date</span>
+                  <span id="dtl-start-date" class="font-medium text-slate-900 block tabular-nums">2022-09</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[11px]">Original Completion</span>
+                  <span id="dtl-plan-date" class="font-medium text-slate-900 block tabular-nums">2025-06</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[11px]">Revised Target Date</span>
+                  <span id="dtl-rev-date" class="font-semibold text-orange-700 block tabular-nums">2027-02 (20 mo delay)</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[11px]">Original Approved Cost</span>
+                  <span id="dtl-orig-cost" class="font-medium text-slate-900 block tabular-nums">₹1,250.0 Cr</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[11px]">Current Revised Cost</span>
+                  <span id="dtl-rev-cost" class="font-semibold text-slate-900 block tabular-nums">₹1,840.5 Cr</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[11px]">Cumulative Expenditure</span>
+                  <span id="dtl-expenditure" class="font-medium text-slate-900 block tabular-nums">₹1,472.4 Cr</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[11px]">Reported Cost Growth</span>
+                  <span id="dtl-cost-growth" class="font-semibold text-red-700 block tabular-nums">+47.2% (+₹590.5 Cr)</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[11px]">Schedule Extensions</span>
+                  <span id="dtl-extensions" class="font-medium text-slate-900 block tabular-nums">2 formal revisions</span>
+                </div>
+              </div>
             </div>
 
-            <div id="dtl-signals-container" class="space-y-2 pt-1">
-              <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg border border-slate-200/80 text-caption">
-                <div>
-                  <span class="font-semibold text-slate-900">Physical Works Accomplished</span>
-                  <span class="text-slate-500 block text-[11px]">Earthwork, viaduct subgrade completed</span>
+            <!-- Right: Risk Overview Panel (5 Cols) -->
+            <div class="lg:col-span-5 gov-card flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-card-title">Predicted Risk Intelligence</h3>
+                    <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-blue-100 text-blue-800 uppercase tracking-wider">
+                      PREDICTED
+                    </span>
+                  </div>
+                  <span id="dtl-risk-badge">
+                    <span class="risk-badge risk-badge-critical">CRITICAL (78.5)</span>
+                  </span>
                 </div>
-                <span id="sig-phys" class="font-bold text-slate-900 tabular-nums text-sm">42.5%</span>
+
+                <!-- Main Score Display -->
+                <div class="text-center py-3 bg-slate-50 rounded-xl border border-slate-200/80 mb-4">
+                  <div class="text-caption text-slate-500 font-medium">Composite Project Risk Score</div>
+                  <div id="dtl-score-val" class="text-4xl font-bold text-slate-900 tabular-nums tracking-tight my-1 font-mono">
+                    78.5 <span class="text-lg text-slate-400 font-normal">/ 100</span>
+                  </div>
+                  <div id="dtl-risk-headline" class="text-caption text-red-700 font-semibold">
+                    Severe predicted schedule slippage and cost escalation
+                  </div>
+                  <div id="dtl-risk-note" class="text-[11px] text-slate-400 mt-1 max-w-sm mx-auto">
+                    Multi-target ensemble: LightGBM Regressor + HistGradientBoosting Classifier
+                  </div>
+                </div>
+
+                <!-- Sub-Risk Predictions -->
+                <div class="grid grid-cols-3 gap-2 text-center text-caption">
+                  <div class="p-2 bg-white rounded border border-slate-200">
+                    <span class="text-[10px] text-slate-500 block">Schedule Delay</span>
+                    <strong id="dtl-sub-schedule" class="text-base text-slate-900 tabular-nums">20.0 mos</strong>
+                  </div>
+                  <div class="p-2 bg-white rounded border border-slate-200">
+                    <span class="text-[10px] text-slate-500 block">Cost Overrun</span>
+                    <strong id="dtl-sub-cost" class="text-base text-slate-900 tabular-nums">84.2% prob</strong>
+                  </div>
+                  <div class="p-2 bg-white rounded border border-slate-200">
+                    <span class="text-[10px] text-slate-500 block">Impl. Distress</span>
+                    <strong id="dtl-sub-impl" class="text-base text-slate-900 tabular-nums">85.0%</strong>
+                  </div>
+                </div>
               </div>
-              <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg border border-slate-200/80 text-caption">
-                <div>
-                  <span class="font-semibold text-slate-900">Total Funds Disbursed</span>
-                  <span class="text-slate-500 block text-[11px]">80.0% of approved revised estimate</span>
-                </div>
-                <span id="sig-exp" class="font-bold text-slate-900 tabular-nums text-sm">₹1,472.4 Cr</span>
-              </div>
-              <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg border border-slate-200/80 text-caption">
-                <div>
-                  <span class="font-semibold text-slate-900">Critical-Path Checkpoints Delayed</span>
-                  <span class="text-slate-500 block text-[11px]">Milestones delayed beyond baseline schedule</span>
-                </div>
-                <span id="sig-ms" class="font-bold text-red-700 tabular-nums text-sm">4 / 8 Delayed</span>
+
+              <!-- Primary Driver Tag -->
+              <div class="mt-4 pt-3 border-t border-slate-100 text-caption text-slate-600 flex items-center justify-between">
+                <span>Primary Driver: <strong id="dtl-primary-driver" class="text-slate-900">Land Acquisition & RoW</strong></span>
+                <span class="text-[11px] text-slate-400">TreeSHAP Attributed</span>
               </div>
             </div>
+
+          </div>
+
+          <!-- Progress Decoupling Surveillance & Observed Signals -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Financial vs Physical Progress Decoupling (6 Cols) -->
+            <div class="lg:col-span-6 gov-card space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-card-title">Progress Decoupling Surveillance</h3>
+                    <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-100 text-amber-800 uppercase tracking-wider">
+                      DERIVED
+                    </span>
+                  </div>
+                  <p class="text-caption text-slate-500">Expenditure disbursement vs certified physical execution</p>
+                </div>
+                <span id="dtl-gap-badge" class="px-2 py-0.5 rounded text-[11px] font-bold bg-red-100 text-red-800 border border-red-200 font-mono">
+                  Decoupling: +37.5 pp
+                </span>
+              </div>
+
+              <div class="space-y-4">
+                <!-- Physical Progress Bar -->
+                <div class="space-y-1">
+                  <div class="flex justify-between text-caption font-medium">
+                    <span class="text-slate-700">Certified Physical Progress</span>
+                    <span id="dtl-phys-prog-val" class="font-bold text-slate-900 tabular-nums">42.5%</span>
+                  </div>
+                  <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                    <div id="dtl-phys-prog-bar" class="bg-blue-700 h-full rounded-full transition-all" style="width: 42.5%;"></div>
+                  </div>
+                </div>
+
+                <!-- Financial Expenditure Bar -->
+                <div class="space-y-1">
+                  <div class="flex justify-between text-caption font-medium">
+                    <span class="text-slate-700">Disbursed Expenditure Progress</span>
+                    <span id="dtl-fin-prog-val" class="font-bold text-slate-900 tabular-nums">80.0%</span>
+                  </div>
+                  <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                    <div id="dtl-fin-prog-bar" class="bg-amber-600 h-full rounded-full transition-all" style="width: 80.0%;"></div>
+                  </div>
+                </div>
+
+                <!-- Administrative Advisory -->
+                <div class="p-3 bg-amber-50 rounded-lg border border-amber-200 text-caption text-amber-950 flex items-start gap-2">
+                  <span class="text-base flex-shrink-0">⚠️</span>
+                  <div>
+                    <strong>Execution Decoupling Mismatch:</strong> Expenditure is significantly leading certified physical progress on-site. MoSPI IPMD surveillance flagged this pattern as an early warning trigger for contract re-negotiation or billing disputes.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Observed Signal Breakdown (6 Cols) -->
+            <div class="lg:col-span-6 gov-card space-y-3">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <div class="flex items-center gap-2">
+                  <h3 class="text-card-title">Key Operational Execution Signals</h3>
+                  <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-slate-100 text-slate-700 uppercase tracking-wider">
+                    OBSERVED
+                  </span>
+                </div>
+                <span class="text-caption font-mono text-slate-400">Quarterly Return</span>
+              </div>
+
+              <div id="dtl-signals-container" class="space-y-2 pt-1">
+                <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg border border-slate-200/80 text-caption">
+                  <div>
+                    <span class="font-semibold text-slate-900">Physical Works Accomplished</span>
+                    <span class="text-slate-500 block text-[11px]">Earthwork, viaduct subgrade completed</span>
+                  </div>
+                  <span id="sig-phys" class="font-bold text-slate-900 tabular-nums text-sm">42.5%</span>
+                </div>
+                <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg border border-slate-200/80 text-caption">
+                  <div>
+                    <span class="font-semibold text-slate-900">Total Funds Disbursed</span>
+                    <span class="text-slate-500 block text-[11px]">80.0% of approved revised estimate</span>
+                  </div>
+                  <span id="sig-exp" class="font-bold text-slate-900 tabular-nums text-sm">₹1,472.4 Cr</span>
+                </div>
+                <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg border border-slate-200/80 text-caption">
+                  <div>
+                    <span class="font-semibold text-slate-900">Critical-Path Checkpoints Delayed</span>
+                    <span class="text-slate-500 block text-[11px]">Milestones delayed beyond baseline schedule</span>
+                  </div>
+                  <span id="sig-ms" class="font-bold text-red-700 tabular-nums text-sm">4 / 8 Delayed</span>
+                </div>
+              </div>
+            </div>
+
           </div>
 
         </div>
 
-        <!-- TreeSHAP Explainability Waterfall & Milestones -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-          <!-- TreeSHAP Drivers (5 Cols) -->
-          <div class="lg:col-span-5 gov-card space-y-3">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-              <div>
-                <div class="flex items-center gap-2">
-                  <h3 class="text-card-title">TreeSHAP Explainability Decomposition</h3>
-                  <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-blue-100 text-blue-800 uppercase tracking-wider">
-                    EXPLAINABLE AI
-                  </span>
-                </div>
-                <p class="text-caption text-slate-500">Exact Shapley attributions explaining why project is flagged</p>
-              </div>
-              <span class="text-caption font-mono text-slate-400">Σ = 100%</span>
-            </div>
-
-            <!-- Explainability Tooltip Notice -->
-            <div class="text-[11px] text-slate-500 italic">
-              * Feature contribution to model prediction; not a causal certainty.
-            </div>
-
-            <div id="dtl-drivers-container" class="space-y-3 pt-1">
-              <div class="space-y-1">
-                <div class="flex items-center justify-between text-caption">
-                  <span class="font-medium text-slate-800">1. Land Acquisition Impasse</span>
-                  <span class="font-semibold text-blue-900 tabular-nums">52.0% impact</span>
-                </div>
-                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                  <div class="bg-blue-700 h-full rounded-full" style="width: 52%;"></div>
-                </div>
-                <div class="text-[11px] text-slate-500 leading-tight">ROW handover pending in Krishna river basin section</div>
-              </div>
-
-              <div class="space-y-1">
-                <div class="flex items-center justify-between text-caption">
-                  <span class="font-medium text-slate-800">2. Milestone Slippage Velocity</span>
-                  <span class="font-semibold text-blue-900 tabular-nums">28.0% impact</span>
-                </div>
-                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                  <div class="bg-blue-700 h-full rounded-full" style="width: 28%;"></div>
-                </div>
-                <div class="text-[11px] text-slate-500 leading-tight">4 critical-path intermediate milestones delayed</div>
-              </div>
-
-              <div class="space-y-1">
-                <div class="flex items-center justify-between text-caption">
-                  <span class="font-medium text-slate-800">3. Progress Decoupling Gap</span>
-                  <span class="font-semibold text-blue-900 tabular-nums">20.0% impact</span>
-                </div>
-                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                  <div class="bg-blue-700 h-full rounded-full" style="width: 20%;"></div>
-                </div>
-                <div class="text-[11px] text-slate-500 leading-tight">Financial outlay leads physical works by 37.5 pp</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Milestones Detailed List (7 Cols) -->
-          <div class="lg:col-span-7 gov-card space-y-3">
+        <!-- ====================================================================== -->
+        <!-- TAB PANE 2: Critical Path CPM Milestones                                -->
+        <!-- ====================================================================== -->
+        <div id="tab-pane-milestones" class="hidden space-y-4">
+          <div class="gov-card space-y-3">
             <div class="flex items-center justify-between border-b border-slate-100 pb-2">
               <div>
                 <h3 class="text-card-title">Critical Path CPM Milestones</h3>
@@ -345,323 +416,397 @@ const ProjectDetailView = {
               <span id="dtl-milestone-count" class="text-caption font-mono text-slate-400">8 Milestones</span>
             </div>
 
-            <div id="dtl-milestones-list" class="max-h-[360px] overflow-y-auto pr-1 space-y-2">
+            <div id="dtl-milestones-list" class="space-y-2">
               <!-- Milestones dynamically injected by postRender -->
             </div>
           </div>
-
-        </div>
-
-        <!-- Active Project Early Warnings & Operational Triage -->
-        <div class="gov-card border-red-200 bg-white space-y-3">
-          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-            <div>
-              <div class="flex items-center gap-2">
-                <h3 class="text-card-title text-slate-900 font-bold">Active Early Warnings & Operational Triage</h3>
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-800 border border-red-200">
-                  SURVEILLANCE RADAR
-                </span>
-              </div>
-              <p class="text-caption text-slate-500">Automated structural anomalies detected on this project requiring administrative intervention</p>
-            </div>
-            <span class="text-[11px] text-slate-400 font-mono">Role: Monitoring Officer / Admin</span>
-          </div>
-
-          <div id="dtl-warnings-container" class="space-y-3">
-            <!-- Warning Card injected by postRender -->
-            <div class="p-3.5 bg-red-50/60 rounded-lg border border-red-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div class="space-y-1">
-                <div class="flex items-center gap-2">
-                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-600 text-white">CRITICAL • P1</span>
-                  <span class="font-bold text-slate-900 text-sm">Severe Decoupling Gap & Milestone Slippage</span>
-                  <span id="dtl-alert-status-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-800 border border-slate-300">OPEN</span>
-                </div>
-                <p class="text-caption text-slate-700">
-                  Disbursement leads physical works by 37.5 percentage points with 4 delayed critical-path checkpoints.
-                </p>
-                <div class="text-[11px] text-slate-500">
-                  Evidence: Expenditure: ₹1,472.4 Cr • Progress: 42.5% • Bottleneck: Land Acquisition
-                </div>
-              </div>
-
-              <!-- Triage Action Buttons -->
-              <div class="flex items-center gap-2 flex-shrink-0">
-                <button id="btn-triage-ack" class="btn btn-secondary btn-sm" title="Acknowledge receipt of warning signal">
-                  Acknowledge
-                </button>
-                <button id="btn-triage-review" class="btn btn-secondary btn-sm bg-blue-50 text-blue-900 border-blue-200 hover:bg-blue-100" title="Start formal inter-ministerial review">
-                  Start Review
-                </button>
-                <button id="btn-triage-resolve" class="btn btn-primary btn-sm" title="Mark friction as resolved">
-                  Resolve
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
 
         <!-- ====================================================================== -->
-        <!-- Phase 7: What-If Intervention Simulator (Decision Support Engine)        -->
+        <!-- TAB PANE 3: Surveillance Radar & Alerts Triage                          -->
         <!-- ====================================================================== -->
-        <div class="gov-card border-blue-300 bg-white space-y-4 shadow-sm" id="whatif-simulator-container">
-          <!-- Header -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
-            <div class="flex items-center gap-2.5">
-              <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-900 flex items-center justify-center font-bold text-sm shadow-sm">⚡</span>
+        <div id="tab-pane-warnings" class="hidden space-y-4">
+          <div class="gov-card border-red-200 bg-white space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
               <div>
                 <div class="flex items-center gap-2">
-                  <h3 class="text-card-title text-slate-900 font-bold">What-If Intervention Simulator</h3>
-                  <span class="text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                    SCENARIO
+                  <h3 class="text-card-title text-slate-900 font-bold">Active Early Warnings & Operational Triage</h3>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-800 border border-red-200">
+                    SURVEILLANCE RADAR
                   </span>
                 </div>
-                <p class="text-caption text-slate-500">Simulate how predictive risk responds to hypothetical administrative recovery actions (zero production mutation).</p>
+                <p class="text-caption text-slate-500">Automated structural anomalies detected on this project requiring administrative intervention</p>
               </div>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="text-xs text-slate-500">Baseline Risk:</span>
-              <span id="whatif-base-badge" class="text-xs font-bold px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-slate-300 font-mono">
-                78.5 / 100 — CRITICAL
-              </span>
-            </div>
-          </div>
-
-          <!-- Non-Causal Advisory Notice -->
-          <div class="p-2.5 bg-blue-50/60 border border-blue-200 rounded text-[11px] text-blue-950 flex items-start gap-2">
-            <span class="flex-shrink-0 text-sm">ℹ️</span>
-            <div>
-              <strong>Advisory Notice:</strong> All simulation results are <em>model-estimated sensitivity projections</em> based on the specified input assumptions. This tool provides decision-support analysis and does <strong>not</strong> constitute an operational guarantee, automated sanction, or causal certainty.
-            </div>
-          </div>
-
-          <!-- Configuration Matrix: Presets + Variable Controls -->
-          <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200 space-y-3">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <!-- Preset Selector -->
-              <div class="md:col-span-1">
-                <label class="block text-xs font-bold text-slate-700 mb-1">Intervention Preset:</label>
-                <select id="whatif-preset-select" class="w-full bg-white border border-slate-300 rounded p-2 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                  <option value="CUSTOM">Custom Scenario</option>
-                  <option value="PRESET_PROCUREMENT">Accelerate Procurement & Approvals (Clear Bottleneck)</option>
-                  <option value="PRESET_MILESTONE">Recover Delayed Milestones (50% Recovery)</option>
-                  <option value="PRESET_PROGRESS">Physical Construction Velocity Boost (+5%)</option>
-                  <option value="PRESET_COMPREHENSIVE">Comprehensive Turnaround Package</option>
-                </select>
-              </div>
-
-              <!-- Scenario Name -->
-              <div class="md:col-span-2">
-                <label class="block text-xs font-bold text-slate-700 mb-1">Scenario Title:</label>
-                <input type="text" id="whatif-scenario-name" value="Hypothetical Intervention Analysis" class="w-full bg-white border border-slate-300 rounded p-2 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="e.g. Fast-Track Statutory Clearance Sensitivity">
-              </div>
+              <span class="text-[11px] text-slate-400 font-mono">Role: Monitoring Officer / Admin</span>
             </div>
 
-            <!-- Controlled Variables Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-              <!-- Variable 1: Primary Statutory Bottleneck -->
-              <div class="p-2.5 bg-white rounded border border-slate-200 space-y-1.5">
-                <div class="flex items-center justify-between">
-                  <span class="text-[11px] font-bold text-slate-700">Primary Bottleneck</span>
-                  <span class="text-[10px] text-slate-400 font-mono">Category Lever</span>
+            <div id="dtl-warnings-container" class="space-y-3">
+              <!-- Warning Card injected by postRender -->
+              <div class="p-3.5 bg-red-50/60 rounded-lg border border-red-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="space-y-1">
+                  <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-600 text-white">CRITICAL • P1</span>
+                    <span class="font-bold text-slate-900 text-sm">Severe Decoupling Gap & Milestone Slippage</span>
+                    <span id="dtl-alert-status-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-800 border border-slate-300">OPEN</span>
+                  </div>
+                  <p class="text-caption text-slate-700">
+                    Disbursement leads physical works by 37.5 percentage points with 4 delayed critical-path checkpoints.
+                  </p>
+                  <div class="text-[11px] text-slate-500">
+                    Evidence: Expenditure: ₹1,472.4 Cr • Progress: 42.5% • Bottleneck: Land Acquisition
+                  </div>
                 </div>
-                <select id="whatif-input-bottleneck" class="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs text-slate-800 font-medium">
-                  <option value="LAND_ACQUISITION">Land Acquisition (Current)</option>
-                  <option value="ENVIRONMENTAL">Environmental & Forest</option>
-                  <option value="CONTRACTOR">Contractor Liquidity / EPC</option>
-                  <option value="ROW">Right of Way (RoW)</option>
-                  <option value="NONE">NONE (Fully Resolved)</option>
-                </select>
-                <div class="text-[10px] text-slate-500">Assumes clearance barriers resolved via single-window cell.</div>
-              </div>
 
-              <!-- Variable 2: Delayed Milestones Recovery -->
-              <div class="p-2.5 bg-white rounded border border-slate-200 space-y-1.5">
-                <div class="flex items-center justify-between">
-                  <span class="text-[11px] font-bold text-slate-700">Delayed Milestones</span>
-                  <span id="whatif-milestones-val" class="font-mono font-bold text-xs text-blue-900 bg-blue-50 px-1.5 py-0.2 rounded">4</span>
-                </div>
-                <input type="range" id="whatif-input-milestones-slider" min="0" max="8" value="4" class="w-full accent-blue-700 cursor-pointer">
-                <div class="flex justify-between text-[10px] text-slate-400 font-mono">
-                  <span>0 (All Recovered)</span>
-                  <span id="whatif-milestones-max">8 Max</span>
-                </div>
-              </div>
-
-              <!-- Variable 3: Physical Progress Acceleration -->
-              <div class="p-2.5 bg-white rounded border border-slate-200 space-y-1.5">
-                <div class="flex items-center justify-between">
-                  <span class="text-[11px] font-bold text-slate-700">Physical Progress %</span>
-                  <span id="whatif-progress-val" class="font-mono font-bold text-xs text-blue-900 bg-blue-50 px-1.5 py-0.2 rounded">42.5%</span>
-                </div>
-                <input type="range" id="whatif-input-progress-slider" min="42.5" max="100.0" step="0.5" value="42.5" class="w-full accent-blue-700 cursor-pointer">
-                <div class="flex justify-between text-[10px] text-slate-400 font-mono">
-                  <span id="whatif-progress-base">42.5% Base</span>
-                  <span>100% Complete</span>
+                <!-- Triage Action Buttons -->
+                <div class="flex items-center gap-2 flex-shrink-0">
+                  <button id="btn-triage-ack" class="btn btn-secondary btn-sm" title="Acknowledge receipt of warning signal">
+                    Acknowledge
+                  </button>
+                  <button id="btn-triage-review" class="btn btn-secondary btn-sm bg-blue-50 text-blue-900 border-blue-200 hover:bg-blue-100" title="Start formal inter-ministerial review">
+                    Start Review
+                  </button>
+                  <button id="btn-triage-resolve" class="btn btn-primary btn-sm" title="Mark friction as resolved">
+                    Resolve
+                  </button>
                 </div>
               </div>
-            </div>
-
-            <!-- Action Bar -->
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 border-t border-slate-200">
-              <span class="text-[11px] text-slate-500">
-                🔒 In-memory simulation: production project records are never modified.
-              </span>
-              <div class="flex items-center gap-2">
-                <button type="button" id="btn-toggle-sensitivity" class="btn btn-secondary btn-sm text-xs" title="Open multi-point parameter sensitivity analysis">
-                  <span>📈</span> Sensitivity Curve
-                </button>
-                <button type="button" id="btn-run-scenario" class="btn btn-primary btn-sm flex items-center gap-1.5 shadow-sm">
-                  <span>🚀</span> Run Simulation
-                  <span id="btn-sim-spinner" class="hidden animate-spin">⏳</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Simulation Comparative Results Panel (Hidden until run) -->
-          <div id="whatif-results-wrapper" class="hidden space-y-4 pt-2">
-            <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-bold text-slate-900">Simulation Comparative Results</span>
-                <span id="res-class-badge" class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                  IMPROVED
-                </span>
-              </div>
-              <div class="flex items-center gap-2">
-                <button type="button" id="btn-save-scenario" class="btn btn-secondary btn-sm text-xs font-bold text-emerald-800 border-emerald-300 hover:bg-emerald-50">
-                  💾 Save Scenario Record
-                </button>
-              </div>
-            </div>
-
-            <!-- 4 Comparative KPI Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              <!-- Card 1: Composite Risk Score -->
-              <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 flex flex-col justify-between">
-                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Composite Risk Score</div>
-                <div class="flex items-baseline gap-2 mt-1">
-                  <span id="res-base-risk" class="text-sm font-bold text-slate-400 line-through">--</span>
-                  <span class="text-xs text-slate-400">➔</span>
-                  <span id="res-scen-risk" class="text-xl font-bold text-slate-900">--</span>
-                </div>
-                <div class="mt-1 flex items-center justify-between text-[11px]">
-                  <span id="res-delta-risk" class="font-bold text-emerald-700 font-mono">--</span>
-                  <span id="res-risk-transition" class="text-slate-500 text-[10px]">--</span>
-                </div>
-              </div>
-
-              <!-- Card 2: Schedule Delay -->
-              <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 flex flex-col justify-between">
-                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Schedule Delay (Months)</div>
-                <div class="flex items-baseline gap-2 mt-1">
-                  <span id="res-base-delay" class="text-sm font-bold text-slate-400 line-through">--</span>
-                  <span class="text-xs text-slate-400">➔</span>
-                  <span id="res-scen-delay" class="text-xl font-bold text-slate-900">--</span>
-                </div>
-                <div class="mt-1 flex items-center justify-between text-[11px]">
-                  <span id="res-delta-delay" class="font-bold text-emerald-700 font-mono">--</span>
-                  <span id="res-delay-saved" class="text-slate-500 text-[10px]">--</span>
-                </div>
-              </div>
-
-              <!-- Card 3: Cost Overrun Risk -->
-              <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 flex flex-col justify-between">
-                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Cost Overrun Risk</div>
-                <div class="flex items-baseline gap-2 mt-1">
-                  <span id="res-base-cost" class="text-sm font-bold text-slate-400 line-through">--</span>
-                  <span class="text-xs text-slate-400">➔</span>
-                  <span id="res-scen-cost" class="text-xl font-bold text-slate-900">--</span>
-                </div>
-                <div class="mt-1 flex items-center justify-between text-[11px]">
-                  <span id="res-delta-cost" class="font-bold text-emerald-700 font-mono">--</span>
-                  <span id="res-cost-cr" class="text-slate-500 text-[10px]">--</span>
-                </div>
-              </div>
-
-              <!-- Card 4: Implementation Distress -->
-              <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 flex flex-col justify-between">
-                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Implementation Distress</div>
-                <div class="flex items-baseline gap-2 mt-1">
-                  <span id="res-base-impl" class="text-sm font-bold text-slate-400 line-through">--</span>
-                  <span class="text-xs text-slate-400">➔</span>
-                  <span id="res-scen-impl" class="text-xl font-bold text-slate-900">--</span>
-                </div>
-                <div class="mt-1 flex items-center justify-between text-[11px]">
-                  <span id="res-delta-impl" class="font-bold text-emerald-700 font-mono">--</span>
-                  <span id="res-impl-band" class="text-slate-500 text-[10px]">--</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Warning Preview Banner -->
-            <div id="res-warning-banner" class="p-2.5 bg-amber-50 border border-amber-200 rounded text-xs text-amber-950 flex items-start gap-2">
-              <span class="text-base flex-shrink-0">⚠️</span>
-              <div id="res-warning-text">
-                Predicted risk band shifts under scenario assumptions. Active Phase 6 radar warnings remain unchanged.
-              </div>
-            </div>
-          </div>
-
-          <!-- Sensitivity Analysis Drawer (Collapsible) -->
-          <div id="whatif-sensitivity-panel" class="hidden p-3.5 bg-slate-50 rounded-lg border border-blue-200 space-y-3">
-            <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-bold text-slate-800">📊 Multi-Point Sensitivity Analysis</span>
-                <span class="text-[10px] text-slate-500 font-mono">(6-point repeated model inference)</span>
-              </div>
-              <button type="button" id="btn-close-sensitivity" class="text-xs text-slate-500 hover:text-slate-800">✖ Close</button>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr class="bg-slate-100 text-slate-600 font-bold border-b border-slate-200 text-[11px]">
-                    <th class="p-2">Sweep Step</th>
-                    <th class="p-2">Intervention Value</th>
-                    <th class="p-2">Modeled Risk Score</th>
-                    <th class="p-2">Schedule Delay</th>
-                    <th class="p-2">Cost Risk</th>
-                    <th class="p-2">Potential Reduction</th>
-                  </tr>
-                </thead>
-                <tbody id="sensitivity-tbody" class="divide-y divide-slate-200"></tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- Saved Scenarios History Panel -->
-          <div id="whatif-saved-panel" class="space-y-2 pt-1 border-t border-slate-200">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-slate-700">Saved Scenarios on Record:</span>
-              <span id="saved-scenarios-count" class="text-[11px] text-slate-500">0 scenarios on record</span>
-            </div>
-            <div id="saved-scenarios-list" class="space-y-1.5 text-xs text-slate-600">
-              <p class="text-slate-400 italic text-[11px]">No scenarios saved for this project yet. Run a simulation and click 'Save Scenario'.</p>
             </div>
           </div>
         </div>
 
-        <!-- Project Governance & Administrative Audit Trail -->
-        <div class="gov-card space-y-3">
-          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-            <div>
+        <!-- ====================================================================== -->
+        <!-- TAB PANE 4: What-If Intervention Simulator                              -->
+        <!-- ====================================================================== -->
+        <div id="tab-pane-whatif" class="hidden space-y-4">
+          <div class="gov-card border-blue-300 bg-white space-y-4 shadow-sm" id="whatif-simulator-container">
+            <!-- Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+              <div class="flex items-center gap-2.5">
+                <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-900 flex items-center justify-center font-bold text-sm shadow-sm">⚡</span>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-card-title text-slate-900 font-bold">What-If Intervention Simulator</h3>
+                    <span class="text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                      SCENARIO
+                    </span>
+                  </div>
+                  <p class="text-caption text-slate-500">Simulate how predictive risk responds to hypothetical administrative recovery actions (zero production mutation).</p>
+                </div>
+              </div>
               <div class="flex items-center gap-2">
-                <h3 class="text-card-title text-slate-900 font-bold">Project Governance & Audit History</h3>
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-800 border border-slate-300 uppercase">
-                  AUDIT LOG
+                <span class="text-xs text-slate-500">Baseline Risk:</span>
+                <span id="whatif-base-badge" class="text-xs font-bold px-2.5 py-1 rounded bg-slate-100 text-slate-800 border border-slate-300 font-mono">
+                  78.5 / 100 — CRITICAL
                 </span>
               </div>
-              <p class="text-caption text-slate-500">Chronological administrative activity log and decision trail for this project entity</p>
             </div>
-            <span class="text-[11px] text-slate-400 font-mono">Immutable SQLite Ledger</span>
-          </div>
 
-          <div id="dtl-audit-history-list" class="space-y-2 text-xs">
-            <p class="text-slate-400 italic text-[11px]">Loading administrative audit trail...</p>
+            <!-- Non-Causal Advisory Notice -->
+            <div class="p-2.5 bg-blue-50/60 border border-blue-200 rounded text-[11px] text-blue-950 flex items-start gap-2">
+              <span class="flex-shrink-0 text-sm">ℹ️</span>
+              <div>
+                <strong>Advisory Notice:</strong> All simulation results are <em>model-estimated sensitivity projections</em> based on the specified input assumptions. This tool provides decision-support analysis and does <strong>not</strong> constitute an operational guarantee, automated sanction, or causal certainty.
+              </div>
+            </div>
+
+            <!-- Configuration Matrix: Presets + Variable Controls -->
+            <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200 space-y-3">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <!-- Preset Selector -->
+                <div class="md:col-span-1">
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Intervention Preset:</label>
+                  <select id="whatif-preset-select" class="w-full bg-white border border-slate-300 rounded p-2 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option value="CUSTOM">Custom Scenario</option>
+                    <option value="PRESET_PROCUREMENT">Accelerate Procurement & Approvals (Clear Bottleneck)</option>
+                    <option value="PRESET_MILESTONE">Recover Delayed Milestones (50% Recovery)</option>
+                    <option value="PRESET_PROGRESS">Physical Construction Velocity Boost (+5%)</option>
+                    <option value="PRESET_COMPREHENSIVE">Comprehensive Turnaround Package</option>
+                  </select>
+                </div>
+
+                <!-- Scenario Name -->
+                <div class="md:col-span-2">
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Scenario Title:</label>
+                  <input type="text" id="whatif-scenario-name" value="Hypothetical Intervention Analysis" class="w-full bg-white border border-slate-300 rounded p-2 text-xs font-medium text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="e.g. Fast-Track Statutory Clearance Sensitivity">
+                </div>
+              </div>
+
+              <!-- Controlled Variables Grid -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                <!-- Variable 1: Primary Statutory Bottleneck -->
+                <div class="p-2.5 bg-white rounded border border-slate-200 space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-bold text-slate-700">Primary Bottleneck</span>
+                    <span class="text-[10px] text-slate-400 font-mono">Category Lever</span>
+                  </div>
+                  <select id="whatif-input-bottleneck" class="w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs text-slate-800 font-medium">
+                    <option value="LAND_ACQUISITION">Land Acquisition (Current)</option>
+                    <option value="ENVIRONMENTAL">Environmental & Forest</option>
+                    <option value="CONTRACTOR">Contractor Liquidity / EPC</option>
+                    <option value="ROW">Right of Way (RoW)</option>
+                    <option value="NONE">NONE (Fully Resolved)</option>
+                  </select>
+                  <div class="text-[10px] text-slate-500">Assumes clearance barriers resolved via single-window cell.</div>
+                </div>
+
+                <!-- Variable 2: Delayed Milestones Recovery -->
+                <div class="p-2.5 bg-white rounded border border-slate-200 space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-bold text-slate-700">Delayed Milestones</span>
+                    <span id="whatif-milestones-val" class="font-mono font-bold text-xs text-blue-900 bg-blue-50 px-1.5 py-0.2 rounded">4</span>
+                  </div>
+                  <input type="range" id="whatif-input-milestones-slider" min="0" max="8" value="4" class="w-full accent-blue-700 cursor-pointer">
+                  <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+                    <span>0 (All Recovered)</span>
+                    <span id="whatif-milestones-max">8 Max</span>
+                  </div>
+                </div>
+
+                <!-- Variable 3: Physical Progress Acceleration -->
+                <div class="p-2.5 bg-white rounded border border-slate-200 space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-bold text-slate-700">Physical Progress %</span>
+                    <span id="whatif-progress-val" class="font-mono font-bold text-xs text-blue-900 bg-blue-50 px-1.5 py-0.2 rounded">42.5%</span>
+                  </div>
+                  <input type="range" id="whatif-input-progress-slider" min="42.5" max="100.0" step="0.5" value="42.5" class="w-full accent-blue-700 cursor-pointer">
+                  <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+                    <span id="whatif-progress-base">42.5% Base</span>
+                    <span>100% Complete</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Bar -->
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 border-t border-slate-200">
+                <span class="text-[11px] text-slate-500">
+                  🔒 In-memory simulation: production project records are never modified.
+                </span>
+                <div class="flex items-center gap-2">
+                  <button type="button" id="btn-toggle-sensitivity" class="btn btn-secondary btn-sm text-xs" title="Open multi-point parameter sensitivity analysis">
+                    <span>📈</span> Sensitivity Curve
+                  </button>
+                  <button type="button" id="btn-run-scenario" class="btn btn-primary btn-sm flex items-center gap-1.5 shadow-sm">
+                    <span>🚀</span> Run Simulation
+                    <span id="btn-sim-spinner" class="hidden animate-spin">⏳</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Simulation Comparative Results Panel (Hidden until run) -->
+            <div id="whatif-results-wrapper" class="hidden space-y-4 pt-2">
+              <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-bold text-slate-900">Simulation Comparative Results</span>
+                  <span id="res-class-badge" class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                    IMPROVED
+                  </span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button type="button" id="btn-save-scenario" class="btn btn-secondary btn-sm text-xs font-bold text-emerald-800 border-emerald-300 hover:bg-emerald-50">
+                    💾 Save Scenario Record
+                  </button>
+                </div>
+              </div>
+
+              <!-- 4 Comparative KPI Cards -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <!-- Card 1: Composite Risk Score -->
+                <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 flex flex-col justify-between">
+                  <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Composite Risk Score</div>
+                  <div class="flex items-baseline gap-2 mt-1">
+                    <span id="res-base-risk" class="text-sm font-bold text-slate-400 line-through">--</span>
+                    <span class="text-xs text-slate-400">➔</span>
+                    <span id="res-scen-risk" class="text-xl font-bold text-slate-900">--</span>
+                  </div>
+                  <div class="mt-1 flex items-center justify-between text-[11px]">
+                    <span id="res-delta-risk" class="font-bold text-emerald-700 font-mono">--</span>
+                    <span id="res-risk-transition" class="text-slate-500 text-[10px]">--</span>
+                  </div>
+                </div>
+
+                <!-- Card 2: Schedule Delay -->
+                <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 flex flex-col justify-between">
+                  <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Schedule Delay (Months)</div>
+                  <div class="flex items-baseline gap-2 mt-1">
+                    <span id="res-base-delay" class="text-sm font-bold text-slate-400 line-through">--</span>
+                    <span class="text-xs text-slate-400">➔</span>
+                    <span id="res-scen-delay" class="text-xl font-bold text-slate-900">--</span>
+                  </div>
+                  <div class="mt-1 flex items-center justify-between text-[11px]">
+                    <span id="res-delta-delay" class="font-bold text-emerald-700 font-mono">--</span>
+                    <span id="res-delay-saved" class="text-slate-500 text-[10px]">--</span>
+                  </div>
+                </div>
+
+                <!-- Card 3: Cost Overrun Risk -->
+                <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 flex flex-col justify-between">
+                  <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Cost Overrun Risk</div>
+                  <div class="flex items-baseline gap-2 mt-1">
+                    <span id="res-base-cost" class="text-sm font-bold text-slate-400 line-through">--</span>
+                    <span class="text-xs text-slate-400">➔</span>
+                    <span id="res-scen-cost" class="text-xl font-bold text-slate-900">--</span>
+                  </div>
+                  <div class="mt-1 flex items-center justify-between text-[11px]">
+                    <span id="res-delta-cost" class="font-bold text-emerald-700 font-mono">--</span>
+                    <span id="res-cost-cr" class="text-slate-500 text-[10px]">--</span>
+                  </div>
+                </div>
+
+                <!-- Card 4: Implementation Distress -->
+                <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 flex flex-col justify-between">
+                  <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Implementation Distress</div>
+                  <div class="flex items-baseline gap-2 mt-1">
+                    <span id="res-base-impl" class="text-sm font-bold text-slate-400 line-through">--</span>
+                    <span class="text-xs text-slate-400">➔</span>
+                    <span id="res-scen-impl" class="text-xl font-bold text-slate-900">--</span>
+                  </div>
+                  <div class="mt-1 flex items-center justify-between text-[11px]">
+                    <span id="res-delta-impl" class="font-bold text-emerald-700 font-mono">--</span>
+                    <span id="res-impl-band" class="text-slate-500 text-[10px]">--</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Warning Preview Banner -->
+              <div id="res-warning-banner" class="p-2.5 bg-amber-50 border border-amber-200 rounded text-xs text-amber-950 flex items-start gap-2">
+                <span class="text-base flex-shrink-0">⚠️</span>
+                <div id="res-warning-text">
+                  Predicted risk band shifts under scenario assumptions. Active Phase 6 radar warnings remain unchanged.
+                </div>
+              </div>
+            </div>
+
+            <!-- Sensitivity Analysis Drawer (Collapsible) -->
+            <div id="whatif-sensitivity-panel" class="hidden p-3.5 bg-slate-50 rounded-lg border border-blue-200 space-y-3">
+              <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-bold text-slate-800">📊 Multi-Point Sensitivity Analysis</span>
+                  <span class="text-[10px] text-slate-500 font-mono">(6-point repeated model inference)</span>
+                </div>
+                <button type="button" id="btn-close-sensitivity" class="text-xs text-slate-500 hover:text-slate-800">✖ Close</button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr class="bg-slate-100 text-slate-600 font-bold border-b border-slate-200 text-[11px]">
+                      <th class="p-2">Sweep Step</th>
+                      <th class="p-2">Intervention Value</th>
+                      <th class="p-2">Modeled Risk Score</th>
+                      <th class="p-2">Schedule Delay</th>
+                      <th class="p-2">Cost Risk</th>
+                      <th class="p-2">Potential Reduction</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sensitivity-tbody" class="divide-y divide-slate-200"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Saved Scenarios History Panel -->
+            <div id="whatif-saved-panel" class="space-y-2 pt-1 border-t border-slate-200">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-700">Saved Scenarios on Record:</span>
+                <span id="saved-scenarios-count" class="text-[11px] text-slate-500">0 scenarios on record</span>
+              </div>
+              <div id="saved-scenarios-list" class="space-y-1.5 text-xs text-slate-600">
+                <p class="text-slate-400 italic text-[11px]">No scenarios saved for this project yet. Run a simulation and click 'Save Scenario'.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====================================================================== -->
+        <!-- TAB PANE 5: Governance & Administrative Audit Trail                     -->
+        <!-- ====================================================================== -->
+        <div id="tab-pane-audit" class="hidden space-y-4">
+          <div class="gov-card space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="text-card-title text-slate-900 font-bold">Project Governance & Audit History</h3>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-800 border border-slate-300 uppercase">
+                    AUDIT LOG
+                  </span>
+                </div>
+                <p class="text-caption text-slate-500">Chronological administrative activity log and decision trail for this project entity</p>
+              </div>
+              <span class="text-[11px] text-slate-400 font-mono">Immutable SQLite Ledger</span>
+            </div>
+
+            <div id="dtl-audit-history-list" class="space-y-2 text-xs">
+              <p class="text-slate-400 italic text-[11px]">Loading administrative audit trail...</p>
+            </div>
           </div>
         </div>
 
       </div>
     `;
+  },
+
+  switchTab(tabKey) {
+    const aliasMap = {
+      "timeline": "milestones",
+      "schedule": "milestones",
+      "plan-vs-actual": "overview",
+      "financial": "overview",
+      "progress-trend": "overview",
+      "progress": "overview",
+      "execution": "warnings",
+      "warnings": "warnings",
+      "whatif": "whatif",
+      "simulation": "whatif",
+      "audit": "audit",
+      "data": "audit"
+    };
+    const target = aliasMap[tabKey] || tabKey || "overview";
+    this.activeTab = target;
+
+    const tabs = ["overview", "milestones", "warnings", "whatif", "audit"];
+    tabs.forEach(t => {
+      const pane = document.getElementById(`tab-pane-${t}`);
+      const btn = document.getElementById(`tab-btn-${t}`);
+      if (pane) {
+        if (t === target) {
+          pane.classList.remove("hidden");
+        } else {
+          pane.classList.add("hidden");
+        }
+      }
+      if (btn) {
+        if (t === target) {
+          btn.className = "tab-btn border-b-2 border-blue-800 text-blue-900 pb-3 px-2.5 flex items-center gap-1.5 transition font-bold";
+        } else {
+          btn.className = "tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-800 pb-3 px-2.5 flex items-center gap-1.5 transition font-medium";
+        }
+      }
+    });
+  },
+
+  toggleExplainability() {
+    const panel = document.getElementById("dtl-explainability-panel");
+    const btnText = document.getElementById("dtl-explain-btn-text");
+    if (!panel) return;
+    const isHidden = panel.classList.contains("hidden");
+    if (isHidden) {
+      panel.classList.remove("hidden");
+      if (btnText) btnText.innerText = "Hide Root Cause Decomposition ▴";
+    } else {
+      panel.classList.add("hidden");
+      if (btnText) btnText.innerText = "Show Root Cause Decomposition ▾";
+    }
+  },
+
+  exportDossier(projectId) {
+    const all = window.MOCK_PROJECTS || [];
+    const p = all.find(item => item.project_id === projectId) || { project_id: projectId };
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(p, null, 2));
+    const downloadAnchor = document.createElement("a");
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `ASTRA_Project_Dossier_${projectId}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
   },
 
   async postRender(projectId) {
@@ -687,6 +832,9 @@ const ProjectDetailView = {
 
     // Setup Warning Triage Buttons
     this.setupWarningTriage(pId);
+
+    // Ensure initial tab is visible
+    this.switchTab(this.activeTab || "overview");
   },
 
   renderRoleAdaptiveBanner(pId, project) {
@@ -913,11 +1061,20 @@ const ProjectDetailView = {
     const elGrowth = document.getElementById("dtl-cost-growth");
     const elExt = document.getElementById("dtl-extensions");
 
+    const headerMin = document.getElementById("dtl-header-ministry");
+    const headerAgency = document.getElementById("dtl-header-agency");
+    const headerState = document.getElementById("dtl-header-state");
+    const headerStatus = document.getElementById("dtl-project-status");
+
     if (elName) elName.innerText = p.project_name;
     if (elMin) elMin.innerText = p.ministry;
     if (elSec) elSec.innerText = p.sector;
     if (elAgency) elAgency.innerText = p.implementing_agency;
     if (elState) elState.innerText = p.state;
+
+    if (headerMin) headerMin.innerText = p.ministry;
+    if (headerAgency) headerAgency.innerText = p.implementing_agency || "MoSPI Desk";
+    if (headerState) headerState.innerText = p.state || "National / Multi-State";
 
     const sched = p.schedule || {};
     if (elStart) elStart.innerText = sched.start_date || "2022-09";
@@ -930,21 +1087,22 @@ const ProjectDetailView = {
     if (elExt) elExt.innerText = `${sched.schedule_revisions_count || 2} formal revisions`;
 
     const fin = p.financials || {};
-    if (elOrigCost) elOrigCost.innerText = `₹${(fin.original_cost_cr || 1250).toLocaleString("en-IN")} Cr`;
-    if (elRevCost) elRevCost.innerText = `₹${(fin.revised_cost_cr || 1840.5).toLocaleString("en-IN")} Cr`;
-    if (elExp) elExp.innerText = `₹${(fin.cumulative_expenditure_cr || 1472.4).toLocaleString("en-IN")} Cr`;
+    const origCost = fin.original_cost_cr || p.original_cost_cr || 1250;
+    const revCost = fin.revised_cost_cr || p.cost_cr || 1840.5;
+    const diff = revCost - origCost;
+    const growthPct = origCost > 0 ? ((diff / origCost) * 100).toFixed(1) : 0;
+
+    if (elOrigCost) elOrigCost.innerText = `₹${origCost.toLocaleString("en-IN")} Cr`;
+    if (elRevCost) elRevCost.innerText = `₹${revCost.toLocaleString("en-IN")} Cr`;
+    if (elExp) elExp.innerText = `₹${(fin.cumulative_expenditure_cr || (revCost * 0.8)).toLocaleString("en-IN")} Cr`;
     if (elGrowth) {
-      const orig = fin.original_cost_cr || 1;
-      const rev = fin.revised_cost_cr || orig;
-      const diff = rev - orig;
-      const growthPct = ((diff / orig) * 100).toFixed(1);
       elGrowth.innerText = diff > 0 ? `+${growthPct}% (+₹${diff.toFixed(1)} Cr)` : "On budget (0%)";
     }
 
     // Progress & Decoupling
     const prog = p.progress || {};
-    const physProg = prog.physical_progress_pct || 42.5;
-    const finProg = prog.financial_progress_pct || 80.0;
+    const physProg = prog.physical_progress_pct || p.physical_progress || 42.5;
+    const finProg = prog.financial_progress_pct || p.financial_progress || 80.0;
     const gap = prog.progress_gap_pct || (finProg - physProg);
 
     const elPhysVal = document.getElementById("dtl-phys-prog-val");
@@ -953,12 +1111,12 @@ const ProjectDetailView = {
     const elFinBar = document.getElementById("dtl-fin-prog-bar");
     const elGap = document.getElementById("dtl-gap-badge");
 
-    if (elPhysVal) elPhysVal.innerText = `${physProg.toFixed(1)}%`;
+    if (elPhysVal) elPhysVal.innerText = `${Number(physProg).toFixed(1)}%`;
     if (elPhysBar) elPhysBar.style.width = `${physProg}%`;
-    if (elFinVal) elFinVal.innerText = `${finProg.toFixed(1)}%`;
+    if (elFinVal) elFinVal.innerText = `${Number(finProg).toFixed(1)}%`;
     if (elFinBar) elFinBar.style.width = `${Math.min(100, finProg)}%`;
     if (elGap) {
-      elGap.innerText = `Decoupling: ${gap > 0 ? '+' : ''}${gap.toFixed(1)} pp`;
+      elGap.innerText = `Decoupling: ${gap > 0 ? '+' : ''}${Number(gap).toFixed(1)} pp`;
       elGap.className = gap > 15 
         ? "px-2 py-0.5 rounded text-[11px] font-bold bg-red-100 text-red-800 border border-red-200 font-mono"
         : "px-2 py-0.5 rounded text-[11px] font-bold bg-slate-100 text-slate-800 border border-slate-200 font-mono";
@@ -975,28 +1133,61 @@ const ProjectDetailView = {
     const pDriver = document.getElementById("dtl-primary-driver");
     const whatifBadge = document.getElementById("whatif-base-badge");
 
-    if (scoreVal) scoreVal.innerHTML = `${r.overall_score || 78.5} <span class="text-lg text-slate-400 font-normal">/ 100</span>`;
-    if (scoreBadge) scoreBadge.innerHTML = CommonUI.renderRiskBadge(r.level || "CRITICAL", r.overall_score || 78.5);
-    if (whatifBadge) whatifBadge.innerText = `${r.overall_score || 78.5} / 100 — ${r.level || 'CRITICAL'}`;
+    const overallScore = r.overall_score || p.overall_risk_score || 78.5;
+    const riskLevel = r.level || p.target_risk_class || "CRITICAL";
 
-    if (subSched) subSched.innerText = `${sched.delay_duration_months || 20.0} mos`;
+    if (scoreVal) scoreVal.innerHTML = `${overallScore} <span class="text-lg text-slate-400 font-normal">/ 100</span>`;
+    if (scoreBadge) scoreBadge.innerHTML = CommonUI.renderRiskBadge(riskLevel, overallScore);
+    if (whatifBadge) whatifBadge.innerText = `${overallScore} / 100 — ${riskLevel}`;
+    if (headerStatus) headerStatus.innerHTML = CommonUI.renderStatusBadge(riskLevel === "CRITICAL" ? "CRITICAL REVIEW" : (riskLevel === "HIGH" ? "WATCH / SURVEILLANCE" : "ON TRACK"));
+
+    if (subSched) subSched.innerText = `${sched.delay_duration_months || p.delay_months || 20.0} mos`;
     if (subCost) subCost.innerText = `${r.cost_score || 84.2}% prob`;
     if (subImpl) subImpl.innerText = `${r.implementation_score || 85.0}%`;
-    if (pDriver) pDriver.innerText = r.primary_driver || "Land Acquisition Constraints";
+    if (pDriver) pDriver.innerText = p.primary_bottleneck ? p.primary_bottleneck.replace(/_/g, ' ') : (r.primary_driver || "Land Acquisition Constraints");
+
+    // Dynamic 5-Pillar Executive Health Strip
+    const delayedMsCount = p.milestones ? p.milestones.filter(m => m.status === 'Delayed').length : 4;
+    const health = {
+      schedule: (riskLevel === "CRITICAL" || (sched.delay_duration_months || 0) > 12) ? "CRITICAL" : ((sched.delay_duration_months || 0) > 3 ? "WATCH" : "HEALTHY"),
+      scheduleText: (sched.delay_duration_months || 0) > 0 ? `+${sched.delay_duration_months} mos drift` : "On Schedule",
+      financial: diff > 0 ? "WATCH" : "HEALTHY",
+      financialText: diff > 0 ? `+${growthPct}% Overrun` : "Within Budget",
+      progress: gap > 15 ? "RISK" : "HEALTHY",
+      progressText: `${Number(physProg).toFixed(1)}% Physical`,
+      execution: delayedMsCount > 0 ? "WATCH" : "HEALTHY",
+      executionText: `${delayedMsCount} Delayed MS`,
+      data: "HEALTHY",
+      dataText: "Verified QA"
+    };
+    const stripMount = document.getElementById("dtl-health-strip-mount");
+    if (stripMount) stripMount.innerHTML = CommonUI.renderHealthStrip(health);
+
+    // Attention Diagnosis Summary
+    const attnSummary = document.getElementById("dtl-attention-summary");
+    if (attnSummary) {
+      attnSummary.innerText = p.executive_summary || `Automated surveillance triggered: project demonstrates critical path slippage (+${sched.delay_duration_months || 20} months delay) with primary bottleneck attributed to ${p.primary_bottleneck ? p.primary_bottleneck.replace(/_/g, ' ') : 'Land Acquisition & RoW'}. Financial disbursement leads certified physical progress by ${Number(gap).toFixed(1)} pp.`;
+    }
 
     // TreeSHAP Drivers
     const driversCont = document.getElementById("dtl-drivers-container");
-    if (driversCont && r.drivers && r.drivers.length > 0) {
-      driversCont.innerHTML = r.drivers.map((d, i) => `
-        <div class="space-y-1">
-          <div class="flex items-center justify-between text-caption">
-            <span class="font-medium text-slate-800">${i + 1}. ${d.name}</span>
-            <span class="font-semibold text-blue-900 tabular-nums">${d.strength_pct}% impact</span>
+    if (driversCont) {
+      const drivers = (r.drivers && r.drivers.length > 0) ? r.drivers : [
+        { name: "Land Acquisition Impasse", strength_pct: 52, evidence: "RoW handover pending in key river basin alignment" },
+        { name: "Milestone Slippage Velocity", strength_pct: 28, evidence: "4 critical-path intermediate checkpoints delayed" },
+        { name: "Progress Decoupling Gap", strength_pct: 20, evidence: `Financial outlay leads physical works by ${Number(gap).toFixed(1)} pp` }
+      ];
+
+      driversCont.innerHTML = drivers.map((d, i) => `
+        <div class="p-3 bg-white rounded-lg border border-amber-200/80 space-y-1.5">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-slate-900">${i + 1}. ${d.name}</span>
+            <span class="font-mono font-bold text-amber-900 bg-amber-100 px-1.5 py-0.2 rounded text-[10px]">${d.strength_pct}% impact</span>
           </div>
-          <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-            <div class="bg-blue-700 h-full rounded-full" style="width: ${d.strength_pct}%;"></div>
+          <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+            <div class="bg-amber-600 h-full rounded-full" style="width: ${d.strength_pct}%;"></div>
           </div>
-          <div class="text-[11px] text-slate-500 leading-tight">${d.evidence}</div>
+          <p class="text-[11px] text-slate-600 leading-snug">${d.evidence}</p>
         </div>
       `).join("");
     }
@@ -1004,8 +1195,10 @@ const ProjectDetailView = {
     // Milestones List
     const msList = document.getElementById("dtl-milestones-list");
     const msCount = document.getElementById("dtl-milestone-count");
+    const tabBadgeMs = document.getElementById("tab-badge-milestones");
     if (msList && p.milestones) {
       if (msCount) msCount.innerText = `${p.milestones.length} Milestones`;
+      if (tabBadgeMs) tabBadgeMs.innerText = `${p.milestones.length}`;
       msList.innerHTML = p.milestones.map(m => {
         let bClass = "bg-green-50 text-green-700 border-green-200";
         if (m.status === "Delayed") bClass = "bg-red-50 text-red-700 border-red-200";
