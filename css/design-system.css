@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    PROJECTPULSE — Government Digital Design System
    Ministry of Statistics & Programme Implementation (MoSPI) - IPMD / PAIMANA
    Theme: Official Institutional Government Grade (Clean, Dense, Authoritative)
@@ -373,3 +373,246 @@ p, .text-body {
   white-space: nowrap;
   border-width: 0;
 }
+
+/* ==========================================================================
+   Phase 9.5: National Command Center Design Tokens & Components
+   ========================================================================== */
+
+/* Executive Telemetry Header Deck */
+.command-deck-hero {
+  background: linear-gradient(135deg, #0b1528 0%, #112240 50%, #1e3a8a 100%);
+  color: #ffffff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 20px -2px rgba(11, 21, 40, 0.25);
+}
+
+.command-deck-stat {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  transition: all 0.2s ease;
+}
+
+.command-deck-stat:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Portfolio Risk Matrix Scatter Plot & Quadrants */
+.matrix-container {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.matrix-quadrant {
+  position: absolute;
+  pointer-events: none;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+}
+
+.matrix-q-critical {
+  top: 12px;
+  right: 12px;
+  background: rgba(239, 68, 68, 0.08);
+  color: #b91c1c;
+  border: 1px dashed rgba(239, 68, 68, 0.35);
+}
+
+.matrix-q-monitor {
+  top: 12px;
+  left: 12px;
+  background: rgba(245, 158, 11, 0.08);
+  color: #b45309;
+  border: 1px dashed rgba(245, 158, 11, 0.35);
+}
+
+.matrix-q-highcost {
+  bottom: 12px;
+  right: 12px;
+  background: rgba(59, 130, 246, 0.08);
+  color: #1d4ed8;
+  border: 1px dashed rgba(59, 130, 246, 0.35);
+}
+
+.matrix-q-healthy {
+  bottom: 12px;
+  left: 12px;
+  background: rgba(16, 185, 129, 0.08);
+  color: #047857;
+  border: 1px dashed rgba(16, 185, 129, 0.35);
+}
+
+.matrix-point {
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s ease;
+}
+
+.matrix-point:hover {
+  transform: scale(1.6);
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+  z-index: 30;
+}
+
+/* Dual Decoupling Progress Track */
+.decoupling-track {
+  position: relative;
+  height: 28px;
+  background: #f1f5f9;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.decoupling-physical {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 14px;
+  background: linear-gradient(90deg, #10b981, #059669);
+  transition: width 0.5s ease;
+}
+
+.decoupling-financial {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 14px;
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+  transition: width 0.5s ease;
+}
+
+.decoupling-gap-badge {
+  background: repeating-linear-gradient(
+    -45deg,
+    #fee2e2,
+    #fee2e2 6px,
+    #fecaca 6px,
+    #fecaca 12px
+  );
+  border: 1px solid #f87171;
+  color: #991b1b;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+}
+
+/* Milestone Timeline & Critical Path */
+.milestone-timeline {
+  position: relative;
+}
+
+.milestone-timeline::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  bottom: 14px;
+  left: 20px;
+  width: 2px;
+  background: #e2e8f0;
+}
+
+.milestone-node {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.milestone-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  box-shadow: 0 0 0 2px var(--border);
+  flex-shrink: 0;
+  z-index: 2;
+  margin-top: 2px;
+}
+
+.milestone-dot.completed { background: #10b981; box-shadow: 0 0 0 2px #10b981; }
+.milestone-dot.delayed { background: #ef4444; box-shadow: 0 0 0 2px #ef4444; }
+.milestone-dot.at-risk { background: #f59e0b; box-shadow: 0 0 0 2px #f59e0b; }
+.milestone-dot.on-track { background: #3b82f6; box-shadow: 0 0 0 2px #3b82f6; }
+
+/* TreeSHAP Horizontal Bar Visual */
+.shap-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.shap-bar-track {
+  flex-grow: 1;
+  height: 12px;
+  background: #f1f5f9;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  position: relative;
+}
+
+.shap-bar-fill-red {
+  height: 100%;
+  background: linear-gradient(90deg, #f87171, #dc2626);
+  border-radius: var(--radius-sm);
+}
+
+.shap-bar-fill-green {
+  height: 100%;
+  background: linear-gradient(90deg, #34d399, #059669);
+  border-radius: var(--radius-sm);
+}
+
+/* Command Palette Modal (Ctrl+K) */
+.command-palette-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12vh;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.command-palette-modal {
+  width: 100%;
+  max-width: 620px;
+  background: #ffffff;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+  border: 1px solid #cbd5e1;
+  overflow: hidden;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Government Watermark / Security Strip */
+.gov-security-strip {
+  background: repeating-linear-gradient(
+    90deg,
+    #ff9933 0px,
+    #ff9933 12px,
+    #ffffff 12px,
+    #ffffff 24px,
+    #138808 24px,
+    #138808 36px
+  );
+  height: 3px;
+  width: 100%;
+}
+

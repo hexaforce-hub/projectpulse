@@ -142,7 +142,9 @@ def list_projects(
     sector: str = Query("", description="Filter by Sector"),
     risk_level: str = Query("", description="Filter by Risk Tier (LOW, MODERATE, HIGH, CRITICAL)"),
     sort_by: str = Query("overall_risk_score", description="Sort attribute"),
-    sort_order: str = Query("desc", pattern="^(asc|desc)$", description="Sort order")
+    sort_order: str = Query("desc", pattern="^(asc|desc)$", description="Sort order"),
+    bottleneck: str = Query("", description="Filter by Primary Bottleneck"),
+    state: str = Query("", description="Filter by State")
 ):
     """Returns paginated, filterable project catalog."""
     try:
@@ -154,10 +156,26 @@ def list_projects(
             sector=sector,
             risk_level=risk_level,
             sort_by=sort_by,
-            sort_order=sort_order
+            sort_order=sort_order,
+            bottleneck=bottleneck,
+            state=state
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Projects query failed: {str(e)}")
+
+@app.get("/api/portfolio/matrix", tags=["Portfolio"])
+def get_portfolio_matrix(
+    limit: int = Query(250, ge=10, le=1000, description="Max projects to return for heatmap matrix")
+):
+    """Returns top projects by financial exposure formatted for the interactive 4-quadrant risk matrix."""
+    try:
+        return {
+            "status": "success",
+            "count": limit,
+            "matrix": db_client.get_portfolio_matrix(limit=limit)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Matrix query failed: {str(e)}")
 
 @app.get("/api/projects/{project_id}", tags=["Projects"])
 def get_project_detail(

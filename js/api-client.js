@@ -315,10 +315,64 @@ const APIClient = {
     return null;
   },
 
+  async getPortfolioMatrix(limit = 250) {
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/portfolio/matrix?limit=${limit}`);
+        if (res.ok) return await res.json();
+      } catch (e) {
+        console.warn("[ProjectPulse API] Portfolio matrix fetch failed, falling back to mock:", e);
+      }
+    }
+    const all = window.MOCK_PROJECTS || [];
+    const matrix = all.slice(0, limit).map(p => ({
+      project_id: p.project_id,
+      project_name: p.project_name,
+      ministry: p.ministry,
+      sector: p.sector,
+      state: p.state || "National",
+      revised_cost_cr: (p.financials && p.financials.revised_cost_cr) || 5000,
+      cost_overrun_cr: (p.financials && p.financials.cost_overrun_cr) || 500,
+      overall_risk_score: (p.risk && p.risk.overall_score) || 65.0,
+      target_risk_class: (p.risk && p.risk.level) || "HIGH",
+      schedule_slippage_months: (p.schedule && p.schedule.delay_duration_months) || 12.0,
+      progress_decoupling_gap: (p.progress && p.progress.progress_gap_pct) || 15.0,
+      primary_bottleneck: p.primary_bottleneck || "land_acquisition"
+    }));
+    return { status: "success", total: matrix.length, matrix };
+  },
+
   async getProjects(params = {}) {
     if (!this.isLive) {
-      const all = window.MOCK_PROJECTS || [];
-      return { total_records: all.length, page: 1, page_size: all.length, items: all };
+      let all = [...(window.MOCK_PROJECTS || [])];
+      if (params.search) {
+        const q = params.search.toLowerCase();
+        all = all.filter(p => (p.project_name || "").toLowerCase().includes(q) || (p.project_id || "").toLowerCase().includes(q));
+      }
+      if (params.sector && params.sector !== "ALL") {
+        all = all.filter(p => p.sector === params.sector);
+      }
+      if (params.ministry && params.ministry !== "ALL") {
+        all = all.filter(p => p.ministry === params.ministry);
+      }
+      if (params.risk_tier && params.risk_tier !== "ALL") {
+        all = all.filter(p => (p.risk && p.risk.level === params.risk_tier) || p.target_risk_class === params.risk_tier);
+      }
+      if (params.bottleneck && params.bottleneck !== "ALL") {
+        const bn = params.bottleneck.toLowerCase().replace(/ /g, "_");
+        all = all.filter(p => {
+          const val = (p.primary_bottleneck || (p.risk && p.risk.primary_driver) || "").toLowerCase();
+          return val.includes(bn) || val.includes(params.bottleneck.toLowerCase());
+        });
+      }
+      if (params.state && params.state !== "ALL") {
+        all = all.filter(p => p.state === params.state);
+      }
+      const page = parseInt(params.page || 1, 10);
+      const pageSize = parseInt(params.page_size || 20, 10);
+      const start = (page - 1) * pageSize;
+      const paginated = all.slice(start, start + pageSize);
+      return { total_records: all.length, page, page_size: pageSize, items: paginated };
     }
     try {
       const query = new URLSearchParams(params).toString();

@@ -1,11 +1,14 @@
 // ==========================================================================
-// PROJECTPULSE — National Overview Dashboard Component (Phase 9)
+// PROJECTPULSE — National Command Center Dashboard Component (Phase 9.5)
 // Route: / or /dashboard
 // Ministry of Statistics & Programme Implementation (MoSPI) - IPMD / PAIMANA
 // Smart India Hackathon 2026 — Team HexaForce
 // ==========================================================================
 
 const DashboardView = {
+  donutChart: null,
+  sectorChart: null,
+
   render() {
     const summary = window.MOCK_DASHBOARD_SUMMARY || {};
     const projects = window.MOCK_PROJECTS || [];
@@ -18,201 +21,267 @@ const DashboardView = {
     return `
       <div class="max-w-[1440px] mx-auto space-y-6">
         
-        <!-- Page Header -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-blue-800 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded">
-                Executive Flight Deck
-              </span>
-              <span class="text-caption text-slate-400">•</span>
-              <span class="text-caption text-slate-500 font-medium">MoSPI IPMD Surveillance Standard</span>
-            </div>
-            <h1 class="text-page-title mt-1">National Portfolio Overview</h1>
-            <p class="text-caption text-slate-500 mt-0.5">
-              Autonomous risk prediction, execution decoupling surveillance, and intervention intelligence across Central Sector Projects (₹150 Cr+)
-            </p>
+        <!-- =====================================================================
+             EXECUTIVE TELEMETRY FLIGHT DECK (Hero Command Banner)
+             ===================================================================== -->
+        <div class="command-deck-hero rounded-2xl p-6 sm:p-7 relative overflow-hidden">
+          
+          <!-- Subtle MoSPI Watermark Grid Background -->
+          <div class="absolute -right-10 -bottom-10 opacity-10 pointer-events-none select-none text-[160px] font-black tracking-tighter">
+            IPMD
           </div>
-          <div class="flex items-center gap-2">
-            <span id="dashboard-last-updated" class="text-caption text-slate-500 hidden sm:inline tabular-nums">
-              Baseline: MoSPI PAIMANA Standard
-            </span>
-            <a href="#/projects" class="btn btn-secondary btn-sm">
-              Explore All Projects ↗
+
+          <div class="relative z-10 space-y-5">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-200 border border-blue-400/30 px-2.5 py-0.5 rounded-full">
+                    Surveillance Deck • PAIMANA 2.0 Standard
+                  </span>
+                  <span class="text-white/40">•</span>
+                  <span class="text-xs text-blue-200 font-medium">Cabinet Secretariat & IPMD Surveillance</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-1">
+                  National Infrastructure Project Command Center
+                </h1>
+                <p class="text-xs sm:text-sm text-slate-300 max-w-3xl mt-0.5">
+                  Autonomous early risk detection, execution decoupling surveillance, and intervention intelligence across 10,000 Central Sector Infrastructure Projects (₹150 Cr+).
+                </p>
+              </div>
+
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <a href="#/portfolio-matrix" class="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition-colors shadow-sm flex items-center gap-1.5">
+                  <span>🎯</span>
+                  <span>Portfolio Matrix ↗</span>
+                </a>
+                <a href="#/projects" class="px-3.5 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition-colors border border-white/15">
+                  Registry ↗
+                </a>
+              </div>
+            </div>
+
+            <!-- 5 Key Executive Telemetry Metrics -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 pt-2">
+              <div class="command-deck-stat p-3.5 flex flex-col justify-between">
+                <div class="text-[11px] font-medium text-slate-300">Tracked Projects</div>
+                <div class="mt-2">
+                  <div id="kpi-tracked-count" class="text-2xl lg:text-3xl font-bold text-white font-mono">10,000</div>
+                  <div class="text-[10px] text-slate-400 mt-0.5">Central Sector (₹150 Cr+)</div>
+                </div>
+              </div>
+
+              <div class="command-deck-stat p-3.5 flex flex-col justify-between">
+                <div class="text-[11px] font-medium text-slate-300">Total Capital Outlay</div>
+                <div class="mt-2">
+                  <div id="kpi-revised-cost" class="text-2xl lg:text-3xl font-bold text-white font-mono">₹42.50L Cr</div>
+                  <div class="text-[10px] text-slate-400 mt-0.5">Revised aggregate exposure</div>
+                </div>
+              </div>
+
+              <div class="command-deck-stat p-3.5 flex flex-col justify-between">
+                <div class="text-[11px] font-medium text-slate-300">Cumulative Overrun</div>
+                <div class="mt-2">
+                  <div id="kpi-overrun-cost" class="text-2xl lg:text-3xl font-bold text-amber-300 font-mono">₹12.45L Cr</div>
+                  <div class="text-[10px] text-amber-200/70 mt-0.5">+29.3% fiscal expansion</div>
+                </div>
+              </div>
+
+              <div class="command-deck-stat p-3.5 flex flex-col justify-between">
+                <div class="text-[11px] font-medium text-slate-300">Critical / High Focus</div>
+                <div class="mt-2">
+                  <div id="kpi-review-count" class="text-2xl lg:text-3xl font-bold text-red-300 font-mono">3,640</div>
+                  <div class="text-[10px] text-red-200/70 mt-0.5">Projects needing review</div>
+                </div>
+              </div>
+
+              <div class="command-deck-stat p-3.5 flex flex-col justify-between">
+                <div class="text-[11px] font-medium text-slate-300 flex items-center justify-between">
+                  <span>Early Warnings</span>
+                  <span class="w-2 h-2 rounded-full bg-red-400 animate-pulse"></span>
+                </div>
+                <div class="mt-2">
+                  <div id="kpi-warnings-count" class="text-2xl lg:text-3xl font-bold text-red-400 font-mono">14,164</div>
+                  <a href="#/early-warnings" class="text-[10px] text-blue-300 hover:text-white underline mt-0.5 block">Triage Radar ➔</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =====================================================================
+             QUICK ACTION & SYSTEM STATUS RIBBON
+             ===================================================================== -->
+        <div class="p-3 bg-blue-50/80 border border-blue-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-caption text-blue-950">
+          <div class="flex items-center gap-2.5">
+            <span class="text-lg">🏛️</span>
+            <div>
+              <strong>Institutional Decision-Support Layer:</strong> Real-time surveillance over 10,000 Central Sector projects. Non-causal sensitivity modeling is calibrated on historical IPMD monthly project returns.
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0 text-xs">
+            <a href="#/bottlenecks" class="px-2.5 py-1 bg-white hover:bg-blue-100/70 border border-blue-200 rounded-md font-semibold text-blue-900 transition-colors">
+              Bottlenecks Intel ➔
+            </a>
+            <a href="#/data-quality" class="px-2.5 py-1 bg-white hover:bg-blue-100/70 border border-blue-200 rounded-md font-semibold text-blue-900 transition-colors">
+              Data Quality ➔
             </a>
           </div>
         </div>
 
-        <!-- Prototype Governance Disclaimer Banner -->
-        <div class="p-3 bg-blue-50/70 border border-blue-200 rounded-lg flex items-start gap-2.5 text-caption text-blue-950">
-          <span class="text-base flex-shrink-0">🏛️</span>
-          <div>
-            <strong>Institutional Decision-Support Layer:</strong> Operating over 10,000 Central Sector Infrastructure Projects ($>$ ₹150 Crore). ProjectPulse identifies early execution friction signals, models non-causal intervention sensitivities, and prioritizes executive review queues for the Cabinet Secretariat and IPMD.
-          </div>
-        </div>
-
-        <!-- 4 Primary Portfolio KPI Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="gov-card p-4 flex flex-col justify-between">
-            <div class="flex items-center justify-between text-slate-500 text-caption font-medium">
-              <span>Tracked Projects</span>
-              <span class="p-1.5 rounded-md bg-slate-100 text-slate-600">📊</span>
-            </div>
-            <div class="mt-2">
-              <div id="kpi-tracked-count" class="kpi-metric-val text-2xl lg:text-3xl font-bold text-slate-900 font-mono">10,000</div>
-              <div id="kpi-tracked-subtext" class="text-[11px] text-slate-500 mt-1">Central Sector projects (₹150 Cr+)</div>
-            </div>
-          </div>
-
-          <div class="gov-card p-4 flex flex-col justify-between">
-            <div class="flex items-center justify-between text-slate-500 text-caption font-medium">
-              <span>Revised Portfolio Cost</span>
-              <span class="p-1.5 rounded-md bg-blue-50 text-blue-700">₹</span>
-            </div>
-            <div class="mt-2">
-              <div id="kpi-revised-cost" class="kpi-metric-val text-2xl lg:text-3xl font-bold text-slate-900 font-mono">₹42.5L Cr</div>
-              <div class="text-[11px] text-slate-500 mt-1">Total revised capital exposure</div>
-            </div>
-          </div>
-
-          <div class="gov-card p-4 flex flex-col justify-between">
-            <div class="flex items-center justify-between text-slate-500 text-caption font-medium">
-              <span>Projects Requiring Review</span>
-              <span class="p-1.5 rounded-md bg-orange-50 text-orange-700">⚠️</span>
-            </div>
-            <div class="mt-2">
-              <div id="kpi-review-count" class="kpi-metric-val text-2xl lg:text-3xl font-bold text-orange-700 font-mono">3,640</div>
-              <div class="text-[11px] text-slate-500 mt-1">Elevated risk (High / Critical)</div>
-            </div>
-          </div>
-
-          <div class="gov-card p-4 flex flex-col justify-between">
-            <div class="flex items-center justify-between text-slate-500 text-caption font-medium">
-              <span>Capital at Risk</span>
-              <span class="p-1.5 rounded-md bg-red-50 text-red-700" title="Model-derived aggregate exposure associated with High/Critical risk projects">🛡️</span>
-            </div>
-            <div class="mt-2">
-              <div id="kpi-capital-risk" class="kpi-metric-val text-2xl lg:text-3xl font-bold text-red-700 font-mono">₹15.8L Cr</div>
-              <div class="text-[11px] text-slate-500 mt-1" title="Model-estimated capital exposure associated with elevated risk tiers">Associated with higher-risk projects</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Middle Section: Portfolio Risk Distribution & Insights -->
+        <!-- =====================================================================
+             MIDDLE SECTION: RISK DISTRIBUTION & SECTOR FISCAL EXPOSURE
+             ===================================================================== -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
-          <!-- Risk Distribution Chart (5 Cols) -->
+          <!-- Risk Distribution Donut (5 Cols) -->
           <div class="lg:col-span-5 gov-card flex flex-col justify-between">
             <div>
               <div class="flex items-center justify-between mb-1">
-                <h3 class="text-card-title">Portfolio Risk Distribution</h3>
+                <h3 class="text-card-title">Portfolio Risk Stratification</h3>
                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Multi-Class ML</span>
               </div>
               <p class="text-caption text-slate-500 mb-3">
-                Categorization of national projects by composite predictive risk score
+                Categorization of national projects by composite predictive risk score. Click segment to cross-filter.
               </p>
 
               <!-- Chart Container -->
-              <div class="h-44 w-full flex items-center justify-center relative">
+              <div class="h-44 w-full flex items-center justify-center relative cursor-pointer" title="Click to filter projects by risk tier">
                 <canvas id="dashboard-risk-donut-canvas"></canvas>
               </div>
             </div>
 
-            <!-- Accessible Legend & Figures -->
+            <!-- Clickable Interactive Legend & Figures -->
             <div class="grid grid-cols-2 gap-2 pt-3 border-t border-slate-100 text-caption mt-2">
-              <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-sm bg-green-600 flex-shrink-0"></span>
+              <a href="#/projects?risk_tier=LOW" class="flex items-center gap-2 p-1.5 rounded hover:bg-slate-50 transition-colors">
+                <span class="w-3 h-3 rounded-sm bg-emerald-600 flex-shrink-0"></span>
                 <span class="text-slate-600 text-[11px]">Low Risk:</span>
                 <strong id="legend-low-count" class="font-mono text-slate-900 ml-auto text-[11px]">4,210</strong>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-sm bg-amber-600 flex-shrink-0"></span>
+              </a>
+              <a href="#/projects?risk_tier=MODERATE" class="flex items-center gap-2 p-1.5 rounded hover:bg-slate-50 transition-colors">
+                <span class="w-3 h-3 rounded-sm bg-blue-600 flex-shrink-0"></span>
                 <span class="text-slate-600 text-[11px]">Moderate:</span>
                 <strong id="legend-mod-count" class="font-mono text-slate-900 ml-auto text-[11px]">2,150</strong>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-sm bg-orange-600 flex-shrink-0"></span>
+              </a>
+              <a href="#/projects?risk_tier=HIGH" class="flex items-center gap-2 p-1.5 rounded hover:bg-slate-50 transition-colors">
+                <span class="w-3 h-3 rounded-sm bg-amber-500 flex-shrink-0"></span>
                 <span class="text-slate-600 text-[11px]">High Risk:</span>
                 <strong id="legend-high-count" class="font-mono text-slate-900 ml-auto text-[11px]">2,480</strong>
-              </div>
-              <div class="flex items-center gap-2">
+              </a>
+              <a href="#/projects?risk_tier=CRITICAL" class="flex items-center gap-2 p-1.5 rounded hover:bg-slate-50 transition-colors">
                 <span class="w-3 h-3 rounded-sm bg-red-600 flex-shrink-0"></span>
                 <span class="text-slate-600 text-[11px]">Critical:</span>
                 <strong id="legend-crit-count" class="font-mono text-slate-900 ml-auto text-[11px]">1,160</strong>
-              </div>
+              </a>
             </div>
           </div>
 
-          <!-- Analytical Insights & Early Warning Pulse (7 Cols) -->
+          <!-- Sector Capital Outlay & Risk Exposure (7 Cols) -->
           <div class="lg:col-span-7 gov-card flex flex-col justify-between">
             <div>
-              <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
-                <h3 class="text-card-title">Top Execution Bottlenecks & Friction Signals</h3>
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Automated Signals</span>
+              <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
+                <h3 class="text-card-title">Sectoral Exposure & Outlay Breakdown</h3>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Top 6 Infrastructure Sectors</span>
               </div>
+              <p class="text-caption text-slate-500 mb-3">
+                Total revised expenditure (₹ Crore) across strategic infrastructure domains. Click bar to explore sector registry.
+              </p>
 
-              <!-- Key Signal Rows -->
-              <div class="space-y-3 text-caption">
-                <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200/80 flex items-start gap-3">
-                  <div class="w-7 h-7 rounded-md bg-red-100 text-red-800 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
-                    92%
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <div class="font-semibold text-slate-900 flex items-center justify-between">
-                      <span>Land Acquisition & Right-of-Way (RoW)</span>
-                      <span class="text-[10px] text-red-700 font-bold uppercase">Primary Constraint</span>
-                    </div>
-                    <p class="text-slate-500 text-[11px] mt-0.5">
-                      Leading driver across 38% of delayed megaprojects; accounts for average schedule slippage of 14.8 months.
-                    </p>
-                  </div>
-                </div>
-
-                <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200/80 flex items-start gap-3">
-                  <div class="w-7 h-7 rounded-md bg-orange-100 text-orange-800 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
-                    84%
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <div class="font-semibold text-slate-900 flex items-center justify-between">
-                      <span>Financial-Physical Progress Decoupling</span>
-                      <span class="text-[10px] text-orange-700 font-bold uppercase">Structural Trigger</span>
-                    </div>
-                    <p class="text-slate-500 text-[11px] mt-0.5">
-                      Cumulative expenditure leading physical works by $>$20 percentage points flagged in 1,420 projects.
-                    </p>
-                  </div>
-                </div>
-
-                <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200/80 flex items-start gap-3">
-                  <div class="w-7 h-7 rounded-md bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
-                    76%
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <div class="font-semibold text-slate-900 flex items-center justify-between">
-                      <span>Statutory & Environmental Clearances</span>
-                      <span class="text-[10px] text-amber-700 font-bold uppercase">Inter-Ministerial</span>
-                    </div>
-                    <p class="text-slate-500 text-[11px] mt-0.5">
-                      Forest stage-I/II approvals and coastal regulatory permissions pending across 890 highway & rail packages.
-                    </p>
-                  </div>
-                </div>
+              <div class="h-44 w-full relative">
+                <canvas id="dashboard-sector-canvas"></canvas>
               </div>
             </div>
 
-            <!-- Model Health Status Footer -->
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-caption text-slate-500">
-              <span class="flex items-center gap-1.5">
+            <!-- Footer: Navigation link to full portfolio matrix -->
+            <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-caption text-slate-500">
+              <span class="flex items-center gap-1.5 text-xs">
                 <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                <span>Active Engines: <strong class="text-slate-800">LightGBM Regressor + TreeSHAP + What-If Simulator</strong></span>
+                <span>Active Model: <strong class="text-slate-800">LightGBM (125 Evaluated Invariants) + TreeSHAP</strong></span>
               </span>
-              <span class="text-[11px] text-slate-400 font-mono">100% Offline Autonomy</span>
+              <a href="#/portfolio-matrix" class="text-xs font-semibold text-blue-700 hover:text-blue-900 flex items-center gap-1">
+                <span>View Full 2D Risk Matrix</span>
+                <span>➔</span>
+              </a>
             </div>
           </div>
 
         </div>
 
-        <!-- Priority Review Queue Table -->
+        <!-- =====================================================================
+             SYSTEMIC BOTTLENECKS & STRUCTURAL FRICTION CARDS
+             ===================================================================== -->
+        <div class="gov-card p-5">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-card-title">Top Execution Bottlenecks & Strategic Friction Signals</h3>
+                <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded uppercase">Autonomous Insights</span>
+              </div>
+              <p class="text-caption text-slate-500 mt-0.5">
+                Dominant root causes driving project cost escalation and completion slippage across the national portfolio.
+              </p>
+            </div>
+            <a href="#/bottlenecks" class="text-xs font-bold text-blue-800 hover:text-blue-900 flex items-center gap-1">
+              <span>Bottlenecks Intel Observatory</span>
+              <span>➔</span>
+            </a>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between hover:border-slate-300 transition-colors">
+              <div>
+                <div class="flex items-center justify-between text-xs font-bold text-slate-900">
+                  <span class="flex items-center gap-1.5"><span>📍</span> <span>Land Acquisition & RoW</span></span>
+                  <span class="text-[10px] text-red-700 bg-red-100 px-1.5 py-0.2 rounded">38.2% SHARE</span>
+                </div>
+                <p class="text-slate-500 text-xs mt-2 leading-relaxed">
+                  Leading constraint across 3,820 delayed megaprojects. Causes an average schedule slippage of 15.4 months.
+                </p>
+              </div>
+              <div class="mt-4 pt-2.5 border-t border-slate-200/80 flex items-center justify-between">
+                <span class="text-[11px] font-mono font-semibold text-slate-700">₹16.4L Cr Exposure</span>
+                <a href="#/projects?bottleneck=land_acquisition" class="text-[11px] font-bold text-blue-700 hover:text-blue-900">Filter 3,820 Projects ➔</a>
+              </div>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between hover:border-slate-300 transition-colors">
+              <div>
+                <div class="flex items-center justify-between text-xs font-bold text-slate-900">
+                  <span class="flex items-center gap-1.5"><span>🌲</span> <span>Clearance Impasses</span></span>
+                  <span class="text-[10px] text-amber-700 bg-amber-100 px-1.5 py-0.2 rounded">24.5% SHARE</span>
+                </div>
+                <p class="text-slate-500 text-xs mt-2 leading-relaxed">
+                  Forest Stage-I/II clearances and Wildlife Board permissions pending across 2,450 packages in Highways & Rail.
+                </p>
+              </div>
+              <div class="mt-4 pt-2.5 border-t border-slate-200/80 flex items-center justify-between">
+                <span class="text-[11px] font-mono font-semibold text-slate-700">₹10.2L Cr Exposure</span>
+                <a href="#/projects?bottleneck=clearance_impasse" class="text-[11px] font-bold text-blue-700 hover:text-blue-900">Filter 2,450 Projects ➔</a>
+              </div>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between hover:border-slate-300 transition-colors">
+              <div>
+                <div class="flex items-center justify-between text-xs font-bold text-slate-900">
+                  <span class="flex items-center gap-1.5"><span>⚡</span> <span>Progress Decoupling Gap</span></span>
+                  <span class="text-[10px] text-orange-700 bg-orange-100 px-1.5 py-0.2 rounded">14.2% SHARE</span>
+                </div>
+                <p class="text-slate-500 text-xs mt-2 leading-relaxed">
+                  Disbursement exceeding physical construction by &gt;20 percentage points flagged in 1,420 projects.
+                </p>
+              </div>
+              <div class="mt-4 pt-2.5 border-t border-slate-200/80 flex items-center justify-between">
+                <span class="text-[11px] font-mono font-semibold text-slate-700">₹7.8L Cr Exposure</span>
+                <a href="#/data-quality" class="text-[11px] font-bold text-blue-700 hover:text-blue-900">Audit Decoupling ➔</a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- =====================================================================
+             PRIORITY ADMINISTRATIVE REVIEW QUEUE TABLE
+             ===================================================================== -->
         <div class="gov-card">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
             <div>
@@ -223,7 +292,7 @@ const DashboardView = {
                 </span>
               </div>
               <p class="text-caption text-slate-500 mt-0.5">
-                Central sector projects requiring earliest executive intervention based on compound predictive risk indicators
+                Central sector projects requiring earliest executive intervention based on compound predictive risk indicators.
               </p>
             </div>
             <a href="#/projects" class="text-caption font-bold text-blue-800 hover:text-blue-900 flex items-center gap-1">
@@ -274,7 +343,7 @@ const DashboardView = {
                     </td>
                     <td class="text-right">
                       <a href="#/projects/${p.project_id}" class="btn btn-secondary btn-sm">
-                        Inspect
+                        Inspect Dossier ↗
                       </a>
                     </td>
                   </tr>
@@ -289,8 +358,8 @@ const DashboardView = {
   },
 
   async postRender() {
-    const canvas = document.getElementById("dashboard-risk-donut-canvas");
-    if (!canvas || typeof Chart === "undefined") return;
+    const donutCanvas = document.getElementById("dashboard-risk-donut-canvas");
+    const sectorCanvas = document.getElementById("dashboard-sector-canvas");
 
     let dist = { low: 4210, moderate: 2150, high: 2480, critical: 1160 };
 
@@ -302,13 +371,13 @@ const DashboardView = {
           
           const elTracked = document.getElementById("kpi-tracked-count");
           const elCost = document.getElementById("kpi-revised-cost");
+          const elOverrun = document.getElementById("kpi-overrun-cost");
           const elReview = document.getElementById("kpi-review-count");
-          const elCap = document.getElementById("kpi-capital-risk");
 
           if (elTracked) elTracked.innerText = Number(live.tracked_projects_count).toLocaleString("en-IN");
           if (elCost) elCost.innerText = live.total_revised_cost_formatted;
           if (elReview) elReview.innerText = Number(live.projects_requiring_review_count).toLocaleString("en-IN");
-          if (elCap) elCap.innerText = live.capital_at_risk_formatted;
+          if (elOverrun && live.total_cost_overrun_formatted) elOverrun.innerText = live.total_cost_overrun_formatted;
 
           // Update legend values
           const lLow = document.getElementById("legend-low-count");
@@ -323,7 +392,7 @@ const DashboardView = {
 
         // Fetch top priority projects from live database
         const projData = await window.APIClient.getProjects({
-          risk_level: "CRITICAL",
+          risk_tier: "CRITICAL",
           page_size: 6,
           sort_by: "overall_risk_score",
           sort_order: "desc"
@@ -360,7 +429,7 @@ const DashboardView = {
                 </td>
                 <td class="text-right">
                   <a href="#/projects/${p.project_id}" class="btn btn-secondary btn-sm">
-                    Inspect
+                    Inspect Dossier ↗
                   </a>
                 </td>
               </tr>
@@ -372,38 +441,78 @@ const DashboardView = {
       }
     }
 
-    if (window._dashboardChartInstance) {
-      window._dashboardChartInstance.destroy();
-    }
-
-    window._dashboardChartInstance = new Chart(canvas, {
-      type: "doughnut",
-      data: {
-        labels: ["Low Risk", "Moderate Risk", "High Risk", "Critical Risk"],
-        datasets: [{
-          data: [dist.low, dist.moderate, dist.high, dist.critical],
-          backgroundColor: ["#15803d", "#b45309", "#c2410c", "#b91c1c"],
-          borderColor: "#ffffff",
-          borderWidth: 2
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: "68%",
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: "#0f172a",
-            titleFont: { size: 12, family: "Inter" },
-            bodyFont: { size: 11, family: "Inter" },
-            callbacks: {
-              label: (ctx) => ` ${ctx.label}: ${ctx.parsed.toLocaleString("en-IN")} projects`
+    // 1. Render Risk Donut Chart
+    if (donutCanvas && typeof Chart !== "undefined") {
+      if (this.donutChart) this.donutChart.destroy();
+      this.donutChart = new Chart(donutCanvas, {
+        type: "doughnut",
+        data: {
+          labels: ["Low Risk", "Moderate Risk", "High Risk", "Critical Risk"],
+          datasets: [{
+            data: [dist.low, dist.moderate, dist.high, dist.critical],
+            backgroundColor: ["#10b981", "#3b82f6", "#f59e0b", "#ef4444"],
+            borderColor: "#ffffff",
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: "68%",
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: "#0f172a",
+              titleFont: { size: 12, family: "Inter" },
+              bodyFont: { size: 11, family: "Inter" },
+              callbacks: {
+                label: (ctx) => ` ${ctx.label}: ${ctx.parsed.toLocaleString("en-IN")} projects`
+              }
             }
           }
         }
-      }
-    });
+      });
+    }
+
+    // 2. Render Sector Bar Chart
+    if (sectorCanvas && typeof Chart !== "undefined") {
+      if (this.sectorChart) this.sectorChart.destroy();
+      this.sectorChart = new Chart(sectorCanvas, {
+        type: "bar",
+        data: {
+          labels: ["Roads", "Railways", "Power", "Petroleum", "Urban Dev", "Shipping"],
+          datasets: [{
+            label: "Revised Outlay (₹ Thousand Cr)",
+            data: [1420, 1150, 780, 490, 320, 180],
+            backgroundColor: ["#2563eb", "#3b82f6", "#60a5fa", "#93c5fd", "#bfdbfe", "#cbd5e1"],
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: "#f8fafc" },
+              ticks: { callback: (val) => `₹${val}k Cr` }
+            },
+            x: {
+              grid: { display: false }
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: "#0f172a",
+              callbacks: {
+                label: (ctx) => ` Outlay: ₹${ctx.parsed.y * 1000} Crore`
+              }
+            }
+          }
+        }
+      });
+    }
   }
 };
 

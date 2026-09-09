@@ -1,5 +1,5 @@
 // ==========================================================================
-// PROJECTPULSE — Projects Registry Component (Phase 9)
+// PROJECTPULSE — Projects Registry Component (Phase 9.5)
 // Route: /projects
 // Ministry of Statistics & Programme Implementation (MoSPI) - IPMD / PAIMANA
 // Smart India Hackathon 2026 — Team HexaForce
@@ -9,7 +9,8 @@ const ProjectsView = {
   searchQuery: "",
   selectedMinistry: "all",
   selectedRisk: "all",
-  selectedSector: "all",
+  selectedBottleneck: "all",
+  selectedState: "all",
   currentPage: 1,
   pageSize: 15,
   totalRecords: 0,
@@ -34,7 +35,7 @@ const ProjectsView = {
             </div>
             <h1 class="text-page-title mt-1">Central Projects Registry</h1>
             <p class="text-caption text-slate-500 mt-0.5">
-              Comprehensive catalog of 10,000 Central Sector Infrastructure Projects ($>$ ₹150 Cr) with multi-attribute filtering
+              Comprehensive catalog of 10,000 Central Sector Infrastructure Projects ($>$ ₹150 Cr) with multi-attribute filtering.
             </p>
           </div>
           <div class="flex items-center gap-2">
@@ -44,52 +45,84 @@ const ProjectsView = {
           </div>
         </div>
 
-        <!-- Filter Row -->
+        <!-- Filter Deck -->
         <div class="gov-card p-4 space-y-3">
-          <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-center">
             
             <!-- Search -->
-            <div class="sm:col-span-4 relative">
+            <div class="lg:col-span-3 relative">
               <label for="project-search-input" class="sr-only">Search project</label>
               <input type="text" id="project-search-input" 
-                     placeholder="Search project name, ID, or agency..."
+                     placeholder="Search name, ID, or agency..."
                      value="${this.searchQuery}"
-                     class="gov-input pl-9" />
-              <span class="absolute left-3 top-2.5 text-slate-400 text-sm">🔍</span>
+                     class="gov-input pl-9 text-xs" />
+              <span class="absolute left-3 top-2.5 text-slate-400 text-xs">🔍</span>
             </div>
 
             <!-- Ministry Filter -->
-            <div class="sm:col-span-3">
+            <div class="lg:col-span-2">
               <label for="filter-ministry-select" class="sr-only">Filter Ministry</label>
-              <select id="filter-ministry-select" class="gov-select">
-                <option value="all">All Central Ministries</option>
-                <option value="Ministry of Road Transport and Highways">Road Transport & Highways</option>
+              <select id="filter-ministry-select" class="gov-select text-xs">
+                <option value="all">All Ministries</option>
+                <option value="Ministry of Road Transport and Highways">Roads & Highways</option>
                 <option value="Ministry of Railways">Railways</option>
-                <option value="Ministry of Power">Power</option>
-                <option value="Ministry of Petroleum and Natural Gas">Petroleum & Natural Gas</option>
-                <option value="Ministry of Housing and Urban Affairs">Housing & Urban Affairs</option>
-                <option value="Ministry of Shipping">Ports, Shipping & Waterways</option>
+                <option value="Ministry of Power">Power & Energy</option>
+                <option value="Ministry of Petroleum and Natural Gas">Petroleum & Gas</option>
+                <option value="Ministry of Housing and Urban Affairs">Housing & Urban</option>
+                <option value="Ministry of Shipping">Ports & Shipping</option>
                 <option value="Ministry of Coal">Coal</option>
                 <option value="Ministry of Civil Aviation">Civil Aviation</option>
               </select>
             </div>
 
             <!-- Risk Filter -->
-            <div class="sm:col-span-3">
+            <div class="lg:col-span-2">
               <label for="filter-risk-select" class="sr-only">Filter Risk</label>
-              <select id="filter-risk-select" class="gov-select">
-                <option value="all">All Risk Levels</option>
-                <option value="CRITICAL">Critical Risk (Immediate Review)</option>
-                <option value="HIGH">High Risk (Elevated Friction)</option>
+              <select id="filter-risk-select" class="gov-select text-xs">
+                <option value="all">All Risk Tiers</option>
+                <option value="CRITICAL">Critical Risk</option>
+                <option value="HIGH">High Risk</option>
                 <option value="MODERATE">Moderate Risk</option>
                 <option value="LOW">Low Risk</option>
               </select>
             </div>
 
+            <!-- Bottleneck Filter -->
+            <div class="lg:col-span-2">
+              <label for="filter-bottleneck-select" class="sr-only">Filter Bottleneck</label>
+              <select id="filter-bottleneck-select" class="gov-select text-xs">
+                <option value="all">All Bottlenecks</option>
+                <option value="land_acquisition">Land & RoW</option>
+                <option value="clearance_impasse">Clearance Impasse</option>
+                <option value="contractor_failure">Contractor Cashflow</option>
+                <option value="financial_decoupling">Decoupling Gap</option>
+                <option value="utility_shifting">Utility Shifting</option>
+                <option value="monsoonal_impact">Monsoon/Geology</option>
+              </select>
+            </div>
+
+            <!-- State Filter -->
+            <div class="lg:col-span-2">
+              <label for="filter-state-select" class="sr-only">Filter State</label>
+              <select id="filter-state-select" class="gov-select text-xs">
+                <option value="all">All States</option>
+                <option value="Maharashtra">Maharashtra</option>
+                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                <option value="Gujarat">Gujarat</option>
+                <option value="Tamil Nadu">Tamil Nadu</option>
+                <option value="Bihar">Bihar</option>
+                <option value="Andhra Pradesh">Andhra Pradesh</option>
+                <option value="West Bengal">West Bengal</option>
+                <option value="Karnataka">Karnataka</option>
+                <option value="Rajasthan">Rajasthan</option>
+                <option value="Madhya Pradesh">Madhya Pradesh</option>
+              </select>
+            </div>
+
             <!-- Clear Action -->
-            <div class="sm:col-span-2 flex justify-end">
-              <button id="btn-clear-filters" class="btn btn-secondary btn-sm w-full sm:w-auto">
-                Clear Filters
+            <div class="lg:col-span-1 flex justify-end">
+              <button id="btn-clear-filters" class="btn btn-secondary btn-sm w-full text-xs">
+                Reset
               </button>
             </div>
 
@@ -101,6 +134,8 @@ const ProjectsView = {
             <span id="chip-search" class="hidden px-2 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200"></span>
             <span id="chip-ministry" class="hidden px-2 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200"></span>
             <span id="chip-risk" class="hidden px-2 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200"></span>
+            <span id="chip-bottleneck" class="hidden px-2 py-0.5 rounded bg-orange-50 text-orange-800 border border-orange-200"></span>
+            <span id="chip-state" class="hidden px-2 py-0.5 rounded bg-purple-50 text-purple-800 border border-purple-200"></span>
             <span id="chip-none" class="text-slate-400 italic">None (Displaying full portfolio)</span>
           </div>
         </div>
@@ -112,7 +147,7 @@ const ProjectsView = {
               <thead>
                 <tr>
                   <th style="min-width: 280px;">Project Identification</th>
-                  <th>Ministry / Implementing Agency</th>
+                  <th>Ministry / State</th>
                   <th style="min-width: 140px;">Approved / Revised Cost</th>
                   <th style="min-width: 150px;">Physical vs Financial</th>
                   <th>Risk Assessment</th>
@@ -153,20 +188,39 @@ const ProjectsView = {
   },
 
   async postRender() {
+    this.readHashParams();
     this.bindControls();
     await this.fetchAndRenderProjects();
+  },
+
+  readHashParams() {
+    const hash = window.location.hash || "";
+    if (hash.includes("?")) {
+      const qStr = hash.split("?")[1];
+      const params = new URLSearchParams(qStr);
+      if (params.get("bottleneck")) this.selectedBottleneck = params.get("bottleneck");
+      if (params.get("risk_tier")) this.selectedRisk = params.get("risk_tier");
+      if (params.get("risk_level")) this.selectedRisk = params.get("risk_level");
+      if (params.get("ministry")) this.selectedMinistry = params.get("ministry");
+      if (params.get("state")) this.selectedState = params.get("state");
+      if (params.get("search")) this.searchQuery = params.get("search");
+    }
   },
 
   bindControls() {
     const searchInput = document.getElementById("project-search-input");
     const minSelect = document.getElementById("filter-ministry-select");
     const riskSelect = document.getElementById("filter-risk-select");
+    const bnSelect = document.getElementById("filter-bottleneck-select");
+    const stateSelect = document.getElementById("filter-state-select");
     const clearBtn = document.getElementById("btn-clear-filters");
     const prevBtn = document.getElementById("btn-prev-page");
     const nextBtn = document.getElementById("btn-next-page");
 
     if (minSelect) minSelect.value = this.selectedMinistry;
     if (riskSelect) riskSelect.value = this.selectedRisk;
+    if (bnSelect) bnSelect.value = this.selectedBottleneck;
+    if (stateSelect) stateSelect.value = this.selectedState;
 
     if (searchInput) {
       searchInput.addEventListener("input", (e) => {
@@ -195,15 +249,35 @@ const ProjectsView = {
       });
     }
 
+    if (bnSelect) {
+      bnSelect.addEventListener("change", (e) => {
+        this.selectedBottleneck = e.target.value;
+        this.currentPage = 1;
+        this.fetchAndRenderProjects();
+      });
+    }
+
+    if (stateSelect) {
+      stateSelect.addEventListener("change", (e) => {
+        this.selectedState = e.target.value;
+        this.currentPage = 1;
+        this.fetchAndRenderProjects();
+      });
+    }
+
     if (clearBtn) {
       clearBtn.addEventListener("click", () => {
         this.searchQuery = "";
         this.selectedMinistry = "all";
         this.selectedRisk = "all";
+        this.selectedBottleneck = "all";
+        this.selectedState = "all";
         this.currentPage = 1;
         if (searchInput) searchInput.value = "";
         if (minSelect) minSelect.value = "all";
         if (riskSelect) riskSelect.value = "all";
+        if (bnSelect) bnSelect.value = "all";
+        if (stateSelect) stateSelect.value = "all";
         this.fetchAndRenderProjects();
       });
     }
@@ -231,6 +305,8 @@ const ProjectsView = {
     const chipSearch = document.getElementById("chip-search");
     const chipMinistry = document.getElementById("chip-ministry");
     const chipRisk = document.getElementById("chip-risk");
+    const chipBn = document.getElementById("chip-bottleneck");
+    const chipState = document.getElementById("chip-state");
     const chipNone = document.getElementById("chip-none");
 
     let activeCount = 0;
@@ -253,6 +329,20 @@ const ProjectsView = {
       activeCount++;
     } else if (chipRisk) {
       chipRisk.classList.add("hidden");
+    }
+
+    if (this.selectedBottleneck !== "all") {
+      if (chipBn) { chipBn.innerText = `Bottleneck: ${this.selectedBottleneck.replace(/_/g, " ")}`; chipBn.classList.remove("hidden"); }
+      activeCount++;
+    } else if (chipBn) {
+      chipBn.classList.add("hidden");
+    }
+
+    if (this.selectedState !== "all") {
+      if (chipState) { chipState.innerText = `State: ${this.selectedState}`; chipState.classList.remove("hidden"); }
+      activeCount++;
+    } else if (chipState) {
+      chipState.classList.add("hidden");
     }
 
     if (chipNone) {
@@ -283,7 +373,9 @@ const ProjectsView = {
     };
     if (this.searchQuery) params.search = this.searchQuery;
     if (this.selectedMinistry !== "all") params.ministry = this.selectedMinistry;
-    if (this.selectedRisk !== "all") params.risk_level = this.selectedRisk;
+    if (this.selectedRisk !== "all") params.risk_tier = this.selectedRisk;
+    if (this.selectedBottleneck !== "all") params.bottleneck = this.selectedBottleneck;
+    if (this.selectedState !== "all") params.state = this.selectedState;
 
     let res = null;
     if (window.APIClient) {
@@ -296,7 +388,7 @@ const ProjectsView = {
           <td colspan="7" class="p-8 text-center text-slate-500 text-xs">
             <div class="text-xl mb-1">🔍</div>
             <div class="font-bold text-slate-800 text-sm">No projects match the selected filters</div>
-            <p class="text-slate-400 text-[11px] mt-0.5">Try adjusting your search query or clearing the ministry/risk filters.</p>
+            <p class="text-slate-400 text-[11px] mt-0.5">Try adjusting your search query or clearing the filter options.</p>
           </td>
         </tr>
       `;
@@ -317,8 +409,8 @@ const ProjectsView = {
       const physProg = p.progress ? p.progress.physical_progress_pct : 0;
       const finProg = p.progress ? p.progress.financial_progress_pct : 0;
       const gap = p.progress ? p.progress.progress_gap_pct : 0;
-      const riskLevel = p.risk ? p.risk.level : "LOW";
-      const riskScore = p.risk ? p.risk.overall_score : 50;
+      const riskLevel = p.risk ? p.risk.level : (p.target_risk_class || "LOW");
+      const riskScore = p.risk ? p.risk.overall_score : (p.overall_risk_score || 50);
 
       return `
         <tr>
@@ -328,7 +420,7 @@ const ProjectsView = {
           </td>
           <td>
             <div class="text-slate-800 text-caption font-medium line-clamp-1">${p.ministry}</div>
-            <div class="text-caption text-slate-400 line-clamp-1">${p.implementing_agency} • ${p.state}</div>
+            <div class="text-caption text-slate-400 line-clamp-1">${p.implementing_agency} • ${p.state || 'National'}</div>
           </td>
           <td>
             <div class="text-slate-900 font-semibold tabular-nums text-caption">₹${revCost.toLocaleString("en-IN")} Cr</div>
@@ -352,11 +444,11 @@ const ProjectsView = {
             ${CommonUI.renderRiskBadge(riskLevel, riskScore)}
           </td>
           <td class="text-caption text-slate-600 max-w-xs text-xs">
-            ${p.risk ? p.risk.primary_driver : "Routine Clearance"}
+            ${p.primary_bottleneck ? p.primary_bottleneck.replace(/_/g, ' ') : (p.risk ? p.risk.primary_driver : 'N/A')}
           </td>
           <td class="text-right">
             <a href="#/projects/${p.project_id}" class="btn btn-secondary btn-sm">
-              Inspect ➔
+              Inspect
             </a>
           </td>
         </tr>

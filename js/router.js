@@ -1,15 +1,19 @@
 // ==========================================================================
-// PROJECTPULSE — Client-Side Router
+// PROJECTPULSE — Client-Side Router (Phase 9.5)
 // Robust Hash-Based Navigation with Browser Back/Forward & Direct URL Access
 // ==========================================================================
 
 const Router = {
   routes: {
     dashboard: window.DashboardView,
+    "portfolio-matrix": window.PortfolioMatrixView,
     projects: window.ProjectsView,
     "project-detail": window.ProjectDetailView,
     "early-warnings": window.EarlyWarningsView,
+    bottlenecks: window.BottleneckView,
     analytics: window.AnalyticsView,
+    compare: window.ProjectCompareView,
+    "data-quality": window.DataQualityView,
     settings: window.SettingsView
   },
 
@@ -22,39 +26,58 @@ const Router = {
     let hash = window.location.hash || "#/dashboard";
     if (hash === "#" || hash === "#/") hash = "#/dashboard";
 
-    const path = hash.replace("#/", "");
+    // Strip hash prefix and split off any query string
+    const cleanHash = hash.replace("#/", "");
+    const [path, queryString] = cleanHash.split("?");
     const segments = path.split("/");
+    const rootRoute = segments[0] || "dashboard";
 
     const mount = document.getElementById("main-content-mount");
     if (!mount) return;
 
     // Route matching
-    if (segments[0] === "dashboard" || segments[0] === "") {
+    if (rootRoute === "dashboard" || rootRoute === "") {
       mount.innerHTML = window.DashboardView.render();
       if (window.DashboardView.postRender) window.DashboardView.postRender();
       window.AppShell.updateActiveNav("dashboard");
-    } else if (segments[0] === "projects") {
+    } else if (rootRoute === "portfolio-matrix") {
+      mount.innerHTML = window.PortfolioMatrixView.render();
+      if (window.PortfolioMatrixView.postRender) window.PortfolioMatrixView.postRender();
+      window.AppShell.updateActiveNav("portfolio-matrix");
+    } else if (rootRoute === "projects") {
       if (segments[1]) {
         // Project Detail Route: #/projects/PRJ-DEMO-001
         const projectId = decodeURIComponent(segments[1]);
         mount.innerHTML = window.ProjectDetailView.render(projectId);
         if (window.ProjectDetailView.postRender) window.ProjectDetailView.postRender(projectId);
-        window.AppShell.updateActiveNav("projects");
+        window.AppShell.updateActiveNav("projects/" + projectId);
       } else {
         // Projects List Route: #/projects
         mount.innerHTML = window.ProjectsView.render();
         if (window.ProjectsView.postRender) window.ProjectsView.postRender();
         window.AppShell.updateActiveNav("projects");
       }
-    } else if (segments[0] === "early-warnings") {
+    } else if (rootRoute === "early-warnings") {
       mount.innerHTML = window.EarlyWarningsView.render();
       if (window.EarlyWarningsView.postRender) window.EarlyWarningsView.postRender();
       window.AppShell.updateActiveNav("early-warnings");
-    } else if (segments[0] === "analytics") {
+    } else if (rootRoute === "bottlenecks") {
+      mount.innerHTML = window.BottleneckView.render();
+      if (window.BottleneckView.postRender) window.BottleneckView.postRender();
+      window.AppShell.updateActiveNav("bottlenecks");
+    } else if (rootRoute === "analytics") {
       mount.innerHTML = window.AnalyticsView.render();
       if (window.AnalyticsView.postRender) window.AnalyticsView.postRender();
       window.AppShell.updateActiveNav("analytics");
-    } else if (segments[0] === "settings") {
+    } else if (rootRoute === "compare") {
+      mount.innerHTML = window.ProjectCompareView.render();
+      if (window.ProjectCompareView.postRender) window.ProjectCompareView.postRender();
+      window.AppShell.updateActiveNav("compare");
+    } else if (rootRoute === "data-quality") {
+      mount.innerHTML = window.DataQualityView.render();
+      if (window.DataQualityView.postRender) window.DataQualityView.postRender();
+      window.AppShell.updateActiveNav("data-quality");
+    } else if (rootRoute === "settings") {
       mount.innerHTML = window.SettingsView.render();
       if (window.SettingsView.postRender) window.SettingsView.postRender();
       window.AppShell.updateActiveNav("settings");

@@ -81,7 +81,7 @@ class DatabaseClient:
                 }
             }
 
-    def list_projects(self, page=1, page_size=20, search="", ministry="", sector="", risk_level="", sort_by="overall_risk_score", sort_order="desc"):
+    def list_projects(self, page=1, page_size=20, search="", ministry="", sector="", risk_level="", sort_by="overall_risk_score", sort_order="desc", bottleneck="", state=""):
         """Returns paginated project summaries with multi-attribute filtering."""
         with self._get_connection() as conn:
             cursor = conn.cursor()
@@ -105,6 +105,14 @@ class DatabaseClient:
             if risk_level and risk_level != "ALL":
                 where_clauses.append("target_risk_class = ?")
                 params.append(risk_level.upper())
+                
+            if bottleneck and bottleneck != "ALL":
+                where_clauses.append("LOWER(primary_bottleneck) = ?")
+                params.append(bottleneck.lower().replace(" ", "_"))
+                
+            if state and state != "ALL":
+                where_clauses.append("state = ?")
+                params.append(state)
                 
             where_sql = " AND ".join(where_clauses)
             
@@ -150,6 +158,7 @@ class DatabaseClient:
                     "state": r["state"],
                     "implementing_agency": r["implementing_agency"],
                     "status": "Ongoing" if r["project_status"] != "COMPLETED" else "Commissioned",
+                    "primary_bottleneck": r["primary_bottleneck"],
                     "financials": {
                         "original_cost_cr": r["original_cost_cr"],
                         "revised_cost_cr": r["revised_cost_cr"],
@@ -424,3 +433,20 @@ class DatabaseClient:
                 "bottlenecks": bottleneck_rows,
                 "states": state_rows
             }
+
+    def get_portfolio_matrix(self, limit=250):
+        """Returns top projects by financial exposure formatted for interactive risk matrix (Risk vs Financial Exposure)."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT 
+                    project_id, project_name, ministry, sector, state, implementing_agency,
+                    original_cost_cr, revised_cost_cr, cost_overrun_cr,
+                    physical_progress_pct, financial_progress_pct, progress_decoupling_gap,
+                    schedule_slippage_months, primary_bottleneck, target_risk_class, overall_risk_score
+                FROM projects
+                ORDER BY revised_cost_cr DESC
+                LIMIT ?
+            """, (limit,))
+            rows = cursor.fetchall()
+            return [dict(r) for r in rows]
