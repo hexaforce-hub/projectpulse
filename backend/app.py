@@ -507,7 +507,7 @@ def list_audit_logs(
     action: Optional[str] = Query(None),
     actor: Optional[str] = Query(None),
     resource: Optional[str] = Query(None),
-    user: dict = Depends(get_current_user_from_header)
+    user: dict = Depends(require_permission("can_view_audit"))
 ):
     """Returns transparent audit trail of decision events and model evaluations."""
     audit = get_audit_manager()

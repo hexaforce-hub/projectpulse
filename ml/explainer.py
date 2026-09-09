@@ -70,6 +70,12 @@ class ProjectPulseExplainer:
         Conforms 100% to DATA_CONTRACT.md schema.
         """
         df_in = pd.DataFrame([project_features])
+        req_cols = set()
+        for _, _, cols in self.preprocessor.transformers_:
+            req_cols.update(cols)
+        if not req_cols.issubset(df_in.columns):
+            from src.ml.feature_engineering import engineer_features
+            df_in = engineer_features(df_in)
         X_trans = self.preprocessor.transform(df_in)
         
         # 1. Compute TreeSHAP attributions using LightGBM C++ native pred_contrib

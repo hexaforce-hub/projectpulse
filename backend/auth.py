@@ -20,7 +20,7 @@ import sqlite3
 from pathlib import Path
 from typing import Dict, List, Optional
 from pydantic import BaseModel
-from fastapi import HTTPException, Header, status
+from fastapi import HTTPException, Header, status, Depends
 
 DB_PATH = Path(__file__).parent.parent / "data" / "projectpulse.db"
 
@@ -419,7 +419,7 @@ def get_current_user_from_header(authorization: Optional[str] = Header(None)) ->
     }
 
 def require_permission(permission_name: str):
-    def dependency(user: dict = get_current_user_from_header):
+    def dependency(user: dict = Depends(get_current_user_from_header)):
         perms = user.get("permissions", {})
         if not perms.get(permission_name, False):
             raise HTTPException(
