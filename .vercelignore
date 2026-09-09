@@ -1,21 +1,24 @@
-# Vercel Deployment Ignore Rules
+﻿# Vercel Deployment Ignore
 tools/
+tools/**
 python.bat
-run_server.bat
-scratch/
 
-# Database files & backups
-*.db
-*.db.bak
+# Heavy local database binaries and SQL dumps
 data/*.db
 data/*.db.bak
-data/processed/
-data/raw/
+database/astra_supabase_dump.sql
 
-# ML models
-models/
-
-# Testing & logs
+# Development & Testing
 tests/
-*.log
+tests/**
+__pycache__/
+*.pyc
 .pytest_cache/
+.coverage
+htmlcov/
+*.log
+
+# Scratch & logs
+scratch/
+scratch/**
+scratch_*.json
