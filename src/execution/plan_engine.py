@@ -60,14 +60,14 @@ class PlanEngine:
         project_id = payload.get("project_id") or f"PRJ-NEW-{uuid.uuid4().hex[:6].upper()}"
         now_str = datetime.utcnow().strftime("%Y-%m-%d")
         
-        orig_cost = float(payload.get("original_cost_cr", 100.0))
-        rev_cost = float(payload.get("revised_cost_cr", orig_cost))
+        orig_cost = float(payload.get("original_cost_cr") or 100.0)
+        rev_cost = float(payload.get("revised_cost_cr") or orig_cost)
         overrun_cr = max(0.0, rev_cost - orig_cost)
         cost_growth = (overrun_cr / orig_cost * 100.0) if orig_cost > 0 else 0.0
 
-        p_start = payload.get("start_date", now_str)
-        p_comp = payload.get("planned_completion_date", "2028-12-31")
-        rev_comp = payload.get("revised_completion_date", p_comp)
+        p_start = payload.get("start_date") or now_str
+        p_comp = payload.get("planned_completion_date") or "2028-12-31"
+        rev_comp = payload.get("revised_completion_date") or p_comp
 
         project_record = {
             "project_id": project_id,

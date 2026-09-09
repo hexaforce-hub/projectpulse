@@ -31,12 +31,10 @@ const AppShell = {
             <!-- Logo & Branding -->
             <div class="h-16 flex items-center px-4 border-b border-slate-200 justify-between">
               <a href="#/dashboard" class="flex items-center gap-2.5 overflow-hidden text-decoration-none">
-                <div class="w-8 h-8 rounded-lg bg-blue-800 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm">
-                  P
-                </div>
+                <img src="assets/astra_logo.png" alt="ASTRA" class="w-9 h-9 rounded-xl object-contain flex-shrink-0 shadow-sm border border-slate-200 bg-white p-0.5" />
                 <div class="sidebar-text-brand leading-tight">
-                  <span class="font-bold text-slate-900 tracking-tight text-sm block">PROJECTPULSE</span>
-                  <span class="text-[10px] text-slate-500 font-medium block">MoSPI • Command Center</span>
+                  <span class="font-extrabold text-slate-900 tracking-tight text-sm block">ASTRA</span>
+                  <span class="text-[9px] text-slate-500 font-semibold block leading-none">MoSPI • ProjectPulse</span>
                 </div>
               </a>
               <button id="btn-collapse-sidebar" class="text-slate-400 hover:text-slate-700 p-1.5 rounded-md text-xs hover:bg-slate-100" title="Toggle Sidebar">
@@ -143,10 +141,19 @@ const AppShell = {
                   ☰
                 </button>
                 <nav class="flex items-center gap-2" aria-label="Breadcrumb">
-                  <a href="#/dashboard" id="header-breadcrumb-root" class="text-caption text-slate-500 hover:text-blue-700 font-medium">ProjectPulse</a>
+                  <a href="#/dashboard" id="header-breadcrumb-root" class="text-caption text-slate-500 hover:text-blue-700 font-medium">ASTRA</a>
                   <span class="text-slate-300 text-xs">/</span>
                   <span id="header-breadcrumb-page" class="text-sm font-bold text-slate-900">National Command Center</span>
                 </nav>
+
+                <!-- Official ASTRA Institutional Header Badge -->
+                <div class="hidden sm:flex items-center gap-2 pl-3 border-l border-slate-200">
+                  <img src="assets/astra_logo.png" alt="ASTRA" class="w-6 h-6 object-contain rounded" />
+                  <div class="leading-none text-left">
+                    <span class="text-[10px] font-extrabold text-slate-900 tracking-wider block">ASTRA</span>
+                    <span class="text-[8px] text-slate-400 font-medium block">MoSPI • IPMD</span>
+                  </div>
+                </div>
               </div>
 
               <!-- Center: Quick Jump / Command Palette Search Input -->
@@ -192,10 +199,18 @@ const AppShell = {
               </div>
             </header>
 
-            <!-- Main Scrollable Content Mount -->
-            <main id="main-content-mount" class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8" role="main">
-              <!-- Dynamic route content injected here by Router -->
-            </main>
+            <!-- Main Content Area with Institutional ASTRA Watermark -->
+            <div class="flex-1 relative overflow-hidden flex flex-col">
+              <!-- ASTRA Institutional Watermark Overlay (Centrally positioned, ultra-low opacity watermark) -->
+              <div class="astra-watermark-overlay" aria-hidden="true">
+                <img src="assets/astra_logo.png" alt="ASTRA Watermark" />
+              </div>
+
+              <!-- Main Scrollable Content Mount -->
+              <main id="main-content-mount" class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 relative z-10" role="main">
+                <!-- Dynamic route content injected here by Router -->
+              </main>
+            </div>
 
           </div>
 
@@ -205,9 +220,12 @@ const AppShell = {
           <div id="mobile-drawer-backdrop" class="fixed inset-0 bg-slate-900/40 z-40 hidden md:hidden"></div>
           <aside id="mobile-drawer" class="fixed inset-y-0 left-0 w-64 bg-white border-r border-slate-200 z-50 transform -translate-x-full transition-transform duration-200 md:hidden flex flex-col">
             <div class="h-16 flex items-center justify-between px-4 border-b border-slate-200">
-              <div class="flex items-center gap-2">
-                <div class="w-7 h-7 rounded-lg bg-blue-800 flex items-center justify-center text-white font-bold text-xs">P</div>
-                <div class="font-bold text-slate-900 text-sm">PROJECTPULSE</div>
+              <div class="flex items-center gap-2.5">
+                <img src="assets/astra_logo.png" alt="ASTRA" class="w-8 h-8 rounded-lg object-contain border border-slate-200 bg-white p-0.5" />
+                <div class="leading-tight">
+                  <span class="font-extrabold text-slate-900 text-sm block">ASTRA</span>
+                  <span class="text-[9px] text-slate-500 font-medium block">MoSPI • ProjectPulse</span>
+                </div>
               </div>
               <button id="btn-close-mobile-drawer" class="text-slate-500 hover:text-slate-800 text-lg p-1.5" aria-label="Close menu">✕</button>
             </div>
