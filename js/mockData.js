@@ -1,4 +1,4 @@
-﻿// PROJECTPULSE — Central Demonstration Dataset
+// PROJECTPULSE — Central Demonstration Dataset
 // Ministry of Statistics & Programme Implementation (MoSPI) - IPMD / PAIMANA
 
 const MOCK_PROJECTS = [
@@ -468,5 +468,7 @@ const MOCK_ALERTS = [
 ];
 
 window.MOCK_PROJECTS = MOCK_PROJECTS;
+window.ORIGINAL_MOCK_PROJECTS = JSON.parse(JSON.stringify(MOCK_PROJECTS));
 window.MOCK_DASHBOARD_SUMMARY = MOCK_DASHBOARD_SUMMARY;
 window.MOCK_ALERTS = MOCK_ALERTS;
+window.ORIGINAL_MOCK_ALERTS = JSON.parse(JSON.stringify(MOCK_ALERTS));

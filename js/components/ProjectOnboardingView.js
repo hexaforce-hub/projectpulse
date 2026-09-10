@@ -24,7 +24,7 @@ const ProjectOnboardingView = {
     extractedEntities: null,
     generatedPlan: null
   },
-  activeTab: "wizard",
+  activeTab: "import",
   sampleDatasets: {
     morth: `project_name,ministry,sector,state,implementing_agency,original_cost_cr,revised_cost_cr,physical_progress_pct,financial_progress_pct,delay_in_months,start_date,planned_completion_date,primary_bottleneck
 "Delhi-Amritsar-Katra Expressway PKG-5","Ministry of Road Transport & Highways","Road","Punjab","NHAI",3800.0,4450.0,48.5,45.0,14,"2023-04-01","2026-12-31","land_acquisition"
@@ -36,6 +36,17 @@ const ProjectOnboardingView = {
   },
   importResult: null,
   validationReport: null,
+  rawPayload: "",
+
+  escapeHtml(str) {
+    if (!str) return "";
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  },
 
   async render(container) {
     if (!container) {
@@ -510,12 +521,53 @@ const ProjectOnboardingView = {
   renderImportTab() {
     const report = this.validationReport;
     const result = this.importResult;
+    const isCleared = window.APIClient.isDemoCleared();
+    const customProjects = window.APIClient.getCustomProjects();
+    const activeProjects = window.APIClient.getActiveProjects();
 
     return `
       <div class="space-y-6">
+        
+        <!-- Clean Slate & Active Dataset Mode Command Bar -->
+        <div class="p-4.5 bg-slate-900 text-white rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-lg border border-slate-800">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl ${isCleared ? 'bg-emerald-600/30 text-emerald-400 border border-emerald-500/40' : 'bg-blue-600/30 text-blue-400 border border-blue-500/40'} flex items-center justify-center font-bold text-lg flex-shrink-0">
+              ${isCleared ? '🟢' : '📊'}
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Registry Mode:</span>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold ${isCleared ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-blue-500/20 text-blue-300 border border-blue-500/40'}">
+                  ${isCleared ? `CLEAN SLATE — REAL DATA ONLY (${customProjects.length} Custom Project${customProjects.length !== 1 ? 's' : ''})` : `10,000 BENCHMARK UNIVERSE (${activeProjects.length} Projects Loaded)`}
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                ${isCleared 
+                  ? 'All synthetic benchmark records are silenced. The Command Center, Projects Registry, Analytics, Radar, and Matrix operate <strong>exclusively on your uploaded data</strong>.' 
+                  : 'Demonstration projects are loaded. You can click <strong>"Remove All Demo Data"</strong> below to clear out all synthetic records and test exclusively with your real data.'}
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 flex-shrink-0 flex-wrap">
+            ${isCleared ? `
+              <button id="btn-restore-demo-data" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer">
+                <span>↺</span> Restore 10k Benchmark
+              </button>
+            ` : `
+              <button id="btn-clear-demo-data" class="px-3.5 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl transition shadow-sm flex items-center gap-1.5 cursor-pointer">
+                <span>🗑️</span> Remove All Demo Data
+              </button>
+            `}
+            <button id="btn-reset-registry-zero" class="px-3 py-2 bg-slate-800 hover:bg-red-950/60 text-slate-400 hover:text-red-300 border border-slate-700 text-xs font-semibold rounded-xl transition cursor-pointer" title="Reset all custom and demo projects to 0">
+              Reset to 0
+            </button>
+          </div>
+        </div>
+
         <!-- Ingestion Overview Banner -->
         <div class="bg-blue-50/70 border border-blue-200 rounded-2xl p-5 text-xs space-y-3">
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between flex-wrap gap-2">
             <div class="flex items-center gap-2 font-bold text-blue-900 text-sm">
               <span>📥</span> National Dataset Ingestion & AI Pipeline
             </div>
@@ -524,48 +576,48 @@ const ProjectOnboardingView = {
             </span>
           </div>
           <p class="text-slate-600 leading-relaxed">
-            Batch-ingest project records directly from institutional spreadsheets (CSV) or REST payloads (JSON). The ASTRA intelligence engine performs <strong>fuzzy column normalization</strong> (supporting over 30 ministry nomenclature variations), runs <strong>LightGBM risk inference</strong>, evaluates <strong>Early Warning Radar triggers</strong>, auto-synthesizes <strong>Work Breakdown Structures (WBS)</strong>, and commits immutable governance audit entries.
+            Batch-ingest project records directly from institutional spreadsheets (CSV, TSV, semicolon-separated) or REST payloads (JSON). The ASTRA intelligence engine automatically <strong>detects headers</strong> (skipping title banners like "Sector Wise Details"), performs <strong>fuzzy column normalization</strong>, runs <strong>LightGBM risk inference</strong>, auto-synthesizes <strong>12 Work Breakdown Structures (WBS)</strong>, generates <strong>Early Warning Radar triggers</strong>, and saves directly to your local registry.
           </p>
           <div class="flex flex-wrap items-center gap-2 pt-1">
             <span class="text-slate-500 font-semibold text-[11px]">Quick Load Institutional Samples:</span>
-            <button id="btn-sample-morth" class="px-3 py-1 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold rounded-lg shadow-sm transition">
+            <button id="btn-sample-morth" class="px-3 py-1 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold rounded-lg shadow-xs transition cursor-pointer">
               🛣️ MoRTH Highway Package (3 Projects)
             </button>
-            <button id="btn-sample-railways" class="px-3 py-1 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold rounded-lg shadow-sm transition">
+            <button id="btn-sample-railways" class="px-3 py-1 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold rounded-lg shadow-xs transition cursor-pointer">
               🚆 Railways DFC Corridors (2 Projects)
             </button>
-            <button id="btn-clear-dataset" class="px-2.5 py-1 text-slate-500 hover:text-red-600 transition ml-auto">
-              Clear
+            <button id="btn-clear-dataset" class="px-2.5 py-1 text-slate-500 hover:text-red-600 transition ml-auto cursor-pointer">
+              Clear Text
             </button>
           </div>
         </div>
 
         <!-- Input Area: Dropzone + Raw Textarea -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-xs">
           <div class="flex items-center justify-between text-xs">
-            <label class="font-bold text-slate-800 uppercase tracking-wider">Dataset Payload (CSV or JSON)</label>
-            <span class="text-slate-400">Accepted: .csv, .json</span>
+            <label class="font-bold text-slate-800 uppercase tracking-wider">Dataset Payload (CSV, TSV, or JSON)</label>
+            <span class="text-slate-400">Accepted: .csv, .tsv, .txt, .json</span>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="md:col-span-2 space-y-2">
               <textarea id="txt-import-payload" rows="10" class="w-full p-3 font-mono text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-slate-400" placeholder="Paste CSV with headers or JSON array here...
-Example headers: project_name, ministry, sector, state, original_cost_cr, revised_cost_cr, physical_progress_pct..."></textarea>
+Example headers: project_name, ministry, sector, state, original_cost_cr, revised_cost_cr, physical_progress_pct...">${this.escapeHtml(this.rawPayload || "")}</textarea>
             </div>
 
             <div class="space-y-3 flex flex-col justify-between">
               <div class="border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-2xl p-6 text-center transition cursor-pointer relative bg-slate-50/50 hover:bg-blue-50/30">
-                <input type="file" id="file-import-dataset" accept=".csv,.json" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
+                <input type="file" id="file-import-dataset" accept=".csv,.tsv,.txt,.json" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
                 <div class="text-3xl mb-2">📂</div>
                 <div class="text-xs font-bold text-slate-800">Upload Dataset File</div>
-                <div class="text-[10px] text-slate-400 mt-1">Select .csv or .json from your computer</div>
+                <div class="text-[10px] text-slate-400 mt-1">Select .csv, .tsv, or .json from your computer</div>
               </div>
 
               <div class="space-y-2">
-                <button id="btn-inspect-dataset" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-2">
+                <button id="btn-inspect-dataset" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-2 cursor-pointer">
                   <span>🔍</span> Inspect & Auto-Map Columns
                 </button>
-                <button id="btn-run-dataset-import" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                <button id="btn-run-dataset-import" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
                   <span>⚡</span> Execute AI Ingestion & Synthesis
                 </button>
               </div>
@@ -575,8 +627,8 @@ Example headers: project_name, ministry, sector, state, original_cost_cr, revise
 
         <!-- Live Column Mapping Preview & Validation Report -->
         ${report ? `
-          <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 animate-fade-in">
-            <div class="flex items-center justify-between">
+          <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-xs animate-fade-in">
+            <div class="flex items-center justify-between flex-wrap gap-2">
               <div class="flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full ${report.valid ? 'bg-emerald-500' : 'bg-amber-500'}"></span>
                 <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">
@@ -605,7 +657,7 @@ Example headers: project_name, ministry, sector, state, original_cost_cr, revise
                       <td class="p-2.5 font-mono text-[11px] text-slate-800">${m.source}</td>
                       <td class="p-2.5 font-semibold text-blue-700">${m.target}</td>
                       <td class="p-2.5">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${m.confidence === 'EXACT' ? 'bg-emerald-100 text-emerald-800' : 'bg-sky-100 text-sky-800'}">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${m.confidence === 'EXACT' ? 'bg-emerald-100 text-emerald-800' : m.confidence === 'SYNTHESIZED' ? 'bg-amber-100 text-amber-800' : 'bg-sky-100 text-sky-800'}">
                           ${m.confidence} MATCH
                         </span>
                       </td>
@@ -620,47 +672,56 @@ Example headers: project_name, ministry, sector, state, original_cost_cr, revise
 
         <!-- Ingestion Results Summary -->
         ${result ? `
-          <div class="bg-emerald-50/60 border border-emerald-200 rounded-2xl p-5 space-y-4 animate-fade-in">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2 text-emerald-900 font-extrabold text-sm">
-                <span>🎉</span> Ingestion Completed Successfully
+          <div class="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-5 space-y-4 shadow-sm animate-fade-in">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2 text-emerald-950 font-extrabold text-sm">
+                <span>🎉</span> Ingestion & AI Synthesis Completed Successfully
               </div>
-              <span class="px-2.5 py-1 bg-emerald-600 text-white rounded-lg text-xs font-bold shadow-sm">
-                ${result.summary?.created_count || 0} Created · ${result.summary?.updated_count || 0} Updated
+              <span class="px-3 py-1 bg-emerald-600 text-white rounded-lg text-xs font-bold shadow-xs">
+                ${result.summary?.created_count || (result.projects || []).length} Ingested Records
               </span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <p class="text-xs text-emerald-900 leading-relaxed">
+              All records have been processed through the ASTRA LightGBM risk classifier, 12 WBS milestone packages have been synthesized, early warning signals have been triggered, and data is active in your platform.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[380px] overflow-y-auto pr-1">
               ${(result.projects || []).map(p => {
                 let badgeColor = "bg-emerald-100 text-emerald-800 border-emerald-200";
-                if (p.risk_class === "CRITICAL") badgeColor = "bg-rose-100 text-rose-800 border-rose-200";
-                else if (p.risk_class === "HIGH") badgeColor = "bg-amber-100 text-amber-800 border-amber-200";
-                else if (p.risk_class === "MODERATE") badgeColor = "bg-blue-100 text-blue-800 border-blue-200";
+                const rLevel = (p.risk && p.risk.level) || p.risk_level || "MODERATE";
+                if (rLevel === "CRITICAL") badgeColor = "bg-rose-100 text-rose-800 border-rose-200";
+                else if (rLevel === "HIGH") badgeColor = "bg-amber-100 text-amber-800 border-amber-200";
+                else if (rLevel === "MODERATE") badgeColor = "bg-blue-100 text-blue-800 border-blue-200";
+
+                const cost = (p.financials && p.financials.revised_cost_cr) || p.revised_cost_cr || 0;
+                const overrun = (p.financials && p.financials.cost_overrun_cr) || p.cost_overrun_cr || 0;
+                const riskScore = (p.risk && p.risk.overall_score) || p.risk_score || 50;
 
                 return `
-                  <div class="bg-white p-4 rounded-xl border border-emerald-200 shadow-sm space-y-2 text-xs">
+                  <div class="bg-white p-4 rounded-xl border border-emerald-200 shadow-xs space-y-2 text-xs">
                     <div class="flex items-start justify-between gap-2">
                       <div class="min-w-0">
                         <div class="font-bold text-slate-900 truncate">${p.project_name}</div>
-                        <div class="text-[10px] font-mono text-slate-400">${p.project_id}</div>
+                        <div class="text-[10px] font-mono text-slate-400">${p.project_id} • ${p.ministry}</div>
                       </div>
                       <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeColor}">
-                        ${p.risk_class} RISK
+                        ${rLevel} RISK
                       </span>
                     </div>
 
                     <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-100 text-center text-[11px]">
                       <div class="p-1.5 bg-slate-50 rounded-lg">
                         <div class="text-[10px] text-slate-400">Risk Score</div>
-                        <div class="font-bold text-slate-800">${p.risk_score || '—'}</div>
+                        <div class="font-bold text-slate-800">${riskScore}/100</div>
                       </div>
                       <div class="p-1.5 bg-slate-50 rounded-lg">
-                        <div class="text-[10px] text-slate-400">Delay</div>
-                        <div class="font-bold text-slate-800">${p.predicted_delay_months ? p.predicted_delay_months + ' mo' : 'On Track'}</div>
+                        <div class="text-[10px] text-slate-400">Outlay</div>
+                        <div class="font-bold text-blue-900">₹${cost.toLocaleString("en-IN")} Cr</div>
                       </div>
                       <div class="p-1.5 bg-slate-50 rounded-lg">
                         <div class="text-[10px] text-slate-400">WBS Tasks</div>
-                        <div class="font-bold text-blue-700">${p.tasks_generated || 5} Synthesized</div>
+                        <div class="font-bold text-emerald-700">12 Synthesized</div>
                       </div>
                     </div>
                   </div>
@@ -668,12 +729,12 @@ Example headers: project_name, ministry, sector, state, original_cost_cr, revise
               }).join('')}
             </div>
 
-            <div class="flex justify-end gap-3 pt-2">
-              <a href="#/my-projects" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5">
-                <span>📁</span> View in Project Directory
+            <div class="flex justify-end gap-3 pt-2 flex-wrap">
+              <a href="#/projects" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5">
+                <span>📁</span> View in Central Projects Registry ➔
               </a>
-              <a href="#/execution" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5">
-                <span>⚡</span> Open Execution Control Center
+              <a href="#/dashboard" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5">
+                <span>📊</span> Open National Command Center ➔
               </a>
             </div>
           </div>
@@ -685,7 +746,7 @@ Example headers: project_name, ministry, sector, state, original_cost_cr, revise
 
   inspectDataset(text) {
     if (!text || !text.trim()) {
-      window.APIClient.showToast("Please enter CSV or JSON dataset payload first", "warning");
+      window.APIClient.showToast("Please enter or upload CSV or JSON dataset payload first", "warning");
       return;
     }
     const clean = text.trim();
@@ -702,25 +763,24 @@ Example headers: project_name, ministry, sector, state, original_cost_cr, revise
         return;
       }
     } else {
-      const lines = clean.split("\n").map(l => l.trim()).filter(Boolean);
-      if (lines.length < 2) {
-        window.APIClient.showToast("CSV must contain a header row and at least one data row", "warning");
+      const parsed = window.APIClient.parseDelimitedText(clean);
+      headers = parsed.headers;
+      rows = parsed.rows;
+      if (headers.length === 0 || rows.length === 0) {
+        window.APIClient.showToast("Could not find table headers or data rows in uploaded content", "warning");
         return;
       }
-      headers = lines[0].split(",").map(h => h.replace(/^["']|["']$/g, "").trim());
-      const firstRowVals = lines[1].split(",").map(v => v.replace(/^["']|["']$/g, "").trim());
-      rows = [firstRowVals];
     }
 
     const aliases = {
-      project_name: ["project_name", "name", "project", "title", "corridor", "project_title"],
-      ministry: ["ministry", "central_ministry", "min", "ministry_name"],
-      sector: ["sector", "sub_sector", "domain", "industry"],
-      state: ["state", "primary_state", "location", "province"],
-      original_cost_cr: ["original_cost_cr", "sanctioned_cost", "cost", "budget", "outlay", "original_cost"],
-      physical_progress_pct: ["physical_progress_pct", "physical_progress", "progress", "progress_pct"],
-      start_date: ["start_date", "start", "commencement_date", "appointed_date"],
-      planned_completion_date: ["planned_completion_date", "completion_date", "target_date", "scheduled_completion"]
+      project_name: ["project_name", "project name", "name", "project", "title", "corridor", "work name", "item name", "description", "work package", "project title", "name of project", "scheme"],
+      ministry: ["ministry", "central ministry", "ministry name", "department", "dept", "min", "ministry / department", "ministry/dept"],
+      sector: ["sector", "sub sector", "domain", "category", "infrastructure sector", "subsector", "sector wise details", "sector name"],
+      state: ["state", "primary state", "location", "province", "region", "state / ut", "state/ut"],
+      original_cost_cr: ["original_cost_cr", "original cost", "sanctioned cost", "sanctioned outlay", "cost", "budget", "estimated cost", "original outlay", "original cost (rs. cr)", "cost (rs cr)", "sanctioned cost (rs. cr)", "original cost (cr)"],
+      revised_cost_cr: ["revised_cost_cr", "revised cost", "anticipated cost", "latest cost", "current cost", "revised outlay", "anticipated cost (rs. cr)", "revised cost (rs. cr)", "latest cost (rs cr)"],
+      physical_progress_pct: ["physical_progress_pct", "physical progress", "physical %", "progress", "actual progress", "work done %", "completion %", "physical progress (%)", "progress (%)"],
+      delay_in_months: ["delay_in_months", "delay", "time overrun", "delay months", "slippage months", "months delayed", "delay (months)", "time overrun (months)"]
     };
 
     const mappings = [];
@@ -734,7 +794,7 @@ Example headers: project_name, ministry, sector, state, original_cost_cr, revise
           matchedTarget = target;
           confidence = "EXACT";
           break;
-        } else if (targetAliases.some(a => lower.includes(a.replace(/[\s\-_]/g, "")))) {
+        } else if (targetAliases.some(a => lower.includes(a.replace(/[\s\-_]/g, "")) || a.replace(/[\s\-_]/g, "").includes(lower))) {
           matchedTarget = target;
           confidence = "FUZZY";
           break;
@@ -742,9 +802,7 @@ Example headers: project_name, ministry, sector, state, original_cost_cr, revise
       }
 
       let sampleVal = "";
-      if (Array.isArray(rows[0])) {
-        sampleVal = rows[0][idx] || "";
-      } else if (typeof rows[0] === "object") {
+      if (rows.length > 0 && typeof rows[0] === "object") {
         sampleVal = rows[0][h] !== undefined ? String(rows[0][h]) : "";
       }
 
@@ -756,9 +814,20 @@ Example headers: project_name, ministry, sector, state, original_cost_cr, revise
       });
     });
 
+    // If project_name is missing, allow automatic synthesis
+    const hasProjectName = mappings.some(m => m.target === "project_name");
+    if (!hasProjectName && headers.length > 0) {
+      mappings.unshift({
+        source: "(Auto-Synthesized)",
+        target: "project_name",
+        confidence: "SYNTHESIZED",
+        sampleValue: "Asset Package #1"
+      });
+    }
+
     this.validationReport = {
-      recordsCount: clean.startsWith("[") ? rows.length : clean.split("\n").filter(Boolean).length - 1,
-      valid: mappings.some(m => m.target === "project_name"),
+      recordsCount: rows.length,
+      valid: true,
       columnMappings: mappings
     };
   },
@@ -786,39 +855,74 @@ Example headers: project_name, ministry, sector, state, original_cost_cr, revise
     const btnClear = container.querySelector("#btn-clear-dataset");
     const txtPayload = container.querySelector("#txt-import-payload");
 
-    if (btnSampleMorth && txtPayload) {
+    if (txtPayload) {
+      txtPayload.addEventListener("input", (e) => {
+        this.rawPayload = e.target.value;
+      });
+    }
+
+    if (btnSampleMorth) {
       btnSampleMorth.addEventListener("click", () => {
-        txtPayload.value = this.sampleDatasets.morth;
-        this.inspectDataset(txtPayload.value);
+        this.rawPayload = this.sampleDatasets.morth;
+        this.inspectDataset(this.rawPayload);
         this.render(container);
       });
     }
-    if (btnSampleRail && txtPayload) {
+    if (btnSampleRail) {
       btnSampleRail.addEventListener("click", () => {
-        txtPayload.value = this.sampleDatasets.railways;
-        this.inspectDataset(txtPayload.value);
+        this.rawPayload = this.sampleDatasets.railways;
+        this.inspectDataset(this.rawPayload);
         this.render(container);
       });
     }
-    if (btnClear && txtPayload) {
+    if (btnClear) {
       btnClear.addEventListener("click", () => {
-        txtPayload.value = "";
+        this.rawPayload = "";
         this.validationReport = null;
         this.importResult = null;
         this.render(container);
       });
     }
 
+    // Clean Slate & Demo Data Buttons
+    const btnClearDemo = container.querySelector("#btn-clear-demo-data");
+    const btnRestoreDemo = container.querySelector("#btn-restore-demo-data");
+    const btnResetZero = container.querySelector("#btn-reset-registry-zero");
+
+    if (btnClearDemo) {
+      btnClearDemo.addEventListener("click", () => {
+        window.APIClient.clearDemoData();
+        this.render(container);
+      });
+    }
+    if (btnRestoreDemo) {
+      btnRestoreDemo.addEventListener("click", () => {
+        window.APIClient.restoreDemoData();
+        this.render(container);
+      });
+    }
+    if (btnResetZero) {
+      btnResetZero.addEventListener("click", () => {
+        if (confirm("Are you sure you want to clear all projects (both custom uploads and demo records)? Registry will be reset to 0.")) {
+          window.APIClient.clearAllData();
+          this.rawPayload = "";
+          this.validationReport = null;
+          this.importResult = null;
+          this.render(container);
+        }
+      });
+    }
+
     // File Upload
     const fileInput = container.querySelector("#file-import-dataset");
-    if (fileInput && txtPayload) {
+    if (fileInput) {
       fileInput.addEventListener("change", (e) => {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
         reader.onload = (evt) => {
-          txtPayload.value = evt.target.result;
-          this.inspectDataset(txtPayload.value);
+          this.rawPayload = evt.target.result;
+          this.inspectDataset(this.rawPayload);
           this.render(container);
         };
         reader.readAsText(file);
@@ -827,18 +931,20 @@ Example headers: project_name, ministry, sector, state, original_cost_cr, revise
 
     // Inspect Dataset Button
     const btnInspect = container.querySelector("#btn-inspect-dataset");
-    if (btnInspect && txtPayload) {
+    if (btnInspect) {
       btnInspect.addEventListener("click", () => {
-        this.inspectDataset(txtPayload.value);
+        const text = (this.rawPayload || (txtPayload ? txtPayload.value : "")).trim();
+        this.rawPayload = text;
+        this.inspectDataset(this.rawPayload);
         this.render(container);
       });
     }
 
     // Run Dataset Import Button
     const btnRunImport = container.querySelector("#btn-run-dataset-import");
-    if (btnRunImport && txtPayload) {
+    if (btnRunImport) {
       btnRunImport.addEventListener("click", async () => {
-        const text = txtPayload.value ? txtPayload.value.trim() : "";
+        const text = (this.rawPayload || (txtPayload ? txtPayload.value : "")).trim();
         if (!text) {
           window.APIClient.showToast("Please enter or upload a dataset first", "warning");
           return;
