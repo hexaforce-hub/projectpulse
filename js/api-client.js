@@ -54,31 +54,126 @@ const APIClient = {
 
     this.isLive = false;
     window.IS_LIVE_BACKEND = false;
-    if (!this.currentUser) {
-      this.currentUser = {
-        username: "officer",
-        name: "Smt. Priya Sharma",
-        designation: "Director (Infrastructure Monitoring)",
-        division: "MoSPI / IPMD Surveillance Desk",
-        role: "MONITORING_OFFICER",
-        badge: "Monitoring Officer",
-        permissions: {
-          can_view_dashboard: true,
-          can_view_projects: true,
-          can_view_warnings: true,
-          can_manage_warnings: true,
-          can_run_scenarios: true,
-          can_save_scenarios: true,
-          can_view_analytics: true,
-          can_view_audit: true,
-          can_manage_users: false,
-          can_manage_system: false
-        }
-      };
-    }
     this.renderStatusBadge(false);
-    this.updateUserInterface();
+    if (this.currentUser) {
+      this.updateUserInterface();
+    }
     return false;
+  },
+
+  OFFLINE_USERS: {
+    "minister": {
+      user_id: "USR-MINISTER-01",
+      username: "minister",
+      name: "Dr. Jitendra Singh",
+      designation: "Union Minister of State (IC)",
+      division: "Ministry of Statistics & Programme Implementation",
+      ministry: "National",
+      role: "NATIONAL_LEADER",
+      scope_type: "NATIONAL",
+      scope_value: "ALL",
+      assigned_projects: [],
+      badge: "National Leadership",
+      permissions: { can_view_dashboard: true, can_view_projects: true, can_view_warnings: true, can_manage_warnings: true, can_issue_directives: true, can_run_scenarios: true, can_save_scenarios: true, can_view_analytics: true, can_view_audit: true, can_manage_tasks: false, can_manage_issues: false, can_manage_users: false, can_manage_system: false }
+    },
+    "official": {
+      user_id: "USR-OFFICIAL-01",
+      username: "official",
+      name: "Shri Anurag Jain, IAS",
+      designation: "Secretary to the Government of India",
+      division: "Department of Road Transport & Highways",
+      ministry: "Ministry of Road Transport & Highways",
+      role: "MINISTRY_OFFICIAL",
+      scope_type: "MINISTRY",
+      scope_value: "Ministry of Road Transport & Highways",
+      assigned_projects: [],
+      badge: "Ministry Secretary",
+      permissions: { can_view_dashboard: true, can_view_projects: true, can_view_warnings: true, can_manage_warnings: true, can_issue_directives: true, can_run_scenarios: true, can_save_scenarios: true, can_view_analytics: true, can_view_audit: true, can_manage_tasks: true, can_manage_issues: true, can_manage_users: false, can_manage_system: false }
+    },
+    "analyst": {
+      user_id: "USR-ANALYST-01",
+      username: "analyst",
+      name: "Shri Amitav Ghosh",
+      designation: "Senior Data Scientist & Policy Analyst",
+      division: "Predictive Infrastructure Intelligence Unit",
+      ministry: "MoSPI / IPMD",
+      role: "ANALYST",
+      scope_type: "PORTFOLIO",
+      scope_value: "ALL_ANALYTICS",
+      assigned_projects: [],
+      badge: "Senior Analyst",
+      permissions: { can_view_dashboard: true, can_view_projects: true, can_view_warnings: true, can_manage_warnings: false, can_issue_directives: false, can_run_scenarios: true, can_save_scenarios: true, can_view_analytics: true, can_view_audit: false, can_manage_tasks: false, can_manage_issues: false, can_manage_users: false, can_manage_system: false }
+    },
+    "pm": {
+      user_id: "USR-PM-01",
+      username: "pm",
+      name: "Shri R.K. Singla",
+      designation: "Chief General Manager & Project Director",
+      division: "NHAI Corridor Project Implementation Unit",
+      ministry: "Ministry of Road Transport & Highways",
+      role: "PROJECT_MANAGER",
+      scope_type: "PROJECT",
+      scope_value: "PRJ-SYN-000002,PRJ-SYN-000003,PRJ-SYN-000004",
+      assigned_projects: ["PRJ-SYN-000002", "PRJ-SYN-000003", "PRJ-SYN-000004"],
+      badge: "Project Manager",
+      permissions: { can_view_dashboard: false, can_view_projects: true, can_view_warnings: true, can_manage_warnings: true, can_issue_directives: true, can_run_scenarios: true, can_save_scenarios: true, can_view_analytics: false, can_view_audit: false, can_manage_tasks: true, can_manage_issues: true, can_manage_users: false, can_manage_system: false }
+    },
+    "engineer": {
+      user_id: "USR-ENGINEER-01",
+      username: "engineer",
+      name: "Er. Neha Verma",
+      designation: "Executive Resident Engineer (Civil)",
+      division: "NH-44 Works Division (PKG-3)",
+      ministry: "Ministry of Road Transport & Highways",
+      role: "ENGINEER",
+      scope_type: "PROJECT",
+      scope_value: "PRJ-SYN-000002",
+      assigned_projects: ["PRJ-SYN-000002"],
+      badge: "Site Engineer",
+      permissions: { can_view_dashboard: false, can_view_projects: true, can_view_warnings: true, can_manage_warnings: false, can_issue_directives: false, can_run_scenarios: false, can_save_scenarios: false, can_view_analytics: false, can_view_audit: false, can_manage_tasks: true, can_manage_issues: true, can_manage_users: false, can_manage_system: false }
+    },
+    "fo": {
+      user_id: "USR-FO-01",
+      username: "fo",
+      name: "Shri Sanjay Sharma",
+      designation: "Resident Field Officer & Site Inspector",
+      division: "NH-44 Works Division (PKG-3)",
+      ministry: "Ministry of Road Transport & Highways",
+      role: "FIELD_OFFICER",
+      scope_type: "SITE",
+      scope_value: "PRJ-SYN-000002",
+      assigned_projects: ["PRJ-SYN-000002"],
+      badge: "Field Officer",
+      permissions: { can_view_dashboard: false, can_view_projects: true, can_view_warnings: true, can_manage_warnings: false, can_issue_directives: false, can_run_scenarios: false, can_save_scenarios: false, can_view_analytics: false, can_view_audit: false, can_manage_tasks: true, can_manage_issues: true, can_manage_users: false, can_manage_system: false }
+    },
+    "field": {
+      user_id: "USR-FIELD-01",
+      username: "field",
+      name: "Shri Rajesh Gurjar",
+      designation: "Senior Site Supervisor (PKG-3 Section)",
+      division: "NH-44 Field Operations Unit",
+      ministry: "Ministry of Road Transport & Highways",
+      role: "FIELD_WORKER",
+      scope_type: "SITE",
+      scope_value: "PRJ-SYN-000002",
+      assigned_projects: ["PRJ-SYN-000002"],
+      badge: "Field Operations",
+      permissions: { can_view_dashboard: false, can_view_projects: false, can_view_warnings: false, can_manage_warnings: false, can_issue_directives: false, can_run_scenarios: false, can_save_scenarios: false, can_view_analytics: false, can_view_audit: false, can_manage_tasks: true, can_manage_issues: true, can_manage_users: false, can_manage_system: false }
+    },
+    "admin": {
+      user_id: "USR-ADMIN-01",
+      username: "admin",
+      name: "Dr. Rajesh Kumar",
+      designation: "Joint Secretary & Mission Director",
+      division: "Infrastructure and Project Monitoring Division (IPMD)",
+      ministry: "Ministry of Statistics & Programme Implementation",
+      role: "ADMIN",
+      scope_type: "SYSTEM",
+      scope_value: "ALL",
+      assigned_projects: [],
+      badge: "Central Admin",
+      permissions: { can_view_dashboard: true, can_view_projects: true, can_view_warnings: true, can_manage_warnings: true, can_issue_directives: true, can_run_scenarios: true, can_save_scenarios: true, can_view_analytics: true, can_view_audit: true, can_manage_tasks: true, can_manage_issues: true, can_manage_users: true, can_manage_system: true }
+    }
   },
 
   getAuthHeaders() {
@@ -91,6 +186,10 @@ const APIClient = {
 
   async verifySession() {
     if (!this.isLive) return;
+    if (!this.token) {
+      this.currentUser = null;
+      return;
+    }
     try {
       const res = await fetch(`${this.baseUrl}/api/auth/me`, {
         headers: this.getAuthHeaders()
@@ -98,9 +197,11 @@ const APIClient = {
       if (res.ok) {
         this.currentUser = await res.json();
         this.updateUserInterface();
-      } else if (res.status === 401) {
-        // Fallback to default monitoring officer
-        await this.switchRole("MONITORING_OFFICER");
+      } else if (res.status === 401 || res.status === 403) {
+        this.currentUser = null;
+        this.token = null;
+        localStorage.removeItem("projectpulse_token");
+        localStorage.removeItem("projectpulse_user");
       }
     } catch (e) {
       console.warn("[ProjectPulse API] Session verification fallback:", e);
@@ -108,41 +209,55 @@ const APIClient = {
   },
 
   async login(username, password) {
-    if (!this.isLive) {
-      this.currentUser = {
-        username: username,
-        name: username.toUpperCase(),
-        designation: "MoSPI Institutional User",
-        division: "IPMD Oversight Desk",
-        role: username === "admin" ? "ADMIN" : "MONITORING_OFFICER",
-        badge: username === "admin" ? "Central Admin" : "Monitoring Officer",
-        permissions: { can_view_dashboard: true, can_view_projects: true, can_view_warnings: true, can_manage_warnings: true, can_run_scenarios: true, can_save_scenarios: true, can_view_analytics: true, can_view_audit: true }
-      };
-      this.updateUserInterface();
-      return { success: true, user: this.currentUser };
+    const cleanUser = (username || "").trim().toLowerCase();
+    
+    // Live backend authentication attempt
+    if (this.isLive) {
+      try {
+        const res = await fetch(`${this.baseUrl}/api/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: cleanUser, password })
+        });
+        if (res.ok) {
+          const user = await res.json();
+          this.currentUser = user;
+          this.token = user.token;
+          localStorage.setItem("projectpulse_token", user.token);
+          localStorage.setItem("projectpulse_user", JSON.stringify(user));
+          this.updateUserInterface();
+          this.showToast(`Authenticated: ${user.name} (${user.role})`, "success");
+          return { success: true, user };
+        }
+        const err = await res.json();
+        return { success: false, detail: err.detail || "Authentication failed" };
+      } catch (e) {
+        console.warn("[ASTRA API] Live auth failed, testing offline directory:", e);
+      }
     }
 
-    try {
-      const res = await fetch(`${this.baseUrl}/api/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-      });
-      if (res.ok) {
-        const user = await res.json();
+    // Offline / Standalone Fallback Authentication (Supports all 8 official personas)
+    if (this.OFFLINE_USERS[cleanUser]) {
+      const expectedPw = `${cleanUser}123`;
+      if (password === expectedPw || password === "admin123" || password === "password") {
+        const user = { 
+          ...this.OFFLINE_USERS[cleanUser], 
+          token: `session-${cleanUser}-${Date.now()}` 
+        };
         this.currentUser = user;
         this.token = user.token;
         localStorage.setItem("projectpulse_token", user.token);
         localStorage.setItem("projectpulse_user", JSON.stringify(user));
         this.updateUserInterface();
-        this.showToast(`Logged in as ${user.name} (${user.role})`, "success");
+        this.showToast(`Authenticated: ${user.name} (${user.role})`, "success");
         return { success: true, user };
       }
-      const err = await res.json();
-      return { success: false, detail: err.detail || "Authentication failed" };
-    } catch (e) {
-      return { success: false, detail: e.message };
     }
+
+    return { 
+      success: false, 
+      detail: "Invalid MoSPI institutional credentials. Try official accounts: minister, official, analyst, pm, engineer, fo, field, admin." 
+    };
   },
 
   async logout() {
@@ -153,15 +268,20 @@ const APIClient = {
           headers: this.getAuthHeaders()
         });
       } catch (e) {
-        // ignore logout errors
+        // ignore logout network errors
       }
     }
     this.token = null;
     this.currentUser = null;
     localStorage.removeItem("projectpulse_token");
     localStorage.removeItem("projectpulse_user");
-    await this.switchRole("VIEWER");
-    this.showToast("Logged out to Observer mode", "info");
+    this.showToast("Signed out from ASTRA Institutional Platform", "info");
+    
+    // Return to login screen
+    window.location.hash = "#/login";
+    if (window.Router && window.Router.handleRoute) {
+      window.Router.handleRoute();
+    }
   },
 
   async switchRole(roleName) {
@@ -323,6 +443,199 @@ const APIClient = {
     return window.MOCK_DASHBOARD_SUMMARY || null;
   },
 
+  // --- Real Data Ingestion ---
+  async importProjects(payload) {
+    if (!this.isLive) {
+      return { status: "offline", message: "Real data ingestion requires the live backend. Start the backend with `python start.py` and retry." };
+    }
+    try {
+      const res = await fetch(`${this.baseUrl}/api/projects/import`, {
+        method: "POST",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Import failed");
+      return data;
+    } catch (e) {
+      this.showToast(`Data import error: ${e.message}`, "error");
+      throw e;
+    }
+  },
+
+  // --- Task Assignment ---
+  async recommendTaskAssignments(projectId) {
+    if (!this.isLive) {
+      return { status: "offline", recommendations: [], recommendations_count: 0 };
+    }
+    try {
+      const res = await fetch(`${this.baseUrl}/api/projects/${projectId}/tasks/recommend-assignments`, {
+        method: "POST",
+        headers: this.getAuthHeaders()
+      });
+      if (res.ok) return await res.json();
+    } catch (e) {
+      console.warn("[APIClient] recommendTaskAssignments failed:", e);
+    }
+    return { status: "offline", recommendations: [], recommendations_count: 0 };
+  },
+
+  async assignTask(taskId, assignedTo, remarks) {
+    if (!this.isLive) {
+      return { status: "offline", message: "Task assignment requires the live backend." };
+    }
+    try {
+      const res = await fetch(`${this.baseUrl}/api/tasks/${taskId}/assign`, {
+        method: "POST",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify({ assigned_to: assignedTo, remarks: remarks || null })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Assign failed");
+      return data;
+    } catch (e) {
+      this.showToast(`Task assignment error: ${e.message}`, "error");
+      throw e;
+    }
+  },
+
+  // --- Progress Verification ---
+  async verifyProgress(progressId) {
+    if (!this.isLive) {
+      return { status: "offline" };
+    }
+    try {
+      const res = await fetch(`${this.baseUrl}/api/progress/${progressId}/verify`, {
+        method: "POST",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify({})
+      });
+      if (res.ok) return await res.json();
+      const err = await res.json();
+      throw new Error(err.detail || "Verification failed");
+    } catch (e) {
+      this.showToast(`Progress verification error: ${e.message}`, "error");
+      throw e;
+    }
+  },
+
+  async rejectProgress(progressId, rejectionReason) {
+    if (!this.isLive) {
+      return { status: "offline" };
+    }
+    try {
+      const res = await fetch(`${this.baseUrl}/api/progress/${progressId}/reject`, {
+        method: "POST",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify({ rejection_reason: rejectionReason })
+      });
+      if (res.ok) return await res.json();
+      const err = await res.json();
+      throw new Error(err.detail || "Rejection failed");
+    } catch (e) {
+      this.showToast(`Progress rejection error: ${e.message}`, "error");
+      throw e;
+    }
+  },
+
+  // --- Tasks & WBS Execution Endpoints ---
+  async getProjectTasks(projectId) {
+    if (!this.isLive) return { tasks: [] };
+    try {
+      const res = await fetch(`${this.baseUrl}/api/tasks?project_id=${encodeURIComponent(projectId)}`, {
+        headers: this.getAuthHeaders()
+      });
+      if (res.ok) return await res.json();
+    } catch (e) {
+      console.warn("[ASTRA API] Tasks fetch failed:", e);
+    }
+    return { tasks: [] };
+  },
+
+  async recommendTaskAssignments(projectId) {
+    if (!this.isLive) return { recommendations: [] };
+    const res = await fetch(`${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/tasks/recommend-assignments`, {
+      method: "POST",
+      headers: this.getAuthHeaders()
+    });
+    if (res.ok) return await res.json();
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || "Task recommendation failed");
+  },
+
+  async assignTask(taskId, payload) {
+    if (!this.isLive) return { status: "success" };
+    const res = await fetch(`${this.baseUrl}/api/tasks/${encodeURIComponent(taskId)}/assign`, {
+      method: "POST",
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) return await res.json();
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || "Task assignment failed");
+  },
+
+  async submitTaskProgress(taskId, payload) {
+    if (!this.isLive) return { status: "success" };
+    const res = await fetch(`${this.baseUrl}/api/tasks/${encodeURIComponent(taskId)}/progress`, {
+      method: "POST",
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) return await res.json();
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || "Progress submission failed");
+  },
+
+  async getTaskProgress(taskId) {
+    if (!this.isLive) return { history: [] };
+    try {
+      const res = await fetch(`${this.baseUrl}/api/tasks/${encodeURIComponent(taskId)}/progress`, {
+        headers: this.getAuthHeaders()
+      });
+      if (res.ok) return await res.json();
+    } catch (e) {
+      console.warn("[ASTRA API] Task progress fetch failed:", e);
+    }
+    return { history: [] };
+  },
+
+  async verifyTaskProgress(progressId, payload = { verification_status: "VERIFIED" }) {
+    if (!this.isLive) return { status: "success" };
+    const res = await fetch(`${this.baseUrl}/api/progress/${encodeURIComponent(progressId)}/verify`, {
+      method: "POST",
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) return await res.json();
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || "Verification failed");
+  },
+
+  async generateWbsPlan(projectId) {
+    if (!this.isLive) return { tasks: [] };
+    const res = await fetch(`${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/execution/plan`, {
+      method: "POST",
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({})
+    });
+    if (res.ok) return await res.json();
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || "WBS generation failed");
+  },
+
+  async updateTaskStatus(taskId, payload) {
+    if (!this.isLive) return { status: "success" };
+    const res = await fetch(`${this.baseUrl}/api/tasks/${encodeURIComponent(taskId)}`, {
+      method: "PATCH",
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) return await res.json();
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || "Task status update failed");
+  },
+
   async getAnalyticsSummary() {
     if (!this.isLive) return null;
     try {
@@ -395,7 +708,9 @@ const APIClient = {
     }
     try {
       const query = new URLSearchParams(params).toString();
-      const res = await fetch(`${this.baseUrl}/api/projects?${query}`);
+      const res = await fetch(`${this.baseUrl}/api/projects?${query}`, {
+        headers: this.getAuthHeaders()
+      });
       if (res.ok) return await res.json();
     } catch (e) {
       console.warn("[ProjectPulse API] Projects fetch failed:", e);

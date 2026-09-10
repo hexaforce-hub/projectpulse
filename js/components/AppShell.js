@@ -247,6 +247,12 @@ const AppShell = {
                     </div>
                     <span class="text-[10px] text-slate-400 group-hover:text-slate-700 ml-0.5">▾</span>
                   </button>
+
+                  <!-- Sovereign Sign Out Button -->
+                  <button id="btn-header-signout" onclick="window.APIClient.logout()" class="ml-1 px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-2xs" title="Sign Out of ASTRA Platform">
+                    <span>🚪</span>
+                    <span class="hidden lg:inline">Sign Out</span>
+                  </button>
                 </div>
 
               </div>
@@ -512,8 +518,11 @@ const AppShell = {
               </div>
 
               <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-                <span>MoSPI RBAC Security Enforcement</span>
-                <button id="btn-cancel-role-switcher" class="text-slate-600 hover:text-slate-900 font-medium">Cancel</button>
+                <button id="btn-modal-logout" onclick="window.APIClient.logout()" class="text-xs font-bold text-rose-600 hover:text-rose-800 flex items-center gap-1 cursor-pointer">
+                  <span>🚪</span>
+                  <span>Sign Out Session</span>
+                </button>
+                <button id="btn-cancel-role-switcher" class="text-slate-600 hover:text-slate-900 font-medium cursor-pointer">Cancel</button>
               </div>
             </div>
           </div>
@@ -953,6 +962,26 @@ const AppShell = {
           heading: "ALERTS",
           items: [
             { route: "early-warnings", icon: "⚠️", label: "Active Stoppage Alerts" }
+          ]
+        }
+      ];
+    }
+
+    if (r === "FIELD_OFFICER" || r === "FO") {
+      return [
+        {
+          heading: "FIELD OPERATIONS",
+          items: [
+            { route: "field-officer", icon: "🛡️", label: "Field Inspection Desk", badge: "Field" },
+            { route: "field", icon: "🚜", label: "Ground Telemetry & Crew" },
+            { route: "engineer", icon: "⚙️", label: "Site Technical Desk" }
+          ]
+        },
+        {
+          heading: "OPERATIONS & ALERTS",
+          items: [
+            { route: "execution", icon: "⏱️", label: "Work Packages & WBS", badge: "CPM" },
+            { route: "early-warnings", icon: "⚠️", label: "Site Risk Alerts" }
           ]
         }
       ];

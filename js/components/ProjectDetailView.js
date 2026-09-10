@@ -149,6 +149,12 @@ const ProjectDetailView = {
               <span>📊</span>
               <span>Overview & Plan vs Actual</span>
             </button>
+            <button type="button" onclick="ProjectDetailView.switchTab('execution')" id="tab-btn-execution" 
+                    class="tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-800 pb-3 px-2.5 flex items-center gap-1.5 transition font-medium">
+              <span>👷</span>
+              <span>Execution & WBS Tasks</span>
+              <span id="tab-badge-tasks" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">0</span>
+            </button>
             <button type="button" onclick="ProjectDetailView.switchTab('milestones')" id="tab-btn-milestones" 
                     class="tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-800 pb-3 px-2.5 flex items-center gap-1.5 transition font-medium">
               <span>⏱️</span>
@@ -740,6 +746,47 @@ const ProjectDetailView = {
           </div>
         </div>
 
+        <!-- ====================================================================== -->
+        <!-- TAB PANE: WBS Tasks & Field Execution                                 -->
+        <!-- ====================================================================== -->
+        <div id="tab-pane-execution" class="hidden space-y-6">
+          <div class="gov-card p-5 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="text-sm font-bold text-slate-900">Work Breakdown Structure (WBS) & Tasks</h3>
+                  <span class="px-2 py-0.2 rounded text-[9px] font-bold bg-blue-100 text-blue-800">OPERATIONAL WORKFLOW</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-0.5">
+                  AI-assisted personnel recommendation, field progress telemetry, and engineer verification with continuous LightGBM recalculation.
+                </p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="ProjectDetailView.triggerAiTaskRecommendations('${pId}')" id="btn-ai-recommend-tasks" class="btn btn-secondary btn-sm flex items-center gap-1.5 text-xs font-bold text-indigo-700 bg-indigo-50 border-indigo-200 hover:bg-indigo-100 cursor-pointer">
+                  <span>⚡</span>
+                  <span>AI Recommend Assignments</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- AI Recommendations Alert Container -->
+            <div id="dtl-ai-recommendations-box" class="hidden p-4 bg-indigo-50/80 border border-indigo-200 rounded-xl space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-indigo-950 flex items-center gap-1.5">
+                  <span>🤖</span> AI Assignment Recommendations (Discipline & Workload Matched)
+                </span>
+                <button onclick="document.getElementById('dtl-ai-recommendations-box').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 text-xs">✕</button>
+              </div>
+              <div id="dtl-ai-recommendations-list" class="space-y-2 text-xs"></div>
+            </div>
+
+            <!-- Tasks Table / Cards -->
+            <div id="dtl-tasks-container" class="space-y-3">
+              <div class="p-8 text-center text-slate-400 text-xs">Loading project execution tasks...</div>
+            </div>
+          </div>
+        </div>
+
       </div>
     `;
   },
@@ -752,7 +799,9 @@ const ProjectDetailView = {
       "financial": "overview",
       "progress-trend": "overview",
       "progress": "overview",
-      "execution": "warnings",
+      "execution": "execution",
+      "tasks": "execution",
+      "wbs": "execution",
       "warnings": "warnings",
       "whatif": "whatif",
       "simulation": "whatif",
@@ -762,7 +811,7 @@ const ProjectDetailView = {
     const target = aliasMap[tabKey] || tabKey || "overview";
     this.activeTab = target;
 
-    const tabs = ["overview", "milestones", "warnings", "whatif", "audit"];
+    const tabs = ["overview", "execution", "milestones", "warnings", "whatif", "audit"];
     tabs.forEach(t => {
       const pane = document.getElementById(`tab-pane-${t}`);
       const btn = document.getElementById(`tab-btn-${t}`);
@@ -823,6 +872,9 @@ const ProjectDetailView = {
 
     // Load Audit History for this project
     this.loadProjectAuditHistory(pId);
+
+    // Load WBS Execution Tasks for this project
+    this.loadProjectTasks(pId);
 
     // Render Role-Tailored Adaptive Intelligence Flight Deck
     this.renderRoleAdaptiveBanner(pId, project);
@@ -1075,6 +1127,17 @@ const ProjectDetailView = {
     if (headerMin) headerMin.innerText = p.ministry;
     if (headerAgency) headerAgency.innerText = p.implementing_agency || "MoSPI Desk";
     if (headerState) headerState.innerText = p.state || "National / Multi-State";
+
+    const dsBadge = document.getElementById("dtl-datasource-badge");
+    if (dsBadge) {
+      if (p.data_source === "REAL_IMPORTED" || (p.metadata && p.metadata.data_status === "REAL_IMPORTED")) {
+        dsBadge.className = "px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1";
+        dsBadge.innerHTML = "<span>🟢</span> REAL IMPORTED INFRASTRUCTURE PROJECT";
+      } else {
+        dsBadge.className = "px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-800 border border-blue-200 flex items-center gap-1";
+        dsBadge.innerHTML = "<span>🔵</span> 10,000 PAIMANA SYNTHETIC BASELINE";
+      }
+    }
 
     const sched = p.schedule || {};
     if (elStart) elStart.innerText = sched.start_date || "2022-09";
@@ -1546,6 +1609,269 @@ const ProjectDetailView = {
     };
 
     loadSavedScenarios();
+  },
+
+  async loadProjectTasks(pId) {
+    const mount = document.getElementById("dtl-tasks-container");
+    const badge = document.getElementById("tab-badge-tasks");
+    if (!mount) return;
+
+    try {
+      const res = await window.APIClient.getProjectTasks(pId);
+      const tasks = (res && res.tasks) ? res.tasks : (Array.isArray(res) ? res : []);
+      
+      if (badge) badge.innerText = tasks.length;
+
+      if (!tasks || tasks.length === 0) {
+        mount.innerHTML = `
+          <div class="p-8 text-center bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+            <div class="text-3xl">📐</div>
+            <div class="font-bold text-slate-800 text-sm">No WBS Execution Tasks Synthesized</div>
+            <p class="text-xs text-slate-500 max-w-md mx-auto">
+              This project does not yet have granular work packages or field execution tasks assigned.
+            </p>
+            <button onclick="ProjectDetailView.generateWbsPlan('${pId}')" class="btn btn-primary btn-sm text-xs inline-flex items-center gap-1.5 cursor-pointer">
+              <span>⚡</span> Auto-Generate WBS Structure
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      mount.innerHTML = tasks.map(t => {
+        const isVerified = t.verification_status === "VERIFIED";
+        const progressPct = t.actual_progress || 0;
+        const assignee = t.assigned_to || "Unassigned";
+
+        return `
+          <div class="p-4 bg-white rounded-xl border border-slate-200 hover:border-blue-400 hover:shadow-xs transition space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-300">
+                  ${t.task_id}
+                </span>
+                <span class="text-xs font-bold text-slate-900">${t.title || 'Execution Task'}</span>
+                <span class="px-2 py-0.2 rounded text-[9px] font-bold ${isVerified ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-amber-100 text-amber-800 border border-amber-300'}">
+                  ${isVerified ? '✓ VERIFIED' : (t.verification_status || 'PENDING VERIFICATION')}
+                </span>
+              </div>
+              <div class="flex items-center gap-2 text-xs">
+                <span class="text-[11px] text-slate-500">Assignee:</span>
+                <span class="font-mono font-bold text-slate-800 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
+                  ${assignee}
+                </span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center text-xs">
+              <div class="md:col-span-6 space-y-1">
+                <p class="text-[11px] text-slate-600 leading-relaxed">${t.description || 'Standard civil/engineering work package execution task.'}</p>
+                <div class="text-[10px] text-slate-400 flex items-center gap-3">
+                  <span>Scope: ${t.scope || 'Civil Works'}</span>
+                  <span>•</span>
+                  <span>Target: ${t.target_quantity || 100} ${t.unit || 'units'}</span>
+                  <span>•</span>
+                  <span>Completed: ${t.completed_quantity || 0} ${t.unit || 'units'}</span>
+                </div>
+              </div>
+
+              <div class="md:col-span-3 space-y-1">
+                <div class="flex items-center justify-between text-[11px]">
+                  <span class="text-slate-500">Field Progress:</span>
+                  <span class="font-mono font-bold text-slate-900">${progressPct}%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                  <div class="bg-blue-600 h-2 rounded-full transition-all" style="width: ${progressPct}%"></div>
+                </div>
+              </div>
+
+              <div class="md:col-span-3 flex items-center justify-end gap-1.5 flex-wrap">
+                <button onclick="ProjectDetailView.promptAssignTask('${t.task_id}', '${pId}', '${assignee}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] rounded-lg border border-slate-300 transition cursor-pointer" title="Assign task to engineer or field personnel">
+                  Assign
+                </button>
+                <button onclick="ProjectDetailView.promptSubmitProgress('${t.task_id}', '${pId}')" class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-[11px] rounded-lg border border-blue-200 transition cursor-pointer" title="Submit daily telemetry update">
+                  Report
+                </button>
+                ${!isVerified ? `
+                  <button onclick="ProjectDetailView.verifyTask('${t.task_id}', '${pId}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] rounded-lg shadow-2xs transition cursor-pointer" title="Engineer verification sign-off (recalculates ML risk)">
+                    Verify
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+    } catch (err) {
+      console.warn("[ProjectDetailView] Could not load tasks:", err);
+      mount.innerHTML = `<p class="text-slate-400 text-xs italic">Unable to load tasks for this project.</p>`;
+    }
+  },
+
+  async triggerAiTaskRecommendations(pId) {
+    const box = document.getElementById("dtl-ai-recommendations-box");
+    const list = document.getElementById("dtl-ai-recommendations-list");
+    const btn = document.getElementById("btn-ai-recommend-tasks");
+    if (!box || !list) return;
+
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<span class="inline-block animate-spin">⏳</span> Analyzing Team & Scope...`;
+    }
+
+    try {
+      const res = await window.APIClient.recommendTaskAssignments(pId);
+      if (res && res.recommendations && res.recommendations.length > 0) {
+        list.innerHTML = res.recommendations.map(r => `
+          <div class="p-2.5 bg-white rounded-lg border border-indigo-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="font-mono text-[10px] font-bold bg-indigo-50 text-indigo-900 px-1.5 py-0.2 rounded">${r.task_id}</span>
+                <span class="font-bold text-slate-900">${r.task_title || r.task_id}</span>
+              </div>
+              <p class="text-[11px] text-slate-600 mt-0.5">${r.rationale}</p>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                ${(r.confidence * 100).toFixed(0)}% Match: ${r.recommended_user_name} (${r.recommended_role})
+              </span>
+              <button onclick="ProjectDetailView.applyRecommendation('${r.task_id}', '${r.recommended_user_id}', '${pId}')" class="btn btn-primary btn-sm text-[10px] py-1 px-2.5 cursor-pointer">
+                Accept & Assign
+              </button>
+            </div>
+          </div>
+        `).join("");
+        box.classList.remove("hidden");
+        window.APIClient.showToast(`AI generated ${res.recommendations.length} explainable recommendations!`, "success");
+      } else {
+        window.APIClient.showToast("No tasks available for recommendation.", "info");
+      }
+    } catch (e) {
+      window.APIClient.showToast("Recommendation engine error: " + e.message, "error");
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `<span>⚡</span> <span>AI Recommend Assignments</span>`;
+      }
+    }
+  },
+
+  async applyRecommendation(taskId, userId, pId) {
+    try {
+      const res = await window.APIClient.assignTask(taskId, {
+        assigned_to: userId,
+        remarks: "Approved AI assignment recommendation based on discipline match.",
+        priority: "HIGH"
+      });
+      if (res && res.status === "success") {
+        window.APIClient.showToast(`Task ${taskId} assigned to ${userId}`, "success");
+        await this.loadProjectTasks(pId);
+        this.loadProjectAuditHistory(pId);
+      }
+    } catch (e) {
+      window.APIClient.showToast("Assignment failed: " + e.message, "error");
+    }
+  },
+
+  async promptAssignTask(taskId, pId, currentAssignee) {
+    const target = prompt(`Assign Task ${taskId} to institutional personnel (e.g. USR-ENGINEER-01, USR-FIELD-01, USR-FO-01):`, currentAssignee !== "Unassigned" ? currentAssignee : "USR-FIELD-01");
+    if (!target) return;
+    try {
+      const res = await window.APIClient.assignTask(taskId, {
+        assigned_to: target.trim(),
+        remarks: "Manager assignment from project execution flight deck.",
+        priority: "NORMAL"
+      });
+      if (res && res.status === "success") {
+        window.APIClient.showToast(`Assigned ${taskId} to ${target}`, "success");
+        await this.loadProjectTasks(pId);
+        this.loadProjectAuditHistory(pId);
+      }
+    } catch (e) {
+      window.APIClient.showToast("Assignment failed: " + e.message, "error");
+    }
+  },
+
+  async promptSubmitProgress(taskId, pId) {
+    const rawPct = prompt(`Report updated physical completion % for Task ${taskId} (0-100):`, "75");
+    if (rawPct === null) return;
+    const pct = parseFloat(rawPct);
+    if (isNaN(pct) || pct < 0 || pct > 100) {
+      alert("Please enter a valid percentage between 0 and 100.");
+      return;
+    }
+    const remarks = prompt("Enter telemetry notes / site observations:", "Physical milestone progressed on schedule.");
+    try {
+      const res = await window.APIClient.submitTaskProgress(taskId, {
+        progress_pct: pct,
+        quantity_completed: pct * 10,
+        remarks: remarks || "Telemetry submitted from ASTRA interface.",
+        location_tag: "22.5N, 72.8E",
+        weather_conditions: "Clear"
+      });
+      if (res) {
+        window.APIClient.showToast(`Progress reported (${pct}%). Pending Engineer sign-off.`, "success");
+        await this.loadProjectTasks(pId);
+      }
+    } catch (e) {
+      window.APIClient.showToast("Progress submission failed: " + e.message, "error");
+    }
+  },
+
+  async verifyTask(taskId, pId) {
+    if (!confirm(`Verify technical execution for Task ${taskId}? This will roll progress up to project level and trigger continuous LightGBM risk recalculation.`)) return;
+
+    try {
+      const progRes = await window.APIClient.getTaskProgress(taskId);
+      const reports = (progRes && progRes.history) ? progRes.history : (Array.isArray(progRes) ? progRes : []);
+      let progressId = null;
+      if (reports.length > 0) {
+        const pending = reports.find(r => r.verification_status !== "VERIFIED");
+        progressId = pending ? pending.progress_id : reports[reports.length - 1].progress_id;
+      }
+
+      if (progressId) {
+        const vRes = await window.APIClient.verifyTaskProgress(progressId, {
+          verification_status: "VERIFIED",
+          verification_notes: "On-site measurements and drawings verified by Executive Engineer."
+        });
+        if (vRes && vRes.ai_recalculation) {
+          window.APIClient.showToast(`Progress Verified! LightGBM recalculated score: ${vRes.ai_recalculation.recalculated_risk_score || 'Updated'} (${vRes.ai_recalculation.recalculated_risk_class})`, "success");
+        } else {
+          window.APIClient.showToast(`Progress for ${taskId} certified and verified.`, "success");
+        }
+      } else {
+        await window.APIClient.updateTaskStatus(taskId, {
+          status: "COMPLETED",
+          actual_progress: 100.0,
+          verification_status: "VERIFIED",
+          remarks: "Verified and approved by Engineer."
+        });
+        window.APIClient.showToast(`Task ${taskId} verified and approved.`, "success");
+      }
+
+      // Refresh project and tasks
+      const proj = await window.APIClient.getProject(pId, true);
+      if (proj) this.populateProjectDOM(proj);
+      await this.loadProjectTasks(pId);
+      this.loadProjectAuditHistory(pId);
+    } catch (e) {
+      window.APIClient.showToast("Verification failed: " + e.message, "error");
+    }
+  },
+
+  async generateWbsPlan(pId) {
+    try {
+      window.APIClient.showToast("Synthesizing WBS structure...", "info");
+      const res = await window.APIClient.generateWbsPlan(pId);
+      if (res && res.tasks) {
+        window.APIClient.showToast(`WBS generated: ${res.tasks.length} tasks ready for execution!`, "success");
+        await this.loadProjectTasks(pId);
+      }
+    } catch (e) {
+      window.APIClient.showToast("WBS synthesis failed: " + e.message, "error");
+    }
   }
 };
 

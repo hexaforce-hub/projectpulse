@@ -33,13 +33,37 @@ const Router = {
 
   handleRoute() {
     let hash = window.location.hash || "";
+    const currentUser = (window.APIClient && window.APIClient.currentUser) ? window.APIClient.currentUser : null;
 
-    // Role-Aware Auto-Landing when hash is empty or root
-    if (!hash || hash === "#" || hash === "#/") {
-      const user = (window.APIClient && window.APIClient.currentUser) ? window.APIClient.currentUser : null;
-      const role = user ? (user.role || "").toUpperCase() : "";
+    // 1. Unauthenticated Gate — Force Sovereign Login Gateway
+    if (!currentUser || hash === "#/login") {
+      const appRoot = document.getElementById("app-root");
+      if (appRoot) {
+        if (!document.getElementById("astra-login-form")) {
+          appRoot.innerHTML = window.LoginView ? window.LoginView.render() : '<div class="p-8 text-center text-slate-800">Please sign in to ASTRA.</div>';
+        }
+      }
+      if (hash !== "#/login") {
+        window.location.hash = "#/login";
+      }
+      return;
+    }
+
+    // 2. Authenticated User: Ensure AppShell is mounted in DOM
+    if (!document.getElementById("main-content-mount")) {
+      if (window.AppShell && window.AppShell.render) {
+        window.AppShell.render();
+      }
+    }
+
+    // 3. Role-Aware Auto-Landing when hash is empty, root, or login
+    if (!hash || hash === "#" || hash === "#/" || hash === "#/login") {
+      const role = (currentUser.role || "").toUpperCase();
       if (role === "MINISTRY_OFFICIAL" || role === "OFFICIAL") {
         window.location.hash = "#/ministry";
+        return;
+      } else if (role === "ANALYST") {
+        window.location.hash = "#/analytics";
         return;
       } else if (role === "PROJECT_MANAGER" || role === "PM") {
         window.location.hash = "#/my-projects";
@@ -47,8 +71,14 @@ const Router = {
       } else if (role === "ENGINEER") {
         window.location.hash = "#/engineer";
         return;
+      } else if (role === "FIELD_OFFICER" || role === "FO") {
+        window.location.hash = "#/field-officer";
+        return;
       } else if (role === "FIELD_WORKER" || role === "FIELD") {
         window.location.hash = "#/field";
+        return;
+      } else if (role === "ADMIN") {
+        window.location.hash = "#/settings";
         return;
       } else {
         window.location.hash = "#/dashboard";
@@ -199,11 +229,12 @@ const Router = {
         { label: "Project Onboarding & Ingestion", href: "#/onboarding" }
       ]);
     } else if (rootRoute === "execution") {
-      if (window.ExecutionControlView) window.ExecutionControlView.render(mount);
+      const execProjectId = segments[1] ? decodeURIComponent(segments[1]) : null;
+      if (window.ExecutionControlView) window.ExecutionControlView.render(mount, execProjectId);
       window.AppShell.updateActiveNav("execution");
       updateCrumbs([
         { label: "Execution", href: "#/execution" },
-        { label: "Execution Control Desk", href: "#/execution" }
+        { label: execProjectId ? `Control Desk (${execProjectId})` : "Execution Control Desk", href: "#/execution" }
       ]);
     } else if (rootRoute === "field-officer") {
       if (window.FieldOfficerDesk) window.FieldOfficerDesk.render(mount);

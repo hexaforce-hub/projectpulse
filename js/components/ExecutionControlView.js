@@ -6,6 +6,7 @@
 
 const ExecutionControlView = {
   projectId: "PRJ-SYN-000002",
+  projectData: null,
   timelineData: null,
   planVsActualData: null,
   recoveryData: null,
@@ -14,30 +15,49 @@ const ExecutionControlView = {
   selectedRecoveryOption: null,
   chartInstance: null,
 
-  async render(container) {
+  async render(container, explicitProjectId) {
     if (!container) {
       container = document.getElementById("main-content-mount");
     }
     if (!container) return;
 
+    let targetProjectId = explicitProjectId;
+    if (!targetProjectId) {
+      const urlHash = window.location.hash || "";
+      if (urlHash.includes("?")) {
+        const queryPart = urlHash.split("?")[1];
+        const params = new URLSearchParams(queryPart);
+        targetProjectId = params.get("project_id") || params.get("projectId") || params.get("id");
+      }
+      if (!targetProjectId && urlHash.startsWith("#/execution/")) {
+        const parts = urlHash.split("/");
+        if (parts[2]) {
+          targetProjectId = decodeURIComponent(parts[2].split("?")[0]);
+        }
+      }
+    }
+    this.projectId = targetProjectId || this.projectId || "PRJ-SYN-000002";
+
     container.innerHTML = `
       <div class="space-y-6 animate-fade-in max-w-7xl mx-auto pb-16">
         <div class="p-12 text-center text-slate-500">
           <div class="inline-block animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mb-3"></div>
-          <p class="text-sm font-medium">Initializing Execution Intelligence & CPM Scheduler...</p>
+          <p class="text-sm font-medium">Initializing Execution Intelligence & CPM Scheduler for ${this.projectId}...</p>
         </div>
       </div>
     `;
 
     try {
-      const [timeline, pva, recovery, wpRes, tasksRes] = await Promise.all([
-        window.APIClient.getExecutionTimeline(this.projectId),
-        window.APIClient.getPlanVsActual(this.projectId),
-        window.APIClient.getRecoveryOptions(this.projectId),
-        window.APIClient.getWorkPackages(this.projectId),
-        window.APIClient.getProjectTasks(this.projectId)
+      const [project, timeline, pva, recovery, wpRes, tasksRes] = await Promise.all([
+        window.APIClient.getProject(this.projectId).catch(() => null),
+        window.APIClient.getExecutionTimeline(this.projectId).catch(() => null),
+        window.APIClient.getPlanVsActual(this.projectId).catch(() => null),
+        window.APIClient.getRecoveryOptions(this.projectId).catch(() => null),
+        window.APIClient.getWorkPackages(this.projectId).catch(() => null),
+        window.APIClient.getProjectTasks(this.projectId).catch(() => null)
       ]);
 
+      this.projectData = project;
       this.timelineData = timeline;
       this.planVsActualData = pva;
       this.recoveryData = recovery;
@@ -60,6 +80,12 @@ const ExecutionControlView = {
     const pva = this.planVsActualData || {};
     const recovery = this.recoveryData || {};
     const timeline = this.timelineData || {};
+    const p = this.projectData || {};
+
+    const projectName = p.name || p.project_name || "Varanasi-Ranchi-Kolkata Expressway — PKG-3 Ganga River Bridge";
+    const sector = p.sector || "Infrastructure";
+    const state = p.state || "National Corridor";
+    const isReal = (p.data_source === "REAL_IMPORTED" || p.data_status === "REAL");
 
     container.innerHTML = `
       <div class="space-y-6 animate-fade-in max-w-7xl mx-auto pb-16">
@@ -72,25 +98,37 @@ const ExecutionControlView = {
                 <span class="px-2.5 py-0.5 bg-blue-500/20 text-blue-300 border border-blue-400/30 rounded-full text-xs font-bold uppercase tracking-wider">
                   ⏱️ CPM Execution Control Center
                 </span>
+                ${isReal ? `
+                  <span class="px-2.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 rounded-full text-xs font-bold uppercase tracking-wider">
+                    🌿 REAL IMPORTED DATA
+                  </span>
+                ` : `
+                  <span class="px-2.5 py-0.5 bg-slate-700/60 text-slate-300 border border-slate-600/40 rounded-full text-xs font-bold uppercase tracking-wider">
+                    📊 10K PAIMANA BENCHMARK
+                  </span>
+                `}
                 <span class="px-2 py-0.5 bg-rose-500/20 text-rose-300 border border-rose-400/30 rounded text-xs font-semibold">
                   Critical Path Bottleneck Active
                 </span>
                 <span class="text-xs text-slate-400 font-mono">ID: ${this.projectId}</span>
               </div>
               <h1 class="text-2xl lg:text-3xl font-extrabold tracking-tight text-white">
-                Varanasi-Ranchi-Kolkata Expressway — PKG-3 Ganga River Bridge
+                ${projectName}
               </h1>
               <p class="text-xs sm:text-sm text-slate-300 max-w-3xl leading-relaxed">
-                Integrated execution management linking ground-worker physical quantity telemetry with Critical Path Method (CPM) forward/backward pass calculations and AI-driven delay mitigation.
+                Sector: <strong class="text-white">${sector}</strong> · State: <strong class="text-white">${state}</strong> — Integrated execution management linking ground-worker physical quantity telemetry with Critical Path Method (CPM) forward/backward pass calculations and AI-driven delay mitigation.
               </p>
             </div>
 
             <div class="flex items-center gap-3">
+              <a href="#/projects/${this.projectId}" class="px-3.5 py-2 bg-blue-700 hover:bg-blue-600 text-white text-xs font-bold rounded-xl shadow transition flex items-center gap-2">
+                <span>🔍</span> Project Hub
+              </a>
               <a href="#/onboarding" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-2">
-                <span>⚡</span> Onboard New Project
+                <span>⚡</span> Ingest Data
               </a>
               <a href="#/engineer" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow transition flex items-center gap-2">
-                <span>👷</span> Verification Queue (2)
+                <span>👷</span> Verification Station
               </a>
             </div>
           </div>

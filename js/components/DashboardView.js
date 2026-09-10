@@ -122,6 +122,29 @@ const DashboardView = {
           </div>
         </div>
 
+        <!-- DATASET COMPOSITION STRIP (Explicit Synthetic vs Real Separation) -->
+        <div id="dataset-composition-banner" class="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 bg-slate-900/90 text-white rounded-xl border border-slate-800 shadow-sm text-xs">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-extrabold bg-blue-500/20 text-blue-300 border border-blue-400/30">
+              📊 DATA PROVENANCE
+            </span>
+            <span class="text-slate-300 font-medium">Composition:</span>
+            <span id="composition-synthetic-count" class="font-bold text-blue-400">10,000 PAIMANA Benchmark Records</span>
+            <span class="text-slate-500">•</span>
+            <span id="composition-real-count" class="font-bold text-emerald-400">0 Real Imported Records</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <a href="#/projects?data_source=REAL" class="text-[11px] text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1 transition">
+              <span>🌿 View Real Projects</span>
+            </a>
+            <span class="text-slate-600">|</span>
+            <a href="#/onboarding" class="text-[11px] text-blue-400 hover:text-blue-300 font-bold flex items-center gap-1 transition">
+              <span>📥 Ingest Real Project Data</span>
+              <span>&rarr;</span>
+            </a>
+          </div>
+        </div>
+
         <!-- =====================================================================
              LEVEL 2: 6 KEY NATIONAL INDICATORS (High Information Density, Clickable)
              ===================================================================== -->
@@ -558,6 +581,14 @@ const DashboardView = {
             if (lMod) lMod.innerText = `${dist.moderate.toLocaleString("en-IN")} (${((dist.moderate/10000)*100).toFixed(1)}%)`;
             if (lHigh) lHigh.innerText = `${dist.high.toLocaleString("en-IN")} (${((dist.high/10000)*100).toFixed(1)}%)`;
             if (lCrit) lCrit.innerText = `${dist.critical.toLocaleString("en-IN")} (${((dist.critical/10000)*100).toFixed(1)}%)`;
+          }
+
+          if (live.data_composition) {
+            const dc = live.data_composition;
+            const synthEl = document.getElementById("composition-synthetic-count");
+            const realEl = document.getElementById("composition-real-count");
+            if (synthEl) synthEl.innerText = `${(dc.synthetic_baseline_projects || 10000).toLocaleString("en-IN")} PAIMANA Benchmark Records`;
+            if (realEl) realEl.innerText = `${(dc.real_imported_projects || 0).toLocaleString("en-IN")} Real Imported Records`;
           }
         }
       } catch (e) {

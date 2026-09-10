@@ -24,6 +24,18 @@ const ProjectOnboardingView = {
     extractedEntities: null,
     generatedPlan: null
   },
+  activeTab: "wizard",
+  sampleDatasets: {
+    morth: `project_name,ministry,sector,state,implementing_agency,original_cost_cr,revised_cost_cr,physical_progress_pct,financial_progress_pct,delay_in_months,start_date,planned_completion_date,primary_bottleneck
+"Delhi-Amritsar-Katra Expressway PKG-5","Ministry of Road Transport & Highways","Road","Punjab","NHAI",3800.0,4450.0,48.5,45.0,14,"2023-04-01","2026-12-31","land_acquisition"
+"Vadodara-Mumbai Expressway Section-II","Ministry of Road Transport & Highways","Road","Gujarat","NHAI",5200.0,5900.0,62.0,60.0,8,"2022-10-15","2026-06-30","environmental_clearance"
+"Raipur-Visakhapatnam Economic Corridor PKG-3","Ministry of Road Transport & Highways","Road","Odisha","NHAI",2900.0,3250.0,35.0,34.0,18,"2024-01-10","2027-03-31","contractor_liquidity"`,
+    railways: `project_name,ministry,sector,state,implementing_agency,original_cost_cr,revised_cost_cr,physical_progress_pct,financial_progress_pct,delay_in_months,start_date,planned_completion_date,primary_bottleneck
+"Eastern Dedicated Freight Corridor (Sonnagar-Dankuni)","Ministry of Railways","Railways","West Bengal","DFCCIL",12500.0,14800.0,71.0,68.5,22,"2021-08-01","2026-09-30","land_acquisition"
+"Bilaspur-Manali-Leh Strategic Line","Ministry of Railways","Railways","Himachal Pradesh","RVNL",8200.0,9100.0,22.0,20.0,26,"2023-06-01","2030-12-31","geotechnical_instability"`
+  },
+  importResult: null,
+  validationReport: null,
 
   async render(container) {
     if (!container) {
@@ -44,15 +56,15 @@ const ProjectOnboardingView = {
             <div class="space-y-1">
               <div class="flex items-center gap-2">
                 <span class="px-2.5 py-0.5 bg-blue-500/20 text-blue-300 border border-blue-400/30 rounded-full text-xs font-bold uppercase tracking-wider">
-                  ⚡ AI-Assisted Project Intake
+                  ⚡ AI-Assisted Project Intake & Ingestion
                 </span>
                 <span class="text-xs text-slate-400">MoSPI IPMD / PAIMANA Standards</span>
               </div>
               <h1 class="text-2xl lg:text-3xl font-extrabold tracking-tight text-white">
-                Project Onboarding & AI WBS Synthesis
+                Project Onboarding & Data Ingestion
               </h1>
               <p class="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-                Transform unstructured infrastructure tender documents, DPRs, and Concession Agreements into an automated, verified Work Breakdown Structure (WBS), Critical Path (CPM) network, and verifiable ground tasks.
+                Seamlessly intake individual infrastructure projects with automated WBS synthesis, or ingest batch datasets (CSV/JSON) with fuzzy column mapping, LightGBM risk assessment, and early warning detection.
               </p>
             </div>
             
@@ -64,6 +76,18 @@ const ProjectOnboardingView = {
           </div>
         </div>
 
+        <!-- Mode Switcher Tabs -->
+        <div class="flex items-center gap-3 border-b border-slate-200 pb-3">
+          <button id="tab-mode-wizard" class="px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 ${this.activeTab !== 'import' ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'}">
+            <span>⚡</span> Single Project Wizard (AI WBS Generator)
+          </button>
+          <button id="tab-mode-import" class="px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 ${this.activeTab === 'import' ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'}">
+            <span>📥</span> Import Real Dataset (CSV / JSON / MoSPI)
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${this.activeTab === 'import' ? 'bg-white/20 text-white' : 'bg-blue-100 text-blue-700'}">BATCH AI</span>
+          </button>
+        </div>
+
+        ${this.activeTab === 'import' ? this.renderImportTab() : `
         <!-- 4-Step Wizard Stepper Bar -->
         <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
           <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -104,6 +128,7 @@ const ProjectOnboardingView = {
         <div id="wizard-step-content" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
           ${this.renderStepContent()}
         </div>
+        `}
 
       </div>
     `;
@@ -482,7 +507,366 @@ const ProjectOnboardingView = {
     return '';
   },
 
+  renderImportTab() {
+    const report = this.validationReport;
+    const result = this.importResult;
+
+    return `
+      <div class="space-y-6">
+        <!-- Ingestion Overview Banner -->
+        <div class="bg-blue-50/70 border border-blue-200 rounded-2xl p-5 text-xs space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 font-bold text-blue-900 text-sm">
+              <span>📥</span> National Dataset Ingestion & AI Pipeline
+            </div>
+            <span class="px-2.5 py-0.5 bg-blue-600 text-white font-extrabold text-[10px] rounded-full uppercase tracking-wider">
+              MoSPI / OCMS / PMG / NHAI Compliant
+            </span>
+          </div>
+          <p class="text-slate-600 leading-relaxed">
+            Batch-ingest project records directly from institutional spreadsheets (CSV) or REST payloads (JSON). The ASTRA intelligence engine performs <strong>fuzzy column normalization</strong> (supporting over 30 ministry nomenclature variations), runs <strong>LightGBM risk inference</strong>, evaluates <strong>Early Warning Radar triggers</strong>, auto-synthesizes <strong>Work Breakdown Structures (WBS)</strong>, and commits immutable governance audit entries.
+          </p>
+          <div class="flex flex-wrap items-center gap-2 pt-1">
+            <span class="text-slate-500 font-semibold text-[11px]">Quick Load Institutional Samples:</span>
+            <button id="btn-sample-morth" class="px-3 py-1 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold rounded-lg shadow-sm transition">
+              🛣️ MoRTH Highway Package (3 Projects)
+            </button>
+            <button id="btn-sample-railways" class="px-3 py-1 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold rounded-lg shadow-sm transition">
+              🚆 Railways DFC Corridors (2 Projects)
+            </button>
+            <button id="btn-clear-dataset" class="px-2.5 py-1 text-slate-500 hover:text-red-600 transition ml-auto">
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <!-- Input Area: Dropzone + Raw Textarea -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
+          <div class="flex items-center justify-between text-xs">
+            <label class="font-bold text-slate-800 uppercase tracking-wider">Dataset Payload (CSV or JSON)</label>
+            <span class="text-slate-400">Accepted: .csv, .json</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="md:col-span-2 space-y-2">
+              <textarea id="txt-import-payload" rows="10" class="w-full p-3 font-mono text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-slate-400" placeholder="Paste CSV with headers or JSON array here...
+Example headers: project_name, ministry, sector, state, original_cost_cr, revised_cost_cr, physical_progress_pct..."></textarea>
+            </div>
+
+            <div class="space-y-3 flex flex-col justify-between">
+              <div class="border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-2xl p-6 text-center transition cursor-pointer relative bg-slate-50/50 hover:bg-blue-50/30">
+                <input type="file" id="file-import-dataset" accept=".csv,.json" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
+                <div class="text-3xl mb-2">📂</div>
+                <div class="text-xs font-bold text-slate-800">Upload Dataset File</div>
+                <div class="text-[10px] text-slate-400 mt-1">Select .csv or .json from your computer</div>
+              </div>
+
+              <div class="space-y-2">
+                <button id="btn-inspect-dataset" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-2">
+                  <span>🔍</span> Inspect & Auto-Map Columns
+                </button>
+                <button id="btn-run-dataset-import" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                  <span>⚡</span> Execute AI Ingestion & Synthesis
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Column Mapping Preview & Validation Report -->
+        ${report ? `
+          <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 animate-fade-in">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full ${report.valid ? 'bg-emerald-500' : 'bg-amber-500'}"></span>
+                <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                  Dataset Inspection Report: ${report.recordsCount} Record${report.recordsCount !== 1 ? 's' : ''} Detected
+                </h3>
+              </div>
+              <span class="px-2.5 py-1 rounded-md text-[11px] font-bold ${report.valid ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-amber-50 text-amber-800 border border-amber-200'}">
+                ${report.valid ? '✓ Ready for AI Ingestion' : '⚠️ Missing Required Columns'}
+              </span>
+            </div>
+
+            <!-- Column Mapping Table -->
+            <div class="overflow-x-auto border border-slate-100 rounded-xl">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-100 text-[11px]">
+                  <tr>
+                    <th class="p-2.5">Source Column</th>
+                    <th class="p-2.5">Target Canonical Field</th>
+                    <th class="p-2.5">Mapping Status</th>
+                    <th class="p-2.5">Sample Extracted Value</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${report.columnMappings.map(m => `
+                    <tr class="hover:bg-slate-50/50">
+                      <td class="p-2.5 font-mono text-[11px] text-slate-800">${m.source}</td>
+                      <td class="p-2.5 font-semibold text-blue-700">${m.target}</td>
+                      <td class="p-2.5">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${m.confidence === 'EXACT' ? 'bg-emerald-100 text-emerald-800' : 'bg-sky-100 text-sky-800'}">
+                          ${m.confidence} MATCH
+                        </span>
+                      </td>
+                      <td class="p-2.5 text-slate-600 truncate max-w-xs">${m.sampleValue || '—'}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Ingestion Results Summary -->
+        ${result ? `
+          <div class="bg-emerald-50/60 border border-emerald-200 rounded-2xl p-5 space-y-4 animate-fade-in">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 text-emerald-900 font-extrabold text-sm">
+                <span>🎉</span> Ingestion Completed Successfully
+              </div>
+              <span class="px-2.5 py-1 bg-emerald-600 text-white rounded-lg text-xs font-bold shadow-sm">
+                ${result.summary?.created_count || 0} Created · ${result.summary?.updated_count || 0} Updated
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              ${(result.projects || []).map(p => {
+                let badgeColor = "bg-emerald-100 text-emerald-800 border-emerald-200";
+                if (p.risk_class === "CRITICAL") badgeColor = "bg-rose-100 text-rose-800 border-rose-200";
+                else if (p.risk_class === "HIGH") badgeColor = "bg-amber-100 text-amber-800 border-amber-200";
+                else if (p.risk_class === "MODERATE") badgeColor = "bg-blue-100 text-blue-800 border-blue-200";
+
+                return `
+                  <div class="bg-white p-4 rounded-xl border border-emerald-200 shadow-sm space-y-2 text-xs">
+                    <div class="flex items-start justify-between gap-2">
+                      <div class="min-w-0">
+                        <div class="font-bold text-slate-900 truncate">${p.project_name}</div>
+                        <div class="text-[10px] font-mono text-slate-400">${p.project_id}</div>
+                      </div>
+                      <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeColor}">
+                        ${p.risk_class} RISK
+                      </span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-100 text-center text-[11px]">
+                      <div class="p-1.5 bg-slate-50 rounded-lg">
+                        <div class="text-[10px] text-slate-400">Risk Score</div>
+                        <div class="font-bold text-slate-800">${p.risk_score || '—'}</div>
+                      </div>
+                      <div class="p-1.5 bg-slate-50 rounded-lg">
+                        <div class="text-[10px] text-slate-400">Delay</div>
+                        <div class="font-bold text-slate-800">${p.predicted_delay_months ? p.predicted_delay_months + ' mo' : 'On Track'}</div>
+                      </div>
+                      <div class="p-1.5 bg-slate-50 rounded-lg">
+                        <div class="text-[10px] text-slate-400">WBS Tasks</div>
+                        <div class="font-bold text-blue-700">${p.tasks_generated || 5} Synthesized</div>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+
+            <div class="flex justify-end gap-3 pt-2">
+              <a href="#/my-projects" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5">
+                <span>📁</span> View in Project Directory
+              </a>
+              <a href="#/execution" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5">
+                <span>⚡</span> Open Execution Control Center
+              </a>
+            </div>
+          </div>
+        ` : ''}
+
+      </div>
+    `;
+  },
+
+  inspectDataset(text) {
+    if (!text || !text.trim()) {
+      window.APIClient.showToast("Please enter CSV or JSON dataset payload first", "warning");
+      return;
+    }
+    const clean = text.trim();
+    let rows = [];
+    let headers = [];
+
+    if (clean.startsWith("[") || clean.startsWith("{")) {
+      try {
+        const parsed = JSON.parse(clean);
+        rows = Array.isArray(parsed) ? parsed : [parsed];
+        headers = Object.keys(rows[0] || {});
+      } catch (e) {
+        window.APIClient.showToast("Invalid JSON syntax: " + e.message, "error");
+        return;
+      }
+    } else {
+      const lines = clean.split("\n").map(l => l.trim()).filter(Boolean);
+      if (lines.length < 2) {
+        window.APIClient.showToast("CSV must contain a header row and at least one data row", "warning");
+        return;
+      }
+      headers = lines[0].split(",").map(h => h.replace(/^["']|["']$/g, "").trim());
+      const firstRowVals = lines[1].split(",").map(v => v.replace(/^["']|["']$/g, "").trim());
+      rows = [firstRowVals];
+    }
+
+    const aliases = {
+      project_name: ["project_name", "name", "project", "title", "corridor", "project_title"],
+      ministry: ["ministry", "central_ministry", "min", "ministry_name"],
+      sector: ["sector", "sub_sector", "domain", "industry"],
+      state: ["state", "primary_state", "location", "province"],
+      original_cost_cr: ["original_cost_cr", "sanctioned_cost", "cost", "budget", "outlay", "original_cost"],
+      physical_progress_pct: ["physical_progress_pct", "physical_progress", "progress", "progress_pct"],
+      start_date: ["start_date", "start", "commencement_date", "appointed_date"],
+      planned_completion_date: ["planned_completion_date", "completion_date", "target_date", "scheduled_completion"]
+    };
+
+    const mappings = [];
+    headers.forEach((h, idx) => {
+      const lower = h.toLowerCase().replace(/[\s\-_]/g, "");
+      let matchedTarget = "custom_attribute";
+      let confidence = "FUZZY";
+
+      for (const [target, targetAliases] of Object.entries(aliases)) {
+        if (targetAliases.some(a => a.replace(/[\s\-_]/g, "") === lower)) {
+          matchedTarget = target;
+          confidence = "EXACT";
+          break;
+        } else if (targetAliases.some(a => lower.includes(a.replace(/[\s\-_]/g, "")))) {
+          matchedTarget = target;
+          confidence = "FUZZY";
+          break;
+        }
+      }
+
+      let sampleVal = "";
+      if (Array.isArray(rows[0])) {
+        sampleVal = rows[0][idx] || "";
+      } else if (typeof rows[0] === "object") {
+        sampleVal = rows[0][h] !== undefined ? String(rows[0][h]) : "";
+      }
+
+      mappings.push({
+        source: h,
+        target: matchedTarget,
+        confidence,
+        sampleValue: sampleVal
+      });
+    });
+
+    this.validationReport = {
+      recordsCount: clean.startsWith("[") ? rows.length : clean.split("\n").filter(Boolean).length - 1,
+      valid: mappings.some(m => m.target === "project_name"),
+      columnMappings: mappings
+    };
+  },
+
   bindEvents(container) {
+    // Mode Switcher Tabs
+    const tabWizard = container.querySelector("#tab-mode-wizard");
+    const tabImport = container.querySelector("#tab-mode-import");
+    if (tabWizard) {
+      tabWizard.addEventListener("click", () => {
+        this.activeTab = "wizard";
+        this.render(container);
+      });
+    }
+    if (tabImport) {
+      tabImport.addEventListener("click", () => {
+        this.activeTab = "import";
+        this.render(container);
+      });
+    }
+
+    // Dataset Sample Buttons
+    const btnSampleMorth = container.querySelector("#btn-sample-morth");
+    const btnSampleRail = container.querySelector("#btn-sample-railways");
+    const btnClear = container.querySelector("#btn-clear-dataset");
+    const txtPayload = container.querySelector("#txt-import-payload");
+
+    if (btnSampleMorth && txtPayload) {
+      btnSampleMorth.addEventListener("click", () => {
+        txtPayload.value = this.sampleDatasets.morth;
+        this.inspectDataset(txtPayload.value);
+        this.render(container);
+      });
+    }
+    if (btnSampleRail && txtPayload) {
+      btnSampleRail.addEventListener("click", () => {
+        txtPayload.value = this.sampleDatasets.railways;
+        this.inspectDataset(txtPayload.value);
+        this.render(container);
+      });
+    }
+    if (btnClear && txtPayload) {
+      btnClear.addEventListener("click", () => {
+        txtPayload.value = "";
+        this.validationReport = null;
+        this.importResult = null;
+        this.render(container);
+      });
+    }
+
+    // File Upload
+    const fileInput = container.querySelector("#file-import-dataset");
+    if (fileInput && txtPayload) {
+      fileInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          txtPayload.value = evt.target.result;
+          this.inspectDataset(txtPayload.value);
+          this.render(container);
+        };
+        reader.readAsText(file);
+      });
+    }
+
+    // Inspect Dataset Button
+    const btnInspect = container.querySelector("#btn-inspect-dataset");
+    if (btnInspect && txtPayload) {
+      btnInspect.addEventListener("click", () => {
+        this.inspectDataset(txtPayload.value);
+        this.render(container);
+      });
+    }
+
+    // Run Dataset Import Button
+    const btnRunImport = container.querySelector("#btn-run-dataset-import");
+    if (btnRunImport && txtPayload) {
+      btnRunImport.addEventListener("click", async () => {
+        const text = txtPayload.value ? txtPayload.value.trim() : "";
+        if (!text) {
+          window.APIClient.showToast("Please enter or upload a dataset first", "warning");
+          return;
+        }
+
+        btnRunImport.disabled = true;
+        btnRunImport.innerHTML = `<span>⏳</span> Ingesting & Running AI Pipeline...`;
+
+        try {
+          let payload;
+          if (text.startsWith("[") || text.startsWith("{")) {
+            const parsed = JSON.parse(text);
+            payload = { projects: Array.isArray(parsed) ? parsed : [parsed], data_source: "REAL_IMPORTED" };
+          } else {
+            payload = { csv_data: text, data_source: "REAL_IMPORTED" };
+          }
+
+          const res = await window.APIClient.importProjects(payload);
+          this.importResult = res;
+          window.APIClient.showToast(`Successfully ingested ${(res.projects || []).length} projects with LightGBM & WBS inference!`, "success");
+        } catch (err) {
+          window.APIClient.showToast("Import failed: " + err.message, "error");
+        } finally {
+          this.render(container);
+        }
+      });
+    }
+
     // Step navigation buttons
     const next1 = container.querySelector("#btn-next-step-1");
     if (next1) {

@@ -13,6 +13,7 @@ const ProjectsView = {
   selectedState: "all",
   selectedSector: "all",
   selectedCostTier: "all",
+  selectedDataSource: "all",
   showAdvancedFilters: false,
   currentPage: 1,
   pageSize: 15,
@@ -67,7 +68,7 @@ const ProjectsView = {
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-center">
             
             <!-- Search -->
-            <div class="lg:col-span-4 relative">
+            <div class="lg:col-span-3 relative">
               <label for="project-search-input" class="sr-only">Search projects</label>
               <input type="text" id="project-search-input" 
                      placeholder="Search project name, code (e.g. PRJ-), or agency..."
@@ -107,15 +108,25 @@ const ProjectsView = {
               </select>
             </div>
 
+            <!-- Data Source Filter -->
+            <div class="lg:col-span-2">
+              <label for="filter-datasource-select" class="sr-only">Data Source</label>
+              <select id="filter-datasource-select" class="gov-select text-xs font-semibold">
+                <option value="all">All Datasets (10K+)</option>
+                <option value="REAL">🟢 Real Imported Data</option>
+                <option value="SYNTHETIC">🔵 Synthetic 10K Baseline</option>
+              </select>
+            </div>
+
             <!-- Advanced Filters Toggle & Reset -->
-            <div class="lg:col-span-3 flex items-center justify-end gap-2">
+            <div class="lg:col-span-2 flex items-center justify-end gap-2">
               <button id="btn-toggle-advanced" onclick="ProjectsView.toggleAdvancedFilters()" 
-                      class="btn btn-secondary btn-sm flex items-center gap-1.5 text-xs">
+                      class="btn btn-secondary btn-sm flex items-center gap-1 text-xs px-2">
                 <span>⚙️</span>
-                <span id="adv-filter-label">More Filters</span>
+                <span id="adv-filter-label">More</span>
                 <span id="adv-filter-count" class="hidden px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">0</span>
               </button>
-              <button id="btn-clear-filters" onclick="ProjectsView.clearAllFilters()" class="btn btn-secondary btn-sm text-xs">
+              <button id="btn-clear-filters" onclick="ProjectsView.clearAllFilters()" class="btn btn-secondary btn-sm text-xs px-2">
                 Reset
               </button>
             </div>
@@ -281,6 +292,7 @@ const ProjectsView = {
       if (params.get("state")) this.selectedState = params.get("state");
       if (params.get("sector")) this.selectedSector = params.get("sector");
       if (params.get("cost_tier")) this.selectedCostTier = params.get("cost_tier");
+      if (params.get("data_source")) this.selectedDataSource = params.get("data_source");
       if (params.get("search")) this.searchQuery = params.get("search");
 
       if (this.selectedBottleneck !== "all" || this.selectedState !== "all" || this.selectedSector !== "all" || this.selectedCostTier !== "all") {
@@ -293,6 +305,7 @@ const ProjectsView = {
     const searchInput = document.getElementById("project-search-input");
     const minSelect = document.getElementById("filter-ministry-select");
     const riskSelect = document.getElementById("filter-risk-select");
+    const dsSelect = document.getElementById("filter-datasource-select");
     const bnSelect = document.getElementById("filter-bottleneck-select");
     const stateSelect = document.getElementById("filter-state-select");
     const sectorSelect = document.getElementById("filter-sector-select");
@@ -303,10 +316,19 @@ const ProjectsView = {
 
     if (minSelect) minSelect.value = this.selectedMinistry;
     if (riskSelect) riskSelect.value = this.selectedRisk;
+    if (dsSelect) dsSelect.value = this.selectedDataSource;
     if (bnSelect) bnSelect.value = this.selectedBottleneck;
     if (stateSelect) stateSelect.value = this.selectedState;
     if (sectorSelect) sectorSelect.value = this.selectedSector;
     if (costSelect) costSelect.value = this.selectedCostTier;
+
+    if (dsSelect) {
+      dsSelect.addEventListener("change", (e) => {
+        this.selectedDataSource = e.target.value;
+        this.currentPage = 1;
+        this.fetchAndRenderProjects();
+      });
+    }
 
     if (searchInput) {
       searchInput.addEventListener("input", (e) => {
@@ -450,6 +472,10 @@ const ProjectsView = {
       this.selectedCostTier = "all";
       const el = document.getElementById("filter-cost-select");
       if (el) el.value = "all";
+    } else if (key === "data_source") {
+      this.selectedDataSource = "all";
+      const el = document.getElementById("filter-datasource-select");
+      if (el) el.value = "all";
     }
     this.currentPage = 1;
     this.fetchAndRenderProjects();
@@ -463,11 +489,13 @@ const ProjectsView = {
     this.selectedState = "all";
     this.selectedSector = "all";
     this.selectedCostTier = "all";
+    this.selectedDataSource = "all";
     this.currentPage = 1;
 
     const searchInput = document.getElementById("project-search-input");
     const minSelect = document.getElementById("filter-ministry-select");
     const riskSelect = document.getElementById("filter-risk-select");
+    const dsSelect = document.getElementById("filter-datasource-select");
     const bnSelect = document.getElementById("filter-bottleneck-select");
     const stateSelect = document.getElementById("filter-state-select");
     const sectorSelect = document.getElementById("filter-sector-select");
@@ -476,6 +504,7 @@ const ProjectsView = {
     if (searchInput) searchInput.value = "";
     if (minSelect) minSelect.value = "all";
     if (riskSelect) riskSelect.value = "all";
+    if (dsSelect) dsSelect.value = "all";
     if (bnSelect) bnSelect.value = "all";
     if (stateSelect) stateSelect.value = "all";
     if (sectorSelect) sectorSelect.value = "all";
@@ -497,6 +526,9 @@ const ProjectsView = {
     }
     if (this.selectedRisk !== "all") {
       chips.push({ key: "risk", label: "Risk Tier", value: this.selectedRisk });
+    }
+    if (this.selectedDataSource !== "all") {
+      chips.push({ key: "data_source", label: "Dataset", value: this.selectedDataSource === "REAL" ? "Real Data Only" : "Synthetic 10K Baseline" });
     }
     if (this.selectedBottleneck !== "all") {
       chips.push({ key: "bottleneck", label: "Bottleneck", value: this.selectedBottleneck.replace(/_/g, " ") });
@@ -567,6 +599,7 @@ const ProjectsView = {
     if (this.selectedBottleneck !== "all") params.bottleneck = this.selectedBottleneck;
     if (this.selectedState !== "all") params.state = this.selectedState;
     if (this.selectedSector !== "all") params.sector = this.selectedSector;
+    if (this.selectedDataSource !== "all") params.data_source = this.selectedDataSource;
 
     let res = null;
     if (window.APIClient) {
@@ -639,6 +672,15 @@ const ProjectsView = {
               <span class="font-mono text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded uppercase font-semibold">
                 ${p.project_id}
               </span>
+              ${(p.data_source === "REAL_IMPORTED" || (p.metadata && p.metadata.data_status === "REAL_IMPORTED")) ? `
+                <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  REAL DATA
+                </span>
+              ` : `
+                <span class="px-1.5 py-0.2 rounded text-[9px] font-medium bg-slate-100 text-slate-500 border border-slate-200">
+                  SYNTHETIC (10K)
+                </span>
+              `}
               <span class="text-slate-300">•</span>
               <span class="text-[11px] text-slate-500 font-medium truncate max-w-[140px]">
                 ${p.implementing_agency || 'MoSPI Desk'}

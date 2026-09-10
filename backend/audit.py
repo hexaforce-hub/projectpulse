@@ -85,6 +85,20 @@ class AuditManager:
             conn.commit()
             return cursor.lastrowid
 
+    def log_event(self, user: Any, action: str, target_entity: str, details: Any = None) -> int:
+        import json
+        actor = user.get("name", "System") if isinstance(user, dict) else str(user)
+        role = user.get("role", "SYSTEM") if isinstance(user, dict) else "SYSTEM"
+        details_str = json.dumps(details) if isinstance(details, (dict, list)) else str(details or "")
+        return self.record_event(
+            actor=actor,
+            role=role,
+            action=action,
+            resource=str(target_entity),
+            status="SUCCESS",
+            details=details_str
+        )
+
     def list_logs(
         self,
         page: int = 1,

@@ -35,6 +35,7 @@
   <script src="js/mockData.js"></script>
   <script src="js/api-client.js"></script>
   <script src="js/components/common.js"></script>
+  <script src="js/components/LoginView.js"></script>
   <script src="js/components/DashboardView.js"></script>
   <script src="js/components/PortfolioMatrixView.js"></script>
   <script src="js/components/ProjectsView.js"></script>
@@ -60,8 +61,7 @@
   <!-- Application Bootstrap -->
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
-      console.log("[ProjectPulse] Booting Government Digital Interface...");
-      window.AppShell.render();
+      console.log("[ASTRA] Booting Sovereign Intelligence Platform...");
       if (window.APIClient) await window.APIClient.init();
       window.Router.init();
     });

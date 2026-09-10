@@ -79,6 +79,12 @@ class DatabaseClient(ReportsClientMixin):
                     "high": row["high_count"],
                     "critical": row["critical_count"]
                 },
+                "data_composition": {
+                    "total_projects": row["total_count"],
+                    "real_imported_projects": 0,
+                    "synthetic_baseline_projects": row["total_count"] or 0,
+                    "has_real_projects": False
+                },
                 "last_updated": "2026-03-31 • MoSPI PAIMANA Standard Baseline",
                 "metadata": {
                     "data_source": "MoSPI IPMD PAIMANA Schema",
@@ -87,7 +93,7 @@ class DatabaseClient(ReportsClientMixin):
                 }
             }
 
-    def list_projects(self, page=1, page_size=20, search="", ministry="", sector="", risk_level="", sort_by="overall_risk_score", sort_order="desc", bottleneck="", state="", allowed_project_ids=None):
+    def list_projects(self, page=1, page_size=20, search="", ministry="", sector="", risk_level="", sort_by="overall_risk_score", sort_order="desc", bottleneck="", state="", allowed_project_ids=None, data_source=""):
         """Returns paginated project summaries with multi-attribute filtering."""
         with self._get_connection() as conn:
             cursor = conn.cursor()
@@ -119,6 +125,16 @@ class DatabaseClient(ReportsClientMixin):
             if state and state != "ALL":
                 where_clauses.append("state = ?")
                 params.append(state)
+
+            if data_source and data_source != "ALL":
+                norm_ds = data_source.strip().upper()
+                if norm_ds in ["REAL", "REAL_IMPORTED"]:
+                    where_clauses.append("data_source = 'REAL_IMPORTED'")
+                elif norm_ds in ["SYNTHETIC", "SYNTHETIC_DEVELOPMENT", "BASELINE"]:
+                    where_clauses.append("(data_source != 'REAL_IMPORTED' OR data_source IS NULL)")
+                else:
+                    where_clauses.append("data_source = ?")
+                    params.append(data_source)
                 
             if allowed_project_ids is not None:
                 if len(allowed_project_ids) == 0:
@@ -153,7 +169,7 @@ class DatabaseClient(ReportsClientMixin):
                     cost_overrun_cr, physical_progress_pct, financial_progress_pct, progress_decoupling_gap,
                     start_date, planned_completion_date, revised_completion_date, schedule_slippage_months,
                     milestone_count, milestones_completed, milestones_delayed, milestone_delay_rate,
-                    primary_bottleneck, target_risk_class, overall_risk_score
+                    primary_bottleneck, target_risk_class, overall_risk_score, data_source, data_status
                 FROM projects
                 WHERE {where_sql}
                 ORDER BY {sort_col} {order_dir}
@@ -173,6 +189,8 @@ class DatabaseClient(ReportsClientMixin):
                     "implementing_agency": r["implementing_agency"],
                     "status": "Ongoing" if r["project_status"] != "COMPLETED" else "Commissioned",
                     "primary_bottleneck": r["primary_bottleneck"],
+                    "data_source": r["data_source"] if "data_source" in r.keys() and r["data_source"] else "PAIMANA-Modeled Synthetic Baseline",
+                    "data_status": r["data_status"] if "data_status" in r.keys() and r["data_status"] else "SYNTHETIC",
                     "financials": {
                         "original_cost_cr": r["original_cost_cr"],
                         "revised_cost_cr": r["revised_cost_cr"],
@@ -185,15 +203,15 @@ class DatabaseClient(ReportsClientMixin):
                         "progress_gap_pct": r["progress_decoupling_gap"]
                     },
                     "schedule": {
-                        "start_date": r["start_date"][:7],
-                        "planned_completion_date": r["planned_completion_date"][:7],
-                        "revised_completion_date": r["revised_completion_date"][:7],
-                        "delay_duration_months": r["schedule_slippage_months"]
+                        "start_date": (r["start_date"] or "")[:7],
+                        "planned_completion_date": (r["planned_completion_date"] or "")[:7],
+                        "revised_completion_date": (r["revised_completion_date"] or "")[:7],
+                        "delay_duration_months": r["schedule_slippage_months"] or 0
                     },
                     "risk": {
                         "overall_score": r["overall_risk_score"],
                         "level": r["target_risk_class"],
-                        "primary_driver": f"Bottleneck: {r['primary_bottleneck'].replace('_', ' ').title()}"
+                        "primary_driver": f"Bottleneck: {(r['primary_bottleneck'] or 'None').replace('_', ' ').title()}"
                     }
                 })
                 
@@ -260,13 +278,13 @@ class DatabaseClient(ReportsClientMixin):
                 for pr in prog_rows
             ]
             
-            primary_btn = p["primary_bottleneck"].replace("_", " ").title()
+            primary_btn = (p["primary_bottleneck"] or "None").replace("_", " ").title()
             
             # Default drivers based on PAIMANA line features
             drivers = [
                 { "rank": 1, "name": primary_btn, "strength_pct": 52.0, "evidence": f"Reported critical constraint in {p['state']}" },
-                { "rank": 2, "name": "Milestone Slippage Rate", "strength_pct": 28.0, "evidence": f"{p['milestones_delayed']} milestones delayed beyond baseline" },
-                { "rank": 3, "name": "Progress Decoupling Gap", "strength_pct": 20.0, "evidence": f"Expenditure leads physical works by {p['progress_decoupling_gap']}%" }
+                { "rank": 2, "name": "Milestone Slippage Rate", "strength_pct": 28.0, "evidence": f"{p['milestones_delayed'] or 0} milestones delayed beyond baseline" },
+                { "rank": 3, "name": "Progress Decoupling Gap", "strength_pct": 20.0, "evidence": f"Expenditure leads physical works by {p['progress_decoupling_gap'] or 0}%" }
             ]
             exec_note = "Model-derived attribution signal computed from MoSPI PAIMANA baseline features"
             
@@ -307,33 +325,35 @@ class DatabaseClient(ReportsClientMixin):
                     "progress_gap_pct": p["progress_decoupling_gap"]
                 },
                 "schedule": {
-                    "start_date": p["start_date"][:7],
-                    "planned_completion_date": p["planned_completion_date"][:7],
-                    "revised_completion_date": p["revised_completion_date"][:7],
-                    "delay_duration_months": p["schedule_slippage_months"],
-                    "schedule_revisions_count": p["schedule_revisions_count"]
+                    "start_date": (p["start_date"] or "")[:7],
+                    "planned_completion_date": (p["planned_completion_date"] or "")[:7],
+                    "revised_completion_date": (p["revised_completion_date"] or "")[:7],
+                    "delay_duration_months": p["schedule_slippage_months"] or 0,
+                    "schedule_revisions_count": p["schedule_revisions_count"] or 0
                 },
                 "milestones": milestones,
                 "progress_history": progress_history,
                 "risk": {
                     "overall_score": p["overall_risk_score"],
                     "level": p["target_risk_class"],
-                    "schedule_score": min(100.0, round(p["target_schedule_delay_months"] * 2.8, 1)),
-                    "cost_score": min(100.0, round(p["target_cost_overrun_pct"] * 2.2, 1)),
+                    "schedule_score": min(100.0, round((p["target_schedule_delay_months"] or 0) * 2.8, 1)),
+                    "cost_score": min(100.0, round((p["target_cost_overrun_pct"] or 0) * 2.2, 1)),
                     "implementation_score": 85.0 if p["primary_bottleneck"] != "NONE" else 15.0,
                     "primary_driver": primary_btn,
                     "drivers": drivers,
                     "observed_signals": [
                         { "label": "Physical Completion", "value": f"{p['physical_progress_pct']}%", "context": "Reported work accomplished" },
                         { "label": "Expenditure", "value": f"₹{p['cumulative_expenditure_cr']} Cr", "context": f"{p['financial_progress_pct']}% of revised cost" },
-                        { "label": "Milestones Slipped", "value": f"{p['milestones_delayed']} / {p['milestone_count']}", "context": "Critical path events delayed" },
-                        { "label": "Schedule Extensions", "value": str(p["schedule_revisions_count"]), "context": "Formal extensions sanctioned" }
+                        { "label": "Milestones Slipped", "value": f"{p['milestones_delayed'] or 0} / {p['milestone_count'] or 0}", "context": "Critical path events delayed" },
+                        { "label": "Schedule Extensions", "value": str(p["schedule_revisions_count"] or 0), "context": "Formal extensions sanctioned" }
                     ],
                     "attribution_note": exec_note
                 },
+                "data_source": p["data_source"] if "data_source" in p.keys() and p["data_source"] else "PAIMANA-Modeled Synthetic Baseline",
+                "data_status": p["data_status"] if "data_status" in p.keys() and p["data_status"] else ("REAL_IMPORTED" if ("data_source" in p.keys() and p["data_source"] == "REAL_IMPORTED") else "SYNTHETIC"),
                 "metadata": {
-                    "data_source": "MoSPI IPMD PAIMANA Schema",
-                    "data_status": "SYNTHETIC",
+                    "data_source": p["data_source"] if "data_source" in p.keys() and p["data_source"] else "MoSPI IPMD PAIMANA Schema",
+                    "data_status": "REAL_IMPORTED" if ("data_source" in p.keys() and p["data_source"] == "REAL_IMPORTED") else "SYNTHETIC",
                     "last_updated": "2026-03-31"
                 }
             }
@@ -898,6 +918,21 @@ class DatabaseClient(ReportsClientMixin):
             conn.commit()
             return t
 
+    def assign_task(self, task_id: str, assigned_to: str, remarks: str = None):
+        """Assigns an execution task to an authenticated user and updates status."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE tasks
+                SET assigned_to = ?,
+                    approval_status = 'APPROVED',
+                    status = CASE WHEN status = 'TODO' THEN 'IN_PROGRESS' ELSE status END,
+                    remarks = COALESCE(?, remarks)
+                WHERE task_id = ?
+            """, (assigned_to, remarks, task_id))
+            conn.commit()
+            return self.get_task_by_id(task_id)
+
     def list_task_dependencies(self, project_id: str):
         """Returns all dependency relationships in a project."""
         with self._get_connection() as conn:
@@ -995,22 +1030,38 @@ class DatabaseClient(ReportsClientMixin):
                 WHERE progress_id = ?
             """, (verification_status, user_id, now_iso, rejection_reason, progress_id))
             
+            project_id = None
             if verification_status == "VERIFIED":
-                cursor.execute("SELECT task_id, quantity_completed, progress_pct FROM task_progress WHERE progress_id = ?", (progress_id,))
+                cursor.execute("SELECT task_id, project_id, quantity_completed, progress_pct FROM task_progress WHERE progress_id = ?", (progress_id,))
                 row = cursor.fetchone()
                 if row:
-                    tid, qty, pct = row["task_id"], row["quantity_completed"], row["progress_pct"]
+                    tid = row["task_id"]
+                    project_id = row["project_id"]
+                    qty = row["quantity_completed"] or 0.0
+                    pct = row["progress_pct"] or 0.0
                     cursor.execute("""
                         UPDATE tasks
                         SET completed_quantity = completed_quantity + ?,
                             actual_progress = MAX(actual_progress, ?),
-                            verification_status = 'VERIFIED'
+                            verification_status = 'VERIFIED',
+                            status = CASE WHEN MAX(actual_progress, ?) >= 100.0 THEN 'COMPLETED' ELSE 'IN_PROGRESS' END
                         WHERE task_id = ?
-                    """, (qty, pct, tid))
+                    """, (qty, pct, pct, tid))
+
+                    # Upward Roll-up to Project Physical Progress:
+                    if project_id:
+                        cursor.execute("SELECT AVG(actual_progress) as avg_prog FROM tasks WHERE project_id = ?", (project_id,))
+                        prow = cursor.fetchone()
+                        if prow and prow["avg_prog"] is not None:
+                            new_phys_pct = round(float(prow["avg_prog"]), 2)
+                            cursor.execute("UPDATE projects SET physical_progress_pct = ? WHERE project_id = ?", (new_phys_pct, project_id))
             conn.commit()
             cursor.execute("SELECT * FROM task_progress WHERE progress_id = ?", (progress_id,))
             row = cursor.fetchone()
-            return dict(row) if row else None
+            res = dict(row) if row else None
+            if res and project_id:
+                res["project_id"] = project_id
+            return res
 
     def list_sites(self, project_id: str):
         """Returns site segments for a project."""
