@@ -32,8 +32,11 @@ const ProjectDetailView = {
           <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div class="space-y-1">
               <div class="flex flex-wrap items-center gap-2">
-                <span id="dtl-project-id" class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-900 border border-blue-200 uppercase tracking-wide">
+                <span id="dtl-project-id" class="font-mono text-xs font-bold px-2.5 py-0.5 rounded bg-blue-100 text-blue-900 border border-blue-200 uppercase tracking-wide">
                   ${pId}
+                </span>
+                <span id="dtl-datasource-badge" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                  MoSPI PAIMANA Standard
                 </span>
                 <span class="text-slate-300">•</span>
                 <span id="dtl-project-status">
@@ -44,11 +47,8 @@ const ProjectDetailView = {
                     HERO BENCHMARK PROJECT
                   </span>
                 ` : ''}
-                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-                  MoSPI PAIMANA Standard
-                </span>
               </div>
-              <h1 id="dtl-project-name" class="text-2xl font-bold text-slate-900 tracking-tight mt-1">
+              <h1 id="dtl-project-name" class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-1">
                 ${fallback.project_name || "NH-44 Strategic Corridor Development Project"}
               </h1>
               <div class="text-xs text-slate-500 flex flex-wrap items-center gap-x-3 gap-y-1 mt-0.5">
@@ -62,20 +62,20 @@ const ProjectDetailView = {
 
             <!-- Executive Quick Actions -->
             <div class="flex flex-wrap items-center gap-2 flex-shrink-0">
-              <a href="#/projects" class="btn btn-secondary btn-sm flex items-center gap-1 text-xs" title="Return to Projects Explorer">
-                <span>←</span>
+              <a href="#/projects" class="btn btn-secondary btn-sm flex items-center gap-1.5 text-xs shadow-2xs" title="Return to Projects Explorer">
+                <i data-lucide="arrow-left" class="w-3.5 h-3.5 text-slate-600"></i>
                 <span>Registry</span>
               </a>
-              <button onclick="ProjectDetailView.switchTab('whatif')" class="btn btn-secondary btn-sm flex items-center gap-1.5 text-xs">
-                <span>⚡</span>
+              <button onclick="ProjectDetailView.switchTab('whatif')" class="btn btn-secondary btn-sm flex items-center gap-1.5 text-xs shadow-2xs">
+                <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-600"></i>
                 <span>What-If Test</span>
               </button>
-              <a href="#/directives?project_id=${pId}&action=new" class="btn btn-primary btn-sm flex items-center gap-1.5 text-xs">
-                <span>📜</span>
+              <a href="#/directives?project_id=${pId}&action=new" class="btn btn-primary btn-sm flex items-center gap-1.5 text-xs shadow-2xs">
+                <i data-lucide="file-signature" class="w-3.5 h-3.5"></i>
                 <span>Issue Directive</span>
               </a>
-              <button onclick="ProjectDetailView.exportDossier('${pId}')" class="btn btn-secondary btn-sm flex items-center gap-1 text-xs" title="Download official project dossier">
-                <span>📥</span>
+              <button onclick="ProjectDetailView.exportDossier('${pId}')" class="btn btn-secondary btn-sm flex items-center gap-1.5 text-xs shadow-2xs" title="Download official project dossier">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-slate-600"></i>
                 <span>Export</span>
               </button>
             </div>
@@ -108,16 +108,18 @@ const ProjectDetailView = {
         </div>
 
         <!-- Level 3: "Why This Project Needs Attention" Diagnosis Banner (Progressive Disclosure) -->
-        <div class="gov-card bg-amber-50/50 border-amber-200 p-4 space-y-3 shadow-xs">
+        <div class="bg-amber-50/70 border border-amber-200/90 rounded-xl p-4 space-y-3 shadow-2xs">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <span class="text-base">⚠️</span>
+              <span class="text-amber-700">
+                <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+              </span>
               <h3 class="text-xs font-bold uppercase tracking-wider text-amber-900">Why This Project Needs Attention</h3>
-              <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-200/60 text-amber-900 uppercase">
+              <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-200/70 text-amber-900 uppercase">
                 AUTOMATED SURVEILLANCE
               </span>
             </div>
-            <button type="button" onclick="ProjectDetailView.toggleExplainability()" class="text-xs font-bold text-amber-900 hover:text-amber-950 underline cursor-pointer">
+            <button type="button" onclick="ProjectDetailView.toggleExplainability()" class="text-xs font-bold text-amber-900 hover:text-amber-950 underline cursor-pointer flex items-center gap-1">
               <span id="dtl-explain-btn-text">Show Root Cause Decomposition ▾</span>
             </button>
           </div>
@@ -142,39 +144,39 @@ const ProjectDetailView = {
         </div>
 
         <!-- Level 4: Clean Tab Navigation Bar -->
-        <div class="border-b border-slate-200 bg-white px-2 rounded-t-lg pt-1">
-          <nav class="flex space-x-2 sm:space-x-4 text-xs font-semibold" aria-label="Project Tabs">
+        <div class="border-b border-slate-200 bg-white px-2 rounded-t-xl pt-1 shadow-2xs">
+          <nav class="flex space-x-2 sm:space-x-4 text-xs font-semibold overflow-x-auto" aria-label="Project Tabs">
             <button type="button" onclick="ProjectDetailView.switchTab('overview')" id="tab-btn-overview" 
-                    class="tab-btn border-b-2 border-blue-800 text-blue-900 pb-3 px-2.5 flex items-center gap-1.5 transition font-bold">
-              <span>📊</span>
+                    class="tab-btn border-b-2 border-blue-800 text-blue-900 pb-3 px-2.5 flex items-center gap-1.5 transition font-bold whitespace-nowrap">
+              <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>
               <span>Overview & Plan vs Actual</span>
             </button>
             <button type="button" onclick="ProjectDetailView.switchTab('execution')" id="tab-btn-execution" 
-                    class="tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-800 pb-3 px-2.5 flex items-center gap-1.5 transition font-medium">
-              <span>👷</span>
+                    class="tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-800 pb-3 px-2.5 flex items-center gap-1.5 transition font-medium whitespace-nowrap">
+              <i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i>
               <span>Execution & WBS Tasks</span>
               <span id="tab-badge-tasks" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">0</span>
             </button>
             <button type="button" onclick="ProjectDetailView.switchTab('milestones')" id="tab-btn-milestones" 
-                    class="tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-800 pb-3 px-2.5 flex items-center gap-1.5 transition font-medium">
-              <span>⏱️</span>
+                    class="tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-800 pb-3 px-2.5 flex items-center gap-1.5 transition font-medium whitespace-nowrap">
+              <i data-lucide="clock" class="w-3.5 h-3.5"></i>
               <span>Critical Path Milestones</span>
               <span id="tab-badge-milestones" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700">8</span>
             </button>
             <button type="button" onclick="ProjectDetailView.switchTab('warnings')" id="tab-btn-warnings" 
-                    class="tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-800 pb-3 px-2.5 flex items-center gap-1.5 transition font-medium">
-              <span>🚨</span>
+                    class="tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-800 pb-3 px-2.5 flex items-center gap-1.5 transition font-medium whitespace-nowrap">
+              <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-rose-600"></i>
               <span>Surveillance Radar</span>
               <span id="tab-badge-warnings" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800">1</span>
             </button>
             <button type="button" onclick="ProjectDetailView.switchTab('whatif')" id="tab-btn-whatif" 
-                    class="tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-800 pb-3 px-2.5 flex items-center gap-1.5 transition font-medium">
-              <span>⚡</span>
+                    class="tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-800 pb-3 px-2.5 flex items-center gap-1.5 transition font-medium whitespace-nowrap">
+              <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-500"></i>
               <span>What-If Simulator</span>
             </button>
             <button type="button" onclick="ProjectDetailView.switchTab('audit')" id="tab-btn-audit" 
-                    class="tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-800 pb-3 px-2.5 flex items-center gap-1.5 transition font-medium">
-              <span>🛡️</span>
+                    class="tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-800 pb-3 px-2.5 flex items-center gap-1.5 transition font-medium whitespace-nowrap">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i>
               <span>Governance & Audit Trail</span>
             </button>
           </nav>
@@ -824,12 +826,13 @@ const ProjectDetailView = {
       }
       if (btn) {
         if (t === target) {
-          btn.className = "tab-btn border-b-2 border-blue-800 text-blue-900 pb-3 px-2.5 flex items-center gap-1.5 transition font-bold";
+          btn.className = "tab-btn border-b-2 border-blue-800 text-blue-900 pb-3 px-2.5 flex items-center gap-1.5 transition font-bold whitespace-nowrap";
         } else {
-          btn.className = "tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-800 pb-3 px-2.5 flex items-center gap-1.5 transition font-medium";
+          btn.className = "tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-800 pb-3 px-2.5 flex items-center gap-1.5 transition font-medium whitespace-nowrap";
         }
       }
     });
+    if (window.CommonUI && window.CommonUI.initIcons) window.CommonUI.initIcons();
   },
 
   toggleExplainability() {
@@ -887,6 +890,7 @@ const ProjectDetailView = {
 
     // Ensure initial tab is visible
     this.switchTab(this.activeTab || "overview");
+    if (window.CommonUI && window.CommonUI.initIcons) window.CommonUI.initIcons();
   },
 
   renderRoleAdaptiveBanner(pId, project) {

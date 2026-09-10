@@ -82,338 +82,202 @@ const DashboardView = {
       }
     ];
 
-    return `
-      <div class="max-w-[1440px] mx-auto space-y-6">
-        
-        <!-- =====================================================================
-             LEVEL 1: PAGE PURPOSE & EXECUTIVE INSIGHT BANNER (Section 10, 114)
-             ===================================================================== -->
-        <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-xl p-5 sm:p-6 text-white shadow-sm border border-slate-800">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div class="space-y-1.5 max-w-3xl">
-              <div class="flex items-center gap-2">
-                <span class="text-[10px] font-extrabold uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-400/30 px-2.5 py-0.5 rounded">
-                  ASTRA COMMAND CENTER • JULY 2026
-                </span>
-                <span class="text-slate-500">•</span>
-                <span class="text-xs text-slate-300 font-medium">MoSPI IPMD National Portfolio</span>
-              </div>
-              <h1 class="text-xl sm:text-2xl font-black text-white tracking-tight">
-                National Infrastructure Executive Decision Deck
-              </h1>
-              
-              <!-- Dynamic One-Sentence Executive Insight (Level 1) -->
-              <div id="executive-one-line-insight" class="text-xs sm:text-sm text-blue-100/90 font-medium leading-relaxed bg-white/5 border border-white/10 rounded-lg p-3 mt-2">
-                <span class="text-amber-400 font-bold mr-1">⚠️ Executive Brief:</span>
-                Portfolio risk is concentrated in <strong>Roads & Highways (38.2%)</strong> and <strong>Railways (26.4%)</strong>, with <strong class="text-rose-300">14 projects</strong> requiring immediate ministerial review due to statutory clearance impasses and physical-financial decoupling.
-              </div>
-            </div>
+    const user = (window.APIClient && window.APIClient.currentUser) ? window.APIClient.currentUser : {};
+    const userName = user.name || "National Leadership";
+    const userRole = user.role ? user.role.replace(/_/g, " ") : "COMMAND CENTER";
 
-            <div class="flex sm:flex-col gap-2 flex-shrink-0">
-              <a href="#/projects?risk_tier=CRITICAL" class="px-3.5 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition-colors shadow-sm text-center flex items-center justify-center gap-1.5">
-                <span>🚨</span>
-                <span>Review Critical (14)</span>
-              </a>
-              <a href="#/reports" class="px-3.5 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition-colors border border-white/15 text-center flex items-center justify-center gap-1.5">
-                <span>📑</span>
-                <span>Flash Reports Tables</span>
-              </a>
+    return `
+      <div class="max-w-[1440px] mx-auto space-y-5">
+        
+        <!-- Header: Page Identity & Executive Greeting -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-1">
+              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200 text-[10px] font-bold uppercase tracking-wider">
+                🏛️ MoSPI • IPMD
+              </span>
+              <span>National Infrastructure Intelligence Platform</span>
             </div>
+            <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight" id="dashboard-user-greeting">
+              Good afternoon, ${userName}
+            </h1>
+            <p class="text-xs text-slate-600 mt-0.5">
+              National Command Center — Portfolio health, early-warning risk radar, and priority ministerial interventions.
+            </p>
+          </div>
+          <div class="flex items-center gap-2.5 flex-shrink-0">
+            <a href="#/projects?risk_tier=CRITICAL" class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm transition flex items-center gap-2">
+              <span>🚨</span>
+              <span>Critical Interventions (<span id="kpi-review-count">1,160</span>)</span>
+            </a>
+            <a href="#/reports" class="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-bold text-xs shadow-2xs transition flex items-center gap-2">
+              <span>📑</span>
+              <span>Flash Reports</span>
+            </a>
           </div>
         </div>
 
-        <!-- DATASET COMPOSITION STRIP (Explicit Synthetic vs Real Separation) -->
-        <div id="dataset-composition-banner" class="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 bg-slate-900/90 text-white rounded-xl border border-slate-800 shadow-sm text-xs">
+        <!-- Dataset Provenance Pill (Explicit Separation of Synthetic vs Real Data) -->
+        <div id="dataset-composition-banner" class="flex flex-wrap items-center justify-between gap-3 px-4 py-2 bg-white text-slate-700 rounded-xl border border-slate-200 shadow-2xs text-xs">
           <div class="flex flex-wrap items-center gap-2">
-            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-extrabold bg-blue-500/20 text-blue-300 border border-blue-400/30">
-              📊 DATA PROVENANCE
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-extrabold bg-blue-50 text-blue-800 border border-blue-200">
+              📊 DATASET PROVENANCE
             </span>
-            <span class="text-slate-300 font-medium">Composition:</span>
-            <span id="composition-synthetic-count" class="font-bold text-blue-400">10,000 PAIMANA Benchmark Records</span>
-            <span class="text-slate-500">•</span>
-            <span id="composition-real-count" class="font-bold text-emerald-400">0 Real Imported Records</span>
+            <span class="text-slate-500 font-medium">Composition:</span>
+            <span id="composition-synthetic-count" class="font-bold text-blue-700">10,000 PAIMANA Benchmark Records</span>
+            <span class="text-slate-300">•</span>
+            <span id="composition-real-count" class="font-bold text-emerald-700">0 Real Imported Records</span>
           </div>
           <div class="flex items-center gap-3">
-            <a href="#/projects?data_source=REAL" class="text-[11px] text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1 transition">
+            <a href="#/projects?data_source=REAL" class="text-[11px] text-emerald-700 hover:text-emerald-800 font-semibold flex items-center gap-1 transition">
               <span>🌿 View Real Projects</span>
             </a>
-            <span class="text-slate-600">|</span>
-            <a href="#/onboarding" class="text-[11px] text-blue-400 hover:text-blue-300 font-bold flex items-center gap-1 transition">
+            <span class="text-slate-300">|</span>
+            <a href="#/onboarding" class="text-[11px] text-blue-700 hover:text-blue-800 font-bold flex items-center gap-1 transition">
               <span>📥 Ingest Real Project Data</span>
               <span>&rarr;</span>
             </a>
           </div>
         </div>
 
-        <!-- =====================================================================
-             LEVEL 2: 6 KEY NATIONAL INDICATORS (High Information Density, Clickable)
-             ===================================================================== -->
-        <div>
-          <div class="flex items-center justify-between mb-2">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Key National Portfolio Telemetry</h2>
-            <span class="text-[11px] text-slate-400">Click any indicator to open filtered explorer</span>
-          </div>
-          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            
-            <!-- 1. Tracked Projects -->
-            <a href="#/projects" class="gov-card p-3.5 flex flex-col justify-between hover:border-blue-400 hover:shadow-md transition group text-decoration-none" title="View all Central Sector Projects">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-blue-700">Ongoing Projects</span>
-              <div class="my-1.5">
-                <div id="kpi-tracked-count" class="text-2xl font-extrabold text-slate-900 font-mono">10,000</div>
-                <div class="text-[10px] text-slate-500 font-medium">Central Sector (₹150 Cr+)</div>
-              </div>
-              <span class="text-[10px] text-blue-700 font-semibold flex items-center gap-1">Explorer →</span>
-            </a>
-
-            <!-- 2. Revised Capital Outlay -->
-            <a href="#/portfolio-matrix" class="gov-card p-3.5 flex flex-col justify-between hover:border-blue-400 hover:shadow-md transition group text-decoration-none" title="Explore Portfolio Outlay Matrix">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-blue-700">Capital Outlay</span>
-              <div class="my-1.5">
-                <div id="kpi-revised-cost" class="text-2xl font-extrabold text-slate-900 font-mono">₹42.50L Cr</div>
-                <div class="text-[10px] text-slate-500 font-medium">Revised aggregate spend</div>
-              </div>
-              <span class="text-[10px] text-blue-700 font-semibold flex items-center gap-1">Outlay Matrix →</span>
-            </a>
-
-            <!-- 3. Cumulative Overrun -->
-            <a href="#/portfolio-matrix" class="gov-card p-3.5 flex flex-col justify-between hover:border-amber-400 hover:shadow-md transition group text-decoration-none" title="Inspect Cost Escalations">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-amber-700">Cost Overrun</span>
-              <div class="my-1.5">
-                <div id="kpi-overrun-cost" class="text-2xl font-extrabold text-amber-700 font-mono">₹12.45L Cr</div>
-                <div class="text-[10px] text-amber-800 font-semibold">+29.3% fiscal expansion</div>
-              </div>
-              <span class="text-[10px] text-amber-700 font-semibold flex items-center gap-1">Cost Drivers →</span>
-            </a>
-
-            <!-- 4. Average Physical Progress -->
-            <a href="#/execution" class="gov-card p-3.5 flex flex-col justify-between hover:border-blue-400 hover:shadow-md transition group text-decoration-none" title="Execution CPM Progress">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-blue-700">Avg Progress</span>
-              <div class="my-1.5">
-                <div id="kpi-avg-progress" class="text-2xl font-extrabold text-slate-900 font-mono">58.4%</div>
-                <div class="text-[10px] text-slate-500 font-medium">vs 69.2% expenditure</div>
-              </div>
-              <span class="text-[10px] text-blue-700 font-semibold flex items-center gap-1">Execution CPM →</span>
-            </a>
-
-            <!-- 5. High-Risk Projects -->
-            <a href="#/projects?risk_tier=HIGH" class="gov-card p-3.5 flex flex-col justify-between hover:border-orange-400 hover:shadow-md transition group text-decoration-none" title="Filter High-Risk Projects">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-orange-700">High Risk</span>
-              <div class="my-1.5">
-                <div id="kpi-high-count" class="text-2xl font-extrabold text-orange-700 font-mono">2,480</div>
-                <div class="text-[10px] text-slate-500 font-medium">Require proactive triage</div>
-              </div>
-              <span class="text-[10px] text-orange-700 font-semibold flex items-center gap-1">View 2,480 →</span>
-            </a>
-
-            <!-- 6. Critical Projects Requiring Review -->
-            <a href="#/projects?risk_tier=CRITICAL" class="gov-card p-3.5 flex flex-col justify-between bg-rose-50/40 border-rose-200 hover:border-rose-400 hover:shadow-md transition group text-decoration-none" title="Filter Critical Priority Projects">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-rose-800">Critical Priority</span>
-              <div class="my-1.5">
-                <div id="kpi-review-count" class="text-2xl font-extrabold text-rose-700 font-mono">1,160</div>
-                <div class="text-[10px] text-rose-700 font-semibold">Immediate attention</div>
-              </div>
-              <span class="text-[10px] text-rose-700 font-bold flex items-center gap-1">View 1,160 →</span>
-            </a>
-
-          </div>
-        </div>
-
-        <!-- =====================================================================
-             LEVEL 3: NATIONAL PORTFOLIO HEALTH STRATIFICATION (Visual Insight)
-             ===================================================================== -->
-        <div class="gov-card p-4 space-y-3">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <!-- PAIMANA-Inspired Clean Filter Bar -->
+        <div class="bg-white rounded-xl border border-slate-200 p-3 shadow-2xs">
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 items-end">
             <div>
-              <h3 class="text-sm font-bold text-slate-900 tracking-tight">National Portfolio Health Stratification</h3>
-              <p class="text-caption text-slate-500">Autonomous risk classification across 10,000 projects based on PAIMANA monthly indicators</p>
+              <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Sector</label>
+              <select id="filter-sector" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
+                <option value="ALL">All Sectors</option>
+                <option value="Roads & Highways">Roads & Highways</option>
+                <option value="Railways">Railways</option>
+                <option value="Power">Power</option>
+                <option value="Petroleum">Petroleum</option>
+                <option value="Urban Development">Urban Development</option>
+                <option value="Ports & Shipping">Ports & Shipping</option>
+              </select>
             </div>
-            <div class="flex items-center gap-2 text-xs">
-              <span class="text-slate-400">Filter by Tier:</span>
-              <a href="#/projects?risk_tier=LOW" class="px-2 py-0.5 rounded font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100">Healthy</a>
-              <a href="#/projects?risk_tier=MODERATE" class="px-2 py-0.5 rounded font-bold bg-blue-50 text-blue-800 border border-blue-200 hover:bg-blue-100">Watch</a>
-              <a href="#/projects?risk_tier=HIGH" class="px-2 py-0.5 rounded font-bold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100">High</a>
-              <a href="#/projects?risk_tier=CRITICAL" class="px-2 py-0.5 rounded font-bold bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100">Critical</a>
-            </div>
-          </div>
-
-          <!-- Stacked Ratio Bar -->
-          <div class="w-full h-4 rounded-full overflow-hidden flex shadow-inner cursor-pointer" title="Click to filter by tier">
-            <div onclick="window.location.hash='#/projects?risk_tier=LOW'" class="bg-emerald-600 h-full hover:opacity-90 transition" style="width: 42.1%;" title="Healthy (Low Risk): 4,210 projects (42.1%)"></div>
-            <div onclick="window.location.hash='#/projects?risk_tier=MODERATE'" class="bg-blue-600 h-full hover:opacity-90 transition" style="width: 21.5%;" title="Watch (Moderate): 2,150 projects (21.5%)"></div>
-            <div onclick="window.location.hash='#/projects?risk_tier=HIGH'" class="bg-amber-500 h-full hover:opacity-90 transition" style="width: 24.8%;" title="High Risk: 2,480 projects (24.8%)"></div>
-            <div onclick="window.location.hash='#/projects?risk_tier=CRITICAL'" class="bg-rose-600 h-full hover:opacity-90 transition" style="width: 11.6%;" title="Critical: 1,160 projects (11.6%)"></div>
-          </div>
-
-          <!-- Legend with Exact Numbers -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-xs">
-            <a href="#/projects?risk_tier=LOW" class="flex items-center gap-2 p-1.5 rounded hover:bg-slate-50 transition">
-              <span class="w-2.5 h-2.5 rounded-sm bg-emerald-600 flex-shrink-0"></span>
-              <span class="text-slate-600">Healthy (Low Risk):</span>
-              <strong id="legend-low-count" class="font-mono text-slate-900 ml-auto">4,210 (42.1%)</strong>
-            </a>
-            <a href="#/projects?risk_tier=MODERATE" class="flex items-center gap-2 p-1.5 rounded hover:bg-slate-50 transition">
-              <span class="w-2.5 h-2.5 rounded-sm bg-blue-600 flex-shrink-0"></span>
-              <span class="text-slate-600">Watch (Moderate):</span>
-              <strong id="legend-mod-count" class="font-mono text-slate-900 ml-auto">2,150 (21.5%)</strong>
-            </a>
-            <a href="#/projects?risk_tier=HIGH" class="flex items-center gap-2 p-1.5 rounded hover:bg-slate-50 transition">
-              <span class="w-2.5 h-2.5 rounded-sm bg-amber-500 flex-shrink-0"></span>
-              <span class="text-slate-600">High Risk:</span>
-              <strong id="legend-high-count" class="font-mono text-slate-900 ml-auto">2,480 (24.8%)</strong>
-            </a>
-            <a href="#/projects?risk_tier=CRITICAL" class="flex items-center gap-2 p-1.5 rounded hover:bg-slate-50 transition">
-              <span class="w-2.5 h-2.5 rounded-sm bg-rose-600 flex-shrink-0"></span>
-              <span class="text-slate-600">Critical Priority:</span>
-              <strong id="legend-crit-count" class="font-mono text-slate-900 ml-auto">1,160 (11.6%)</strong>
-            </a>
-          </div>
-        </div>
-
-        <!-- =====================================================================
-             LEVEL 4: "WHAT NEEDS ATTENTION?" (Priority Action Queue - Section 10)
-             ===================================================================== -->
-        <div class="gov-card p-5 space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
             <div>
-              <div class="flex items-center gap-2">
-                <span class="text-base">🚨</span>
-                <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">What Needs Attention? (Top Priority Administrative Queue)</h3>
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
-                  IMMEDIATE ACTION
-                </span>
-              </div>
-              <p class="text-caption text-slate-500 mt-0.5">
-                Central sector projects exhibiting severe schedule drift, physical-financial decoupling, or statutory clearance impasses.
-              </p>
+              <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Ministry / Dept</label>
+              <select id="filter-ministry" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
+                <option value="ALL">All Ministries</option>
+                <option value="Ministry of Road Transport and Highways">Road Transport (MoRTH)</option>
+                <option value="Ministry of Railways">Railways</option>
+                <option value="Ministry of Power">Power</option>
+                <option value="Ministry of Petroleum and Natural Gas">Petroleum & Natural Gas</option>
+              </select>
             </div>
-            <a href="#/projects?risk_tier=CRITICAL" class="text-xs font-bold text-blue-700 hover:text-blue-900 flex items-center gap-1">
-              <span>View All 1,160 Critical Projects</span>
-              <span>→</span>
-            </a>
-          </div>
-
-          <div class="divide-y divide-slate-100">
-            ${attentionProjects.map(p => `
-              <div class="py-3.5 flex flex-col lg:flex-row lg:items-center justify-between gap-3 hover:bg-slate-50/60 p-2 rounded-lg transition">
-                <div class="space-y-1 max-w-2xl min-w-0">
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <span class="font-mono text-xs font-bold text-blue-700">${p.project_id}</span>
-                    <span class="text-slate-300">•</span>
-                    <span class="text-xs font-semibold text-slate-600">${p.ministry} (${p.agency})</span>
-                    ${CommonUI.renderRiskBadge(p.risk_level, p.risk_score)}
-                  </div>
-                  <h4 class="font-bold text-slate-900 text-sm hover:text-blue-700 transition">
-                    <a href="#/projects/${p.project_id}">${p.project_name}</a>
-                  </h4>
-                  <div class="text-xs text-slate-600 flex items-start gap-1 pt-0.5">
-                    <strong class="text-slate-800 flex-shrink-0">Why:</strong>
-                    <span>${p.why}</span>
-                  </div>
-                </div>
-
-                <div class="flex items-center justify-between lg:justify-end gap-4 flex-shrink-0 text-xs">
-                  <div class="text-right">
-                    <div class="font-bold text-slate-800 tabular-nums">${p.exposure}</div>
-                    <div class="text-[11px] text-rose-700 font-semibold">${p.deadline_pressure}</div>
-                  </div>
-                  <a href="#/projects/${p.project_id}" class="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-800 hover:bg-blue-100 border border-blue-200 font-bold transition flex items-center gap-1">
-                    <span>Inspect</span>
-                    <span>→</span>
-                  </a>
-                </div>
-              </div>
-            `).join('')}
+            <div>
+              <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">State / UT</label>
+              <select id="filter-state" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
+                <option value="ALL">All States / UTs</option>
+                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                <option value="Maharashtra">Maharashtra</option>
+                <option value="Bihar">Bihar</option>
+                <option value="Gujarat">Gujarat</option>
+                <option value="Tamil Nadu">Tamil Nadu</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Risk Tier</label>
+              <select id="filter-risk" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
+                <option value="ALL">All Risk Tiers</option>
+                <option value="CRITICAL">Critical (Immediate Action)</option>
+                <option value="HIGH">High Risk</option>
+                <option value="MODERATE">Moderate / Watch</option>
+                <option value="LOW">Low Risk / Healthy</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Data Source</label>
+              <select id="filter-source" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
+                <option value="ALL">All Datasets</option>
+                <option value="REAL">Real Imported Data</option>
+                <option value="SYNTHETIC">10K PAIMANA Baseline</option>
+              </select>
+            </div>
+            <div>
+              <button onclick="DashboardView.applyFilters()" class="w-full py-1.5 px-3 bg-blue-700 hover:bg-blue-600 text-white font-bold text-xs rounded-lg transition shadow-2xs cursor-pointer flex items-center justify-center gap-1.5">
+                <span>🔍</span>
+                <span>Show Data</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- =====================================================================
-             LEVEL 5: MINISTRY RISK RANKING & CLEAN TREND VISUALIZATION
-             ===================================================================== -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- The 4 Refined Primary KPI Tiles -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           
-          <!-- Ministry Risk Ranked Table (7 Cols) -->
-          <div class="lg:col-span-7 gov-card p-4 flex flex-col justify-between">
+          <!-- 1. Tracked Projects (Cyan Tint) -->
+          <a href="#/projects" class="metric-card-paimana metric-card-cyan group text-decoration-none" title="View all Central Sector Projects">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-teal-700">Central Sector Projects</span>
+              <span class="p-1.5 rounded-lg bg-teal-50 text-teal-700 border border-teal-200 text-sm">📁</span>
+            </div>
+            <div class="mt-2.5 mb-1">
+              <div id="kpi-tracked-count" class="text-3xl font-extrabold text-slate-900 font-mono tracking-tight">10,000</div>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-100">
+              <span>₹150 Cr+ Sanctioned</span>
+              <span class="text-teal-700 font-bold group-hover:underline">Catalog &rarr;</span>
+            </div>
+          </a>
+
+          <!-- 2. Projects at Risk (Amber Tint) -->
+          <a href="#/projects?risk_tier=HIGH" class="metric-card-paimana metric-card-amber group text-decoration-none" title="Projects requiring active triage">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-amber-800 group-hover:text-amber-900">Projects At Risk</span>
+              <span class="p-1.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 text-sm">⚠️</span>
+            </div>
+            <div class="mt-2.5 mb-1">
+              <div id="kpi-high-count" class="text-3xl font-extrabold text-amber-700 font-mono tracking-tight">3,640</div>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-100">
+              <span><strong class="text-rose-700">1,160</strong> Critical Priority</span>
+              <span class="text-amber-800 font-bold group-hover:underline">Radar &rarr;</span>
+            </div>
+          </a>
+
+          <!-- 3. Capital Outlay / Overrun (Rose Tint) -->
+          <a href="#/portfolio-matrix" class="metric-card-paimana metric-card-rose group text-decoration-none" title="Inspect Cost Escalations">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-rose-800 group-hover:text-rose-900">Capital Outlay at Risk</span>
+              <span class="p-1.5 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 text-sm">💸</span>
+            </div>
+            <div class="mt-2.5 mb-1">
+              <div id="kpi-overrun-cost" class="text-3xl font-extrabold text-rose-700 font-mono tracking-tight">₹12.45L Cr</div>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-100">
+              <span id="kpi-revised-cost">₹42.50L Cr Total Outlay</span>
+              <span class="text-rose-700 font-bold group-hover:underline">+29.3% drift &rarr;</span>
+            </div>
+          </a>
+
+          <!-- 4. Average Physical Progress (Emerald Tint) -->
+          <a href="#/execution" class="metric-card-paimana metric-card-emerald group text-decoration-none" title="Execution CPM Progress">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-800 group-hover:text-emerald-900">Physical Progress</span>
+              <span class="p-1.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-sm">📈</span>
+            </div>
+            <div class="mt-2.5 mb-1">
+              <div id="kpi-avg-progress" class="text-3xl font-extrabold text-emerald-700 font-mono tracking-tight">58.4%</div>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-100">
+              <span>vs 69.2% Expenditure</span>
+              <span class="text-emerald-800 font-bold group-hover:underline">CPM Hub &rarr;</span>
+            </div>
+          </a>
+
+        </div>
+
+        <!-- 2-Column Main Layout: Visual Health & Priority Projects -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          
+          <!-- Left: Portfolio Health Trend & Stratification (7 Cols) -->
+          <div class="lg:col-span-7 bg-white rounded-xl border border-slate-200 p-5 shadow-2xs space-y-4 flex flex-col justify-between">
             <div>
               <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
                 <div>
-                  <h3 class="text-sm font-bold text-slate-900">Ministry Risk Concentration</h3>
-                  <p class="text-caption text-slate-500">Ranked by aggregate capital exposure and high-risk project share</p>
-                </div>
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Ranked 1–6</span>
-              </div>
-
-              <div class="overflow-x-auto">
-                <table class="w-full text-xs text-left">
-                  <thead>
-                    <tr class="text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
-                      <th class="pb-2">Ministry</th>
-                      <th class="pb-2">Risk Exposure</th>
-                      <th class="pb-2">Total Outlay</th>
-                      <th class="pb-2">High / Crit</th>
-                      <th class="pb-2 text-right">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-slate-100 font-medium">
-                    <tr class="hover:bg-slate-50 transition cursor-pointer" onclick="window.location.hash='#/projects?ministry=Ministry%20of%20Road%20Transport%20and%20Highways'">
-                      <td class="py-2.5 font-bold text-slate-900">Road Transport & Highways</td>
-                      <td class="py-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-800 border border-rose-200">CRITICAL</span></td>
-                      <td class="py-2.5 font-mono">₹14.20L Cr</td>
-                      <td class="py-2.5 text-rose-700 font-bold tabular-nums">1,480 / 4,113</td>
-                      <td class="py-2.5 text-right"><span class="text-blue-700 font-bold">Filter →</span></td>
-                    </tr>
-                    <tr class="hover:bg-slate-50 transition cursor-pointer" onclick="window.location.hash='#/projects?ministry=Ministry%20of%20Railways'">
-                      <td class="py-2.5 font-bold text-slate-900">Railways</td>
-                      <td class="py-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-800 border border-rose-200">CRITICAL</span></td>
-                      <td class="py-2.5 font-mono">₹11.50L Cr</td>
-                      <td class="py-2.5 text-rose-700 font-bold tabular-nums">980 / 2,840</td>
-                      <td class="py-2.5 text-right"><span class="text-blue-700 font-bold">Filter →</span></td>
-                    </tr>
-                    <tr class="hover:bg-slate-50 transition cursor-pointer" onclick="window.location.hash='#/projects?ministry=Ministry%20of%20Power'">
-                      <td class="py-2.5 font-bold text-slate-900">Power & Renewable Energy</td>
-                      <td class="py-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">HIGH</span></td>
-                      <td class="py-2.5 font-mono">₹7.80L Cr</td>
-                      <td class="py-2.5 text-amber-700 font-bold tabular-nums">540 / 1,220</td>
-                      <td class="py-2.5 text-right"><span class="text-blue-700 font-bold">Filter →</span></td>
-                    </tr>
-                    <tr class="hover:bg-slate-50 transition cursor-pointer" onclick="window.location.hash='#/projects?ministry=Ministry%20of%20Petroleum%20and%20Natural%20Gas'">
-                      <td class="py-2.5 font-bold text-slate-900">Petroleum & Natural Gas</td>
-                      <td class="py-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-800 border border-blue-200">MODERATE</span></td>
-                      <td class="py-2.5 font-mono">₹4.90L Cr</td>
-                      <td class="py-2.5 text-slate-700 font-bold tabular-nums">320 / 890</td>
-                      <td class="py-2.5 text-right"><span class="text-blue-700 font-bold">Filter →</span></td>
-                    </tr>
-                    <tr class="hover:bg-slate-50 transition cursor-pointer" onclick="window.location.hash='#/projects?ministry=Ministry%20of%20Housing%20and%20Urban%20Affairs'">
-                      <td class="py-2.5 font-bold text-slate-900">Housing & Urban Affairs</td>
-                      <td class="py-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-800 border border-blue-200">MODERATE</span></td>
-                      <td class="py-2.5 font-mono">₹3.20L Cr</td>
-                      <td class="py-2.5 text-slate-700 font-bold tabular-nums">210 / 580</td>
-                      <td class="py-2.5 text-right"><span class="text-blue-700 font-bold">Filter →</span></td>
-                    </tr>
-                    <tr class="hover:bg-slate-50 transition cursor-pointer" onclick="window.location.hash='#/projects?ministry=Ministry%20of%20Shipping'">
-                      <td class="py-2.5 font-bold text-slate-900">Ports & Shipping</td>
-                      <td class="py-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">LOW</span></td>
-                      <td class="py-2.5 font-mono">₹1.80L Cr</td>
-                      <td class="py-2.5 text-emerald-700 font-bold tabular-nums">110 / 357</td>
-                      <td class="py-2.5 text-right"><span class="text-blue-700 font-bold">Filter →</span></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-caption text-slate-500">
-              <span>Calibrated against MoSPI IPMD Flash Reports</span>
-              <a href="#/ministry" class="text-xs font-bold text-blue-700 hover:text-blue-900">Open Ministry Command Desk →</a>
-            </div>
-          </div>
-
-          <!-- Clean Trend Visualization (5 Cols) -->
-          <div class="lg:col-span-5 gov-card p-4 flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
-                <div>
-                  <h3 class="text-sm font-bold text-slate-900">Portfolio Health Trend</h3>
-                  <p class="text-caption text-slate-500">Quarterly evolution: Apr 2026 to Jul 2026</p>
+                  <h3 class="text-sm font-bold text-slate-900 tracking-tight">National Portfolio Health & Trajectory</h3>
+                  <p class="text-xs text-slate-500">Autonomous risk stratification and multi-period trend from PAIMANA monthly records</p>
                 </div>
                 <div class="flex items-center gap-1 text-[11px] bg-slate-100 p-0.5 rounded border border-slate-200">
                   <button onclick="DashboardView.switchTrendMetric('risk')" id="btn-trend-risk" class="px-2 py-0.5 rounded font-bold bg-white text-slate-900 shadow-2xs cursor-pointer">Risk</button>
@@ -421,33 +285,123 @@ const DashboardView = {
                 </div>
               </div>
 
-              <div class="h-52 w-full relative">
+              <!-- Line Chart Container -->
+              <div class="h-56 w-full relative">
                 <canvas id="dashboard-trend-canvas"></canvas>
+              </div>
+
+              <!-- Stratification Ratio Bar -->
+              <div class="mt-4 pt-3 border-t border-slate-100 space-y-2">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-bold text-slate-800">Risk Stratification (10,000 Projects)</span>
+                  <a href="#/projects" class="text-blue-700 hover:underline font-semibold text-[11px]">Explore All &rarr;</a>
+                </div>
+                <div class="w-full h-3.5 rounded-full overflow-hidden flex shadow-inner cursor-pointer" title="Click to filter by tier">
+                  <div onclick="window.location.hash='#/projects?risk_tier=LOW'" class="bg-emerald-600 h-full hover:opacity-90 transition" style="width: 42.1%;" title="Healthy (Low Risk): 4,210 projects (42.1%)"></div>
+                  <div onclick="window.location.hash='#/projects?risk_tier=MODERATE'" class="bg-blue-600 h-full hover:opacity-90 transition" style="width: 21.5%;" title="Watch (Moderate): 2,150 projects (21.5%)"></div>
+                  <div onclick="window.location.hash='#/projects?risk_tier=HIGH'" class="bg-amber-500 h-full hover:opacity-90 transition" style="width: 24.8%;" title="High Risk: 2,480 projects (24.8%)"></div>
+                  <div onclick="window.location.hash='#/projects?risk_tier=CRITICAL'" class="bg-rose-600 h-full hover:opacity-90 transition" style="width: 11.6%;" title="Critical: 1,160 projects (11.6%)"></div>
+                </div>
+
+                <!-- Legend with Exact Counts -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-xs">
+                  <a href="#/projects?risk_tier=LOW" class="flex items-center gap-1.5 p-1 rounded hover:bg-slate-50 transition text-decoration-none">
+                    <span class="w-2.5 h-2.5 rounded-sm bg-emerald-600 flex-shrink-0"></span>
+                    <span class="text-slate-600 text-[11px]">Healthy:</span>
+                    <strong id="legend-low-count" class="font-mono text-slate-900 ml-auto text-[11px]">4,210</strong>
+                  </a>
+                  <a href="#/projects?risk_tier=MODERATE" class="flex items-center gap-1.5 p-1 rounded hover:bg-slate-50 transition text-decoration-none">
+                    <span class="w-2.5 h-2.5 rounded-sm bg-blue-600 flex-shrink-0"></span>
+                    <span class="text-slate-600 text-[11px]">Watch:</span>
+                    <strong id="legend-mod-count" class="font-mono text-slate-900 ml-auto text-[11px]">2,150</strong>
+                  </a>
+                  <a href="#/projects?risk_tier=HIGH" class="flex items-center gap-1.5 p-1 rounded hover:bg-slate-50 transition text-decoration-none">
+                    <span class="w-2.5 h-2.5 rounded-sm bg-amber-500 flex-shrink-0"></span>
+                    <span class="text-slate-600 text-[11px]">High:</span>
+                    <strong id="legend-high-count" class="font-mono text-slate-900 ml-auto text-[11px]">2,480</strong>
+                  </a>
+                  <a href="#/projects?risk_tier=CRITICAL" class="flex items-center gap-1.5 p-1 rounded hover:bg-slate-50 transition text-decoration-none">
+                    <span class="w-2.5 h-2.5 rounded-sm bg-rose-600 flex-shrink-0"></span>
+                    <span class="text-slate-600 text-[11px]">Critical:</span>
+                    <strong id="legend-crit-count" class="font-mono text-slate-900 ml-auto text-[11px]">1,160</strong>
+                  </a>
+                </div>
               </div>
             </div>
 
-            <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-caption text-slate-500">
-              <span class="flex items-center gap-1.5 text-xs">
-                <span class="w-2 h-2 rounded-full bg-blue-700"></span>
-                <span>Source: <strong class="text-slate-800">PAIMANA Multi-Period Snapshot Ledger</strong></span>
-              </span>
-              <a href="#/analytics" class="text-xs font-bold text-blue-700 hover:text-blue-900">Deep Analytics →</a>
+            <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+              <span>Source: <strong>PAIMANA Multi-Period Snapshot Ledger</strong></span>
+              <a href="#/portfolio-matrix" class="text-blue-700 font-bold hover:underline">Outlay Matrix &rarr;</a>
+            </div>
+          </div>
+
+          <!-- Right: Priority Projects Requiring Attention (5 Cols) -->
+          <div class="lg:col-span-5 bg-white rounded-xl border border-slate-200 p-5 shadow-2xs space-y-3 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
+                <div class="flex items-center gap-2">
+                  <span class="text-base">🚨</span>
+                  <div>
+                    <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Priority Attention Queue</h3>
+                    <p class="text-[11px] text-slate-500">Critical projects with severe physical-financial decoupling</p>
+                  </div>
+                </div>
+                <a href="#/projects?risk_tier=CRITICAL" class="text-xs font-bold text-blue-700 hover:text-blue-900 flex items-center gap-1">
+                  <span>View All (1,160)</span>
+                  <span>&rarr;</span>
+                </a>
+              </div>
+
+              <!-- List of Top Attention Projects -->
+              <div class="divide-y divide-slate-100 max-h-[380px] overflow-y-auto pr-1">
+                ${attentionProjects.slice(0, 5).map(p => `
+                  <div class="py-2.5 hover:bg-slate-50/80 p-2 rounded-lg transition group">
+                    <div class="flex items-center justify-between gap-2">
+                      <div class="flex items-center gap-1.5 min-w-0">
+                        <span class="w-2 h-2 rounded-full ${p.risk_level === 'CRITICAL' ? 'bg-rose-600' : 'bg-amber-500'} flex-shrink-0"></span>
+                        <span class="font-mono text-[11px] font-bold text-slate-700">${p.project_id}</span>
+                        <span class="text-[10px] text-slate-400 truncate">• ${p.agency}</span>
+                      </div>
+                      <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold ${p.risk_level === 'CRITICAL' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'}">
+                        ${p.risk_level}
+                      </span>
+                    </div>
+
+                    <h4 class="font-bold text-slate-900 text-xs mt-1 truncate group-hover:text-blue-700 transition">
+                      <a href="#/projects/${p.project_id}" class="text-decoration-none text-slate-900 hover:text-blue-700">${p.project_name}</a>
+                    </h4>
+
+                    <p class="text-[11px] text-slate-600 line-clamp-1 mt-0.5">
+                      ${p.why}
+                    </p>
+
+                    <div class="flex items-center justify-between text-[10px] text-slate-500 pt-1 mt-1 border-t border-slate-100/60">
+                      <span class="font-bold text-slate-800 font-mono">${p.exposure}</span>
+                      <span class="text-rose-700 font-medium">${p.deadline_pressure}</span>
+                      <a href="#/projects/${p.project_id}" class="text-blue-700 font-bold hover:underline">Inspect &rarr;</a>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+              <span>Top 5 ministerial triage queue</span>
+              <a href="#/early-warnings" class="text-blue-700 font-bold hover:underline">Early Warning Radar &rarr;</a>
             </div>
           </div>
 
         </div>
 
-        <!-- =====================================================================
-             LEVEL 6: RECENT PORTFOLIO ACTIVITY & SYSTEM STATUS
-             ===================================================================== -->
-        <div class="p-3.5 bg-white border border-slate-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-600">
+        <!-- Bottom: System Status & Governance Ledger -->
+        <div class="p-3.5 bg-white border border-slate-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-600 shadow-2xs">
           <div class="flex items-center gap-2">
             <span class="text-base">ℹ️</span>
-            <span><strong>System Status:</strong> 10,000 Central Sector projects synced. ML risk inference engine operating at 10.7ms lead-time. Verified against MoSPI PAIMANA Standard.</span>
+            <span><strong>System Telemetry:</strong> 10,000 Central Sector projects actively monitored. LightGBM inference & TreeSHAP explainability running at 10.7ms lead-time. Zero unverified records.</span>
           </div>
           <div class="flex items-center gap-3 flex-shrink-0">
-            <a href="#/data-quality" class="text-blue-700 hover:underline font-semibold">Data Observatory →</a>
-            <a href="#/settings" class="text-slate-500 hover:underline">Audit Ledger →</a>
+            <a href="#/data-quality" class="text-blue-700 hover:underline font-semibold">Data Quality &rarr;</a>
+            <a href="#/settings" class="text-slate-500 hover:underline">Governance Audit &rarr;</a>
           </div>
         </div>
 

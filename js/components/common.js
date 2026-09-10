@@ -107,21 +107,31 @@ const CommonUI = {
     `).join("");
   },
 
+  initIcons() {
+    try {
+      if (window.lucide && window.lucide.createIcons) {
+        window.lucide.createIcons();
+      }
+    } catch (e) {
+      console.debug("[CommonUI] Lucide initIcons:", e);
+    }
+  },
+
   // Dynamic Breadcrumb Component (Section 8)
   renderBreadcrumbs(items = []) {
     if (!items || items.length === 0) return "";
     return `
       <nav class="flex items-center gap-1.5 text-xs text-slate-500 overflow-x-auto whitespace-nowrap py-1" aria-label="Breadcrumb">
-        <a href="#/dashboard" class="hover:text-blue-700 font-medium transition-colors flex items-center gap-1">
-          <span>🏛️</span>
-          <span>Command Center</span>
+        <a href="#/dashboard" class="hover:text-blue-700 font-medium transition-colors flex items-center gap-1.5">
+          <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 text-slate-400"></i>
+          <span>ASTRA</span>
         </a>
         ${items.map((item, idx) => {
           const isLast = idx === items.length - 1;
           return `
             <span class="text-slate-300">/</span>
             ${isLast 
-              ? `<span class="font-semibold text-slate-900 truncate max-w-[240px]" aria-current="page">${item.label}</span>`
+              ? `<span class="font-semibold text-slate-900 truncate max-w-[280px]" aria-current="page">${item.label}</span>`
               : `<a href="${item.href || '#'}" class="hover:text-blue-700 transition-colors truncate max-w-[200px]">${item.label}</a>`
             }
           `;
@@ -251,7 +261,10 @@ const CommonUI = {
     `;
 
     backdrop.style.display = "block";
-    requestAnimationFrame(() => panel.classList.add("open"));
+    requestAnimationFrame(() => {
+      panel.classList.add("open");
+      CommonUI.initIcons();
+    });
   },
 
   closeDrawer() {

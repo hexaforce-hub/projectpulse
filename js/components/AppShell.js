@@ -37,8 +37,8 @@ const AppShell = {
                   <span class="text-[9px] text-slate-500 font-semibold block leading-none">MoSPI • ProjectPulse</span>
                 </div>
               </a>
-              <button id="btn-collapse-sidebar" class="text-slate-400 hover:text-slate-700 p-1.5 rounded-md text-xs hover:bg-slate-100" title="Toggle Sidebar">
-                ⇥
+              <button id="btn-collapse-sidebar" class="text-slate-400 hover:text-slate-700 p-1.5 rounded-md text-xs hover:bg-slate-100 transition-colors cursor-pointer" title="Toggle Sidebar">
+                <i data-lucide="chevrons-left" class="w-4 h-4"></i>
               </button>
             </div>
 
@@ -168,7 +168,7 @@ const AppShell = {
               <div class="hidden md:flex items-center mx-3 flex-1 max-w-md justify-center">
                 <button id="btn-trigger-palette" class="flex items-center gap-2.5 px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200/80 border border-slate-200 rounded-lg text-xs text-slate-500 transition-colors w-full justify-between shadow-2xs">
                   <span class="flex items-center gap-2 truncate">
-                    <span>🔍</span>
+                    <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400"></i>
                     <span class="truncate">Search project, ministry, agency, state...</span>
                   </span>
                   <kbd class="px-1.5 py-0.5 text-[10px] font-mono font-semibold bg-white border border-slate-300 rounded text-slate-600 shadow-2xs flex-shrink-0">Ctrl K</kbd>
@@ -194,9 +194,9 @@ const AppShell = {
 
                 <!-- Early Warnings Attention Dropdown -->
                 <div class="relative">
-                  <button id="btn-attention-center" onclick="window.AppShell.toggleAttentionDropdown()" class="relative p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer" title="Attention Required Queue">
-                    <span class="text-base">🔔</span>
-                    <span class="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-red-600 ring-2 ring-white"></span>
+                  <button id="btn-attention-center" onclick="window.AppShell.toggleAttentionDropdown()" class="relative p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer" title="Attention Required Queue">
+                    <i data-lucide="bell" class="w-4 h-4 text-slate-600"></i>
+                    <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-600 ring-2 ring-white"></span>
                   </button>
                   <div id="attention-dropdown-menu" class="hidden absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-xl z-50 p-3 space-y-2">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-2">
@@ -250,7 +250,7 @@ const AppShell = {
 
                   <!-- Sovereign Sign Out Button -->
                   <button id="btn-header-signout" onclick="window.APIClient.logout()" class="ml-1 px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-2xs" title="Sign Out of ASTRA Platform">
-                    <span>🚪</span>
+                    <i data-lucide="log-out" class="w-3.5 h-3.5 text-rose-600"></i>
                     <span class="hidden lg:inline">Sign Out</span>
                   </button>
                 </div>
@@ -547,12 +547,13 @@ const AppShell = {
         if (this.isSidebarCollapsed) {
           sidebar.style.width = "var(--sidebar-collapsed-width)";
           sidebar.querySelectorAll(".sidebar-text, .sidebar-heading, .sidebar-badge, .sidebar-text-brand").forEach(el => el.classList.add("hidden"));
-          collapseBtn.innerText = "⇥";
+          collapseBtn.innerHTML = '<i data-lucide="chevrons-right" class="w-4 h-4"></i>';
         } else {
           sidebar.style.width = "var(--sidebar-width)";
           sidebar.querySelectorAll(".sidebar-text, .sidebar-heading, .sidebar-badge, .sidebar-text-brand").forEach(el => el.classList.remove("hidden"));
-          collapseBtn.innerText = "⇤";
+          collapseBtn.innerHTML = '<i data-lucide="chevrons-left" class="w-4 h-4"></i>';
         }
+        if (window.CommonUI && window.CommonUI.initIcons) window.CommonUI.initIcons();
       });
     }
 
@@ -823,37 +824,37 @@ const AppShell = {
         {
           heading: "COMMAND CENTER",
           items: [
-            { route: "dashboard", icon: "📊", label: "National Command Center" }
+            { route: "dashboard", lucide: "layout-dashboard", icon: "📊", label: "National Command Center" }
           ]
         },
         {
           heading: "PORTFOLIO",
           items: [
-            { route: "projects", icon: "📁", label: "Central Projects Registry" },
-            { route: "reports", icon: "📑", label: "Report Intelligence", badge: "PAIMANA" }
+            { route: "projects", lucide: "folder-kanban", icon: "📁", label: "Central Projects Registry" },
+            { route: "reports", lucide: "file-text", icon: "📑", label: "Report Intelligence", badge: "PAIMANA" }
           ]
         },
         {
           heading: "INTELLIGENCE",
           items: [
-            { route: "portfolio-matrix", icon: "🎯", label: "Risk Stratification" },
-            { route: "early-warnings", icon: "⚠️", label: "Early Warning Radar", badge: "14k" },
-            { route: "bottlenecks", icon: "📍", label: "Bottlenecks Intel" },
-            { route: "analytics", icon: "📈", label: "Portfolio Analytics" }
+            { route: "portfolio-matrix", lucide: "pie-chart", icon: "🎯", label: "Risk Stratification" },
+            { route: "early-warnings", lucide: "alert-triangle", icon: "⚠️", label: "Early Warning Radar", badge: "14k" },
+            { route: "bottlenecks", lucide: "map-pin", icon: "📍", label: "Bottlenecks Intel" },
+            { route: "analytics", lucide: "trending-up", icon: "📈", label: "Portfolio Analytics" }
           ]
         },
         {
           heading: "DECISIONS",
           items: [
-            { route: "directives", icon: "📜", label: "Directives & Escalations" },
-            { route: "what-if", icon: "⚡", label: "What-If Sandbox" }
+            { route: "directives", lucide: "file-signature", icon: "📜", label: "Directives & Escalations" },
+            { route: "what-if", lucide: "zap", icon: "⚡", label: "What-If Sandbox" }
           ]
         },
         {
           heading: "GOVERNANCE",
           items: [
-            { route: "data-quality", icon: "🛡️", label: "Data Quality Observatory" },
-            { route: "settings", icon: "⚙️", label: "Governance & Audit" }
+            { route: "data-quality", lucide: "shield-check", icon: "🛡️", label: "Data Quality Observatory" },
+            { route: "settings", lucide: "settings", icon: "⚙️", label: "Governance & Audit" }
           ]
         }
       ];
@@ -864,37 +865,37 @@ const AppShell = {
         {
           heading: "COMMAND CENTER",
           items: [
-            { route: "ministry", icon: "🏛️", label: "Ministry Command Desk", badge: "MoRTH" }
+            { route: "ministry", lucide: "landmark", icon: "🏛️", label: "Ministry Command Desk", badge: "MoRTH" }
           ]
         },
         {
           heading: "PORTFOLIO",
           items: [
-            { route: "projects", icon: "📁", label: "Ministry Projects (4,113)" },
-            { route: "reports", icon: "📑", label: "Report Intelligence", badge: "PAIMANA" }
+            { route: "projects", lucide: "folder-kanban", icon: "📁", label: "Ministry Projects (4,113)" },
+            { route: "reports", lucide: "file-text", icon: "📑", label: "Report Intelligence", badge: "PAIMANA" }
           ]
         },
         {
           heading: "INTELLIGENCE",
           items: [
-            { route: "early-warnings", icon: "⚠️", label: "Early Warning Radar", badge: "P1" },
-            { route: "bottlenecks", icon: "📍", label: "Bottlenecks Intel" },
-            { route: "portfolio-matrix", icon: "🎯", label: "Risk Stratification" }
+            { route: "early-warnings", lucide: "alert-triangle", icon: "⚠️", label: "Early Warning Radar", badge: "P1" },
+            { route: "bottlenecks", lucide: "map-pin", icon: "📍", label: "Bottlenecks Intel" },
+            { route: "portfolio-matrix", lucide: "pie-chart", icon: "🎯", label: "Risk Stratification" }
           ]
         },
         {
           heading: "EXECUTION",
           items: [
-            { route: "execution", icon: "⏱️", label: "Corridor CPM Control", badge: "CPM" },
-            { route: "my-projects", icon: "🛣️", label: "Corridor Pipeline" }
+            { route: "execution", lucide: "clock", icon: "⏱️", label: "Corridor CPM Control", badge: "CPM" },
+            { route: "my-projects", lucide: "milestone", icon: "🛣️", label: "Corridor Pipeline" }
           ]
         },
         {
           heading: "DECISIONS & GOVERNANCE",
           items: [
-            { route: "directives", icon: "📜", label: "Downward Directives" },
-            { route: "data-quality", icon: "🛡️", label: "Data Quality & Gaps" },
-            { route: "settings", icon: "⚙️", label: "Settings & Audit" }
+            { route: "directives", lucide: "file-signature", icon: "📜", label: "Downward Directives" },
+            { route: "data-quality", lucide: "shield-check", icon: "🛡️", label: "Data Quality & Gaps" },
+            { route: "settings", lucide: "settings", icon: "⚙️", label: "Settings & Audit" }
           ]
         }
       ];
@@ -905,24 +906,24 @@ const AppShell = {
         {
           heading: "EXECUTION CONTROL",
           items: [
-            { route: "execution", icon: "⏱️", label: "Execution & CPM Control", badge: "Live CPM" },
-            { route: "onboarding", icon: "⚡", label: "AI Onboarding & WBS" },
-            { route: "my-projects", icon: "🛣️", label: "My Corridors (3 Active)" }
+            { route: "execution", lucide: "clock", icon: "⏱️", label: "Execution & CPM Control", badge: "Live CPM" },
+            { route: "onboarding", lucide: "sparkles", icon: "⚡", label: "AI Onboarding & WBS" },
+            { route: "my-projects", lucide: "milestone", icon: "🛣️", label: "My Corridors (3 Active)" }
           ]
         },
         {
           heading: "OPERATIONS",
           items: [
-            { route: "projects", icon: "📁", label: "Corridor Projects" },
-            { route: "early-warnings", icon: "⚠️", label: "Corridor Alerts Queue" },
-            { route: "directives", icon: "📜", label: "Directives & Actions" }
+            { route: "projects", lucide: "folder-kanban", icon: "📁", label: "Corridor Projects" },
+            { route: "early-warnings", lucide: "alert-triangle", icon: "⚠️", label: "Corridor Alerts Queue" },
+            { route: "directives", lucide: "file-signature", icon: "📜", label: "Directives & Actions" }
           ]
         },
         {
           heading: "DECISIONS",
           items: [
-            { route: "what-if", icon: "⚡", label: "What-If Simulator" },
-            { route: "data-quality", icon: "🛡️", label: "Data Quality Check" }
+            { route: "what-if", lucide: "zap", icon: "⚡", label: "What-If Simulator" },
+            { route: "data-quality", lucide: "shield-check", icon: "🛡️", label: "Data Quality Check" }
           ]
         }
       ];
@@ -933,17 +934,17 @@ const AppShell = {
         {
           heading: "TECHNICAL WORKSPACE",
           items: [
-            { route: "engineer", icon: "👷", label: "Site Engineering Desk", badge: "Live" },
-            { route: "execution", icon: "⏱️", label: "CPM Work Packages", badge: "CPM" },
-            { route: "projects", icon: "📁", label: "Assigned Corridor" }
+            { route: "engineer", lucide: "hard-hat", icon: "👷", label: "Site Engineering Desk", badge: "Live" },
+            { route: "execution", lucide: "clock", icon: "⏱️", label: "CPM Work Packages", badge: "CPM" },
+            { route: "projects", lucide: "folder-kanban", icon: "📁", label: "Assigned Corridor" }
           ]
         },
         {
           heading: "OPERATIONS & SAFETY",
           items: [
-            { route: "field", icon: "🚜", label: "Field Progress Log" },
-            { route: "early-warnings", icon: "⚠️", label: "Project Early Warnings" },
-            { route: "directives", icon: "📜", label: "Compliance Directives" }
+            { route: "field", lucide: "truck", icon: "🚜", label: "Field Progress Log" },
+            { route: "early-warnings", lucide: "alert-triangle", icon: "⚠️", label: "Project Early Warnings" },
+            { route: "directives", lucide: "file-signature", icon: "📜", label: "Compliance Directives" }
           ]
         }
       ];
@@ -954,14 +955,14 @@ const AppShell = {
         {
           heading: "TODAY'S TARGETS",
           items: [
-            { route: "field", icon: "🚜", label: "My Ground Targets", badge: "Today" },
-            { route: "engineer", icon: "👷", label: "Resident Engineer Desk" }
+            { route: "field", lucide: "truck", icon: "🚜", label: "My Ground Targets", badge: "Today" },
+            { route: "engineer", lucide: "hard-hat", icon: "👷", label: "Resident Engineer Desk" }
           ]
         },
         {
           heading: "ALERTS",
           items: [
-            { route: "early-warnings", icon: "⚠️", label: "Active Stoppage Alerts" }
+            { route: "early-warnings", lucide: "alert-triangle", icon: "⚠️", label: "Active Stoppage Alerts" }
           ]
         }
       ];
@@ -972,16 +973,16 @@ const AppShell = {
         {
           heading: "FIELD OPERATIONS",
           items: [
-            { route: "field-officer", icon: "🛡️", label: "Field Inspection Desk", badge: "Field" },
-            { route: "field", icon: "🚜", label: "Ground Telemetry & Crew" },
-            { route: "engineer", icon: "⚙️", label: "Site Technical Desk" }
+            { route: "field-officer", lucide: "clipboard-check", icon: "🛡️", label: "Field Inspection Desk", badge: "Field" },
+            { route: "field", lucide: "truck", icon: "🚜", label: "Ground Telemetry & Crew" },
+            { route: "engineer", lucide: "hard-hat", icon: "⚙️", label: "Site Technical Desk" }
           ]
         },
         {
           heading: "OPERATIONS & ALERTS",
           items: [
-            { route: "execution", icon: "⏱️", label: "Work Packages & WBS", badge: "CPM" },
-            { route: "early-warnings", icon: "⚠️", label: "Site Risk Alerts" }
+            { route: "execution", lucide: "clock", icon: "⏱️", label: "Work Packages & WBS", badge: "CPM" },
+            { route: "early-warnings", lucide: "alert-triangle", icon: "⚠️", label: "Site Risk Alerts" }
           ]
         }
       ];
@@ -992,31 +993,31 @@ const AppShell = {
         {
           heading: "COMMAND CENTER",
           items: [
-            { route: "dashboard", icon: "📊", label: "National Command Center" }
+            { route: "dashboard", lucide: "layout-dashboard", icon: "📊", label: "National Command Center" }
           ]
         },
         {
           heading: "PORTFOLIO",
           items: [
-            { route: "projects", icon: "📁", label: "Projects Explorer" },
-            { route: "reports", icon: "📑", label: "Report Intelligence", badge: "Flash" }
+            { route: "projects", lucide: "folder-kanban", icon: "📁", label: "Projects Explorer" },
+            { route: "reports", lucide: "file-text", icon: "📑", label: "Report Intelligence", badge: "Flash" }
           ]
         },
         {
           heading: "INTELLIGENCE",
           items: [
-            { route: "analytics", icon: "📈", label: "Portfolio Analytics", badge: "ML" },
-            { route: "portfolio-matrix", icon: "🎯", label: "Risk Stratification" },
-            { route: "compare", icon: "⚖️", label: "Peer Benchmarking" },
-            { route: "early-warnings", icon: "⚠️", label: "Early Warning Radar" },
-            { route: "bottlenecks", icon: "📍", label: "Bottlenecks Intel" }
+            { route: "analytics", lucide: "trending-up", icon: "📈", label: "Portfolio Analytics", badge: "ML" },
+            { route: "portfolio-matrix", lucide: "pie-chart", icon: "🎯", label: "Risk Stratification" },
+            { route: "compare", lucide: "scale", icon: "⚖️", label: "Peer Benchmarking" },
+            { route: "early-warnings", lucide: "alert-triangle", icon: "⚠️", label: "Early Warning Radar" },
+            { route: "bottlenecks", lucide: "map-pin", icon: "📍", label: "Bottlenecks Intel" }
           ]
         },
         {
           heading: "GOVERNANCE",
           items: [
-            { route: "data-quality", icon: "🛡️", label: "Data Quality Observatory" },
-            { route: "settings", icon: "⚙️", label: "Model Registry & Audit" }
+            { route: "data-quality", lucide: "shield-check", icon: "🛡️", label: "Data Quality Observatory" },
+            { route: "settings", lucide: "settings", icon: "⚙️", label: "Model Registry & Audit" }
           ]
         }
       ];
@@ -1027,50 +1028,50 @@ const AppShell = {
       {
         heading: "COMMAND CENTER",
         items: [
-          { route: "dashboard", icon: "📊", label: "Command Center" }
+          { route: "dashboard", lucide: "layout-dashboard", icon: "📊", label: "Command Center" }
         ]
       },
       {
         heading: "PORTFOLIO",
         items: [
-          { route: "projects", icon: "📁", label: "Projects Explorer" },
-          { route: "reports", icon: "📑", label: "Report Center", badge: "PAIMANA" }
+          { route: "projects", lucide: "folder-kanban", icon: "📁", label: "Projects Explorer" },
+          { route: "reports", lucide: "file-text", icon: "📑", label: "Report Center", badge: "PAIMANA" }
         ]
       },
       {
         heading: "INTELLIGENCE",
         items: [
-          { route: "portfolio-matrix", icon: "🎯", label: "Risk Stratification" },
-          { route: "early-warnings", icon: "⚠️", label: "Early Warnings", badge: "14k" },
-          { route: "bottlenecks", icon: "📍", label: "Bottlenecks & RoW" },
-          { route: "analytics", icon: "📈", label: "Portfolio Analytics" },
-          { route: "compare", icon: "⚖️", label: "Peer Benchmarking" }
+          { route: "portfolio-matrix", lucide: "pie-chart", icon: "🎯", label: "Risk Stratification" },
+          { route: "early-warnings", lucide: "alert-triangle", icon: "⚠️", label: "Early Warnings", badge: "14k" },
+          { route: "bottlenecks", lucide: "map-pin", icon: "📍", label: "Bottlenecks & RoW" },
+          { route: "analytics", lucide: "trending-up", icon: "📈", label: "Portfolio Analytics" },
+          { route: "compare", lucide: "scale", icon: "⚖️", label: "Peer Benchmarking" }
         ]
       },
       {
         heading: "EXECUTION",
         items: [
-          { route: "execution", icon: "⏱️", label: "Execution (CPM)", badge: "Live" },
-          { route: "onboarding", icon: "⚡", label: "Onboarding & WBS" },
-          { route: "engineer", icon: "👷", label: "Site Engineering" },
-          { route: "field-officer", icon: "🛡️", label: "Field Officer Desk" },
-          { route: "field", icon: "🚜", label: "Field Operations" }
+          { route: "execution", lucide: "clock", icon: "⏱️", label: "Execution (CPM)", badge: "Live" },
+          { route: "onboarding", lucide: "sparkles", icon: "⚡", label: "Onboarding & WBS" },
+          { route: "engineer", lucide: "hard-hat", icon: "👷", label: "Site Engineering" },
+          { route: "field-officer", lucide: "clipboard-check", icon: "🛡️", label: "Field Officer Desk" },
+          { route: "field", lucide: "truck", icon: "🚜", label: "Field Operations" }
         ]
       },
       {
         heading: "DECISIONS",
         items: [
-          { route: "directives", icon: "📜", label: "Directives & Actions" },
-          { route: "what-if", icon: "⚡", label: "What-If Sandbox" },
-          { route: "ministry", icon: "🏛️", label: "Ministry Desk" },
-          { route: "my-projects", icon: "🛣️", label: "Corridors Workspace" }
+          { route: "directives", lucide: "file-signature", icon: "📜", label: "Directives & Actions" },
+          { route: "what-if", lucide: "zap", icon: "⚡", label: "What-If Sandbox" },
+          { route: "ministry", lucide: "landmark", icon: "🏛️", label: "Ministry Desk" },
+          { route: "my-projects", lucide: "milestone", icon: "🛣️", label: "Corridors Workspace" }
         ]
       },
       {
         heading: "GOVERNANCE",
         items: [
-          { route: "data-quality", icon: "🛡️", label: "Data Quality" },
-          { route: "settings", icon: "⚙️", label: "Audit & Settings" }
+          { route: "data-quality", lucide: "shield-check", icon: "🛡️", label: "Data Quality" },
+          { route: "settings", lucide: "settings", icon: "⚙️", label: "Audit & Settings" }
         ]
       }
     ];
@@ -1088,10 +1089,12 @@ const AppShell = {
         </div>
         <div class="space-y-0.5">
           ${grp.items.map(it => `
-            <a href="#/${it.route}" data-route="${it.route}" class="nav-item flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-slate-700 hover:bg-slate-100" title="${it.label}">
-              <span class="text-base flex-shrink-0">${it.icon}</span>
+            <a href="#/${it.route}" data-route="${it.route}" class="nav-item group flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-100" title="${it.label}">
+              <span class="w-5 h-5 flex items-center justify-center flex-shrink-0 text-slate-400 group-hover:text-blue-700">
+                ${it.lucide ? `<i data-lucide="${it.lucide}" class="w-4 h-4"></i>` : `<span class="text-sm">${it.icon}</span>`}
+              </span>
               <span class="sidebar-text truncate">${it.label}</span>
-              ${it.badge ? `<span class="ml-auto text-[10px] bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded-full sidebar-badge flex-shrink-0">${it.badge}</span>` : ''}
+              ${it.badge ? `<span class="ml-auto text-[9px] bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded-full sidebar-badge flex-shrink-0">${it.badge}</span>` : ''}
             </a>
           `).join("")}
         </div>
@@ -1100,6 +1103,7 @@ const AppShell = {
 
     const currentHash = (window.location.hash || "#/dashboard").replace("#/", "").split("?")[0];
     this.updateActiveNav(currentHash);
+    if (window.CommonUI && window.CommonUI.initIcons) window.CommonUI.initIcons();
   },
 
   renderMobileNav(role) {
@@ -1109,7 +1113,10 @@ const AppShell = {
 
     container.innerHTML = groups.flatMap(grp => grp.items).map(it => `
       <a href="#/${it.route}" class="mobile-nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">
-        <span>${it.icon}</span> ${it.label}
+        <span class="w-5 h-5 flex items-center justify-center text-slate-500">
+          ${it.lucide ? `<i data-lucide="${it.lucide}" class="w-4 h-4"></i>` : it.icon}
+        </span>
+        <span>${it.label}</span>
       </a>
     `).join("");
 
@@ -1123,6 +1130,7 @@ const AppShell = {
         }
       });
     });
+    if (window.CommonUI && window.CommonUI.initIcons) window.CommonUI.initIcons();
   },
 
   updateNavForRole(role) {
@@ -1134,12 +1142,21 @@ const AppShell = {
     const navItems = document.querySelectorAll(".nav-item");
     navItems.forEach(item => {
       const route = item.dataset.route;
+      const iconSpan = item.querySelector(".w-5");
       if (route === activeRoute || (activeRoute && activeRoute.startsWith("projects") && route === "projects")) {
-        item.classList.add("bg-blue-50", "text-blue-900", "font-semibold");
-        item.classList.remove("text-slate-700");
+        item.classList.add("bg-blue-50", "text-blue-900", "font-bold");
+        item.classList.remove("text-slate-600", "font-medium");
+        if (iconSpan) {
+          iconSpan.classList.add("text-blue-700");
+          iconSpan.classList.remove("text-slate-400");
+        }
       } else {
-        item.classList.remove("bg-blue-50", "text-blue-900", "font-semibold");
-        item.classList.add("text-slate-700");
+        item.classList.remove("bg-blue-50", "text-blue-900", "font-bold");
+        item.classList.add("text-slate-600", "font-medium");
+        if (iconSpan) {
+          iconSpan.classList.remove("text-blue-700");
+          iconSpan.classList.add("text-slate-400");
+        }
       }
     });
 

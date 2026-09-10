@@ -25,10 +25,10 @@ const ProjectsView = {
 
   render() {
     return `
-      <div class="max-w-[1440px] mx-auto space-y-6">
+      <div class="max-w-[1440px] mx-auto space-y-5 animate-fade-in">
         
         <!-- Executive Header with Breadcrumbs & Export -->
-        <div class="border-b border-slate-200 pb-4">
+        <div class="border-b border-slate-200 pb-3">
           <div class="mb-2">
             ${CommonUI.renderBreadcrumbs([
               { label: "Portfolio", href: "#/projects" },
@@ -38,52 +38,57 @@ const ProjectsView = {
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div class="flex items-center gap-2">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-blue-800 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded">
+                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-blue-50 text-blue-900 border border-blue-200 text-[10px] font-bold uppercase tracking-wider">
+                  <i data-lucide="shield-check" class="w-3.5 h-3.5 text-blue-700"></i>
                   PAIMANA National Registry
                 </span>
                 <span class="text-slate-300">•</span>
-                <span class="text-caption text-slate-500 font-medium">Surveillance Desk</span>
+                <span class="text-xs text-slate-500 font-medium">Surveillance Desk</span>
               </div>
-              <h1 class="text-2xl font-bold text-slate-900 tracking-tight mt-1">Central Sector Projects Explorer</h1>
-              <p class="text-caption text-slate-500 mt-0.5">
+              <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-1">Central Sector Projects Explorer</h1>
+              <p class="text-xs text-slate-500 mt-0.5">
                 Universal search, multi-attribute filtering, and real-time risk surveillance across 10,000 infrastructure projects (&gt; ₹150 Cr).
               </p>
             </div>
-            <div class="flex items-center gap-3">
-              <span id="projects-total-count-badge" class="text-caption text-slate-600 bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg font-medium">
+            <div class="flex items-center gap-2.5 flex-shrink-0">
+              <span id="projects-total-count-badge" class="text-xs text-slate-700 bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg font-medium shadow-2xs">
                 Active Universe: <strong id="projects-count-display" class="text-slate-900 font-bold tabular-nums">10,000</strong> Projects
               </span>
-              <button onclick="ProjectsView.exportCSV()" class="btn btn-secondary btn-sm flex items-center gap-1.5" title="Export current filtered view as CSV">
-                <span>📥</span>
+              <button onclick="ProjectsView.exportCSV()" class="btn btn-secondary btn-sm flex items-center gap-1.5 text-xs shadow-2xs" title="Export current filtered view as CSV">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-slate-600"></i>
                 <span>Export CSV</span>
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Filter Deck: Progressive Disclosure -->
-        <div class="gov-card p-4 space-y-3">
+        <!-- PAIMANA-Inspired Clean Filter Bar -->
+        <div class="bg-white rounded-xl border border-slate-200 p-3.5 space-y-3 shadow-2xs">
           
-          <!-- Primary Filter Bar (Always visible) -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-center">
+          <!-- Primary Filter Strip -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5 items-end">
             
             <!-- Search -->
             <div class="lg:col-span-3 relative">
-              <label for="project-search-input" class="sr-only">Search projects</label>
-              <input type="text" id="project-search-input" 
-                     placeholder="Search project name, code (e.g. PRJ-), or agency..."
-                     value="${this.escapeHtml(this.searchQuery)}"
-                     class="gov-input pl-9 text-xs" />
-              <span class="absolute left-3 top-2.5 text-slate-400 text-xs">🔍</span>
-              ${this.searchQuery ? `
-                <button onclick="ProjectsView.clearSearch()" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-xs">✕</button>
-              ` : ''}
+              <label for="project-search-input" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Search Identifier</label>
+              <div class="relative">
+                <input type="text" id="project-search-input" 
+                       placeholder="Search name, code (PRJ-), agency..."
+                       value="${this.escapeHtml(this.searchQuery)}"
+                       class="gov-input pl-8 text-xs py-1.5 h-9" />
+                <span class="absolute left-2.5 top-2.5 text-slate-400">
+                  <i data-lucide="search" class="w-3.5 h-3.5"></i>
+                </span>
+                ${this.searchQuery ? `
+                  <button onclick="ProjectsView.clearSearch()" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 text-xs">✕</button>
+                ` : ''}
+              </div>
             </div>
 
             <!-- Ministry Filter -->
             <div class="lg:col-span-3">
-              <label for="filter-ministry-select" class="sr-only">Filter Ministry</label>
-              <select id="filter-ministry-select" class="gov-select text-xs">
+              <label for="filter-ministry-select" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Ministry</label>
+              <select id="filter-ministry-select" class="gov-select text-xs py-1.5 h-9 bg-slate-50">
                 <option value="all">All Ministries (National)</option>
                 <option value="Ministry of Road Transport and Highways">Road Transport & Highways</option>
                 <option value="Ministry of Railways">Railways</option>
@@ -98,20 +103,20 @@ const ProjectsView = {
 
             <!-- Risk Tier Filter -->
             <div class="lg:col-span-2">
-              <label for="filter-risk-select" class="sr-only">Filter Risk</label>
-              <select id="filter-risk-select" class="gov-select text-xs">
+              <label for="filter-risk-select" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Risk Tier</label>
+              <select id="filter-risk-select" class="gov-select text-xs py-1.5 h-9 bg-slate-50">
                 <option value="all">All Risk Tiers</option>
                 <option value="CRITICAL">🔴 Critical Risk (80-100)</option>
                 <option value="HIGH">🟠 High Risk (60-79)</option>
                 <option value="MODERATE">🟡 Moderate Watch (40-59)</option>
-                <option value="LOW">🟢 Low Risk / On Track (0-39)</option>
+                <option value="LOW">🟢 Low Risk / Healthy (0-39)</option>
               </select>
             </div>
 
             <!-- Data Source Filter -->
             <div class="lg:col-span-2">
-              <label for="filter-datasource-select" class="sr-only">Data Source</label>
-              <select id="filter-datasource-select" class="gov-select text-xs font-semibold">
+              <label for="filter-datasource-select" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Data Source</label>
+              <select id="filter-datasource-select" class="gov-select text-xs py-1.5 h-9 bg-slate-50 font-semibold text-slate-800">
                 <option value="all">All Datasets (10K+)</option>
                 <option value="REAL">🟢 Real Imported Data</option>
                 <option value="SYNTHETIC">🔵 Synthetic 10K Baseline</option>
@@ -119,14 +124,14 @@ const ProjectsView = {
             </div>
 
             <!-- Advanced Filters Toggle & Reset -->
-            <div class="lg:col-span-2 flex items-center justify-end gap-2">
+            <div class="lg:col-span-2 flex items-center justify-end gap-1.5">
               <button id="btn-toggle-advanced" onclick="ProjectsView.toggleAdvancedFilters()" 
-                      class="btn btn-secondary btn-sm flex items-center gap-1 text-xs px-2">
-                <span>⚙️</span>
-                <span id="adv-filter-label">More</span>
+                      class="btn btn-secondary btn-sm flex items-center gap-1 text-xs px-2.5 h-9" title="Toggle additional state and bottleneck filters">
+                <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span id="adv-filter-label">Filters</span>
                 <span id="adv-filter-count" class="hidden px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">0</span>
               </button>
-              <button id="btn-clear-filters" onclick="ProjectsView.clearAllFilters()" class="btn btn-secondary btn-sm text-xs px-2">
+              <button id="btn-clear-filters" onclick="ProjectsView.clearAllFilters()" class="btn btn-secondary btn-sm text-xs px-2.5 h-9 text-slate-600 hover:text-slate-900" title="Reset all active filters">
                 Reset
               </button>
             </div>
@@ -134,12 +139,12 @@ const ProjectsView = {
           </div>
 
           <!-- Advanced Filters Panel (Progressive Disclosure) -->
-          <div id="advanced-filters-panel" class="${this.showAdvancedFilters ? 'block' : 'hidden'} pt-3 mt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 bg-slate-50/70 p-3 rounded-lg">
+          <div id="advanced-filters-panel" class="${this.showAdvancedFilters ? 'block' : 'hidden'} pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 bg-slate-50/80 p-3 rounded-lg">
             
             <!-- State Filter -->
             <div>
-              <label for="filter-state-select" class="block text-[11px] font-semibold text-slate-600 mb-1">State / UT</label>
-              <select id="filter-state-select" class="gov-select text-xs">
+              <label for="filter-state-select" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">State / UT</label>
+              <select id="filter-state-select" class="gov-select text-xs bg-white">
                 <option value="all">All States & UTs</option>
                 <option value="Maharashtra">Maharashtra</option>
                 <option value="Uttar Pradesh">Uttar Pradesh</option>
@@ -158,8 +163,8 @@ const ProjectsView = {
 
             <!-- Bottleneck Filter -->
             <div>
-              <label for="filter-bottleneck-select" class="block text-[11px] font-semibold text-slate-600 mb-1">Observed Bottleneck</label>
-              <select id="filter-bottleneck-select" class="gov-select text-xs">
+              <label for="filter-bottleneck-select" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Observed Bottleneck</label>
+              <select id="filter-bottleneck-select" class="gov-select text-xs bg-white">
                 <option value="all">All Bottleneck Types</option>
                 <option value="land_acquisition">Land Acquisition & RoW</option>
                 <option value="clearance_impasse">Regulatory / Forest Clearance</option>
@@ -172,8 +177,8 @@ const ProjectsView = {
 
             <!-- Sector Filter -->
             <div>
-              <label for="filter-sector-select" class="block text-[11px] font-semibold text-slate-600 mb-1">Infrastructure Sector</label>
-              <select id="filter-sector-select" class="gov-select text-xs">
+              <label for="filter-sector-select" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Infrastructure Sector</label>
+              <select id="filter-sector-select" class="gov-select text-xs bg-white">
                 <option value="all">All Infrastructure Sectors</option>
                 <option value="Roads and Highways">Roads & Highways</option>
                 <option value="Railways">Railways</option>
@@ -188,8 +193,8 @@ const ProjectsView = {
 
             <!-- Outlay Bracket Filter -->
             <div>
-              <label for="filter-cost-select" class="block text-[11px] font-semibold text-slate-600 mb-1">Capital Outlay Tier</label>
-              <select id="filter-cost-select" class="gov-select text-xs">
+              <label for="filter-cost-select" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Capital Outlay Tier</label>
+              <select id="filter-cost-select" class="gov-select text-xs bg-white">
                 <option value="all">All Project Sizes (&gt; ₹150 Cr)</option>
                 <option value="mega">Mega Projects (&gt; ₹5,000 Cr)</option>
                 <option value="major">Major Projects (₹1,000 – ₹5,000 Cr)</option>
@@ -206,19 +211,19 @@ const ProjectsView = {
 
         </div>
 
-        <!-- Table Container -->
-        <div id="projects-table-card" class="gov-card p-0 overflow-hidden shadow-sm">
-          <div class="gov-table-container border-0 rounded-none shadow-none">
+        <!-- Table Container with Sticky Header -->
+        <div id="projects-table-card" class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs">
+          <div class="gov-table-container border-0 rounded-none shadow-none max-h-[720px] overflow-y-auto">
             <table class="gov-table">
-              <thead>
+              <thead class="sticky top-0 bg-slate-100/95 backdrop-blur-xs z-10 shadow-2xs border-b border-slate-200">
                 <tr>
-                  <th style="min-width: 260px;">Project Identification</th>
-                  <th style="min-width: 170px;">Ministry & Location</th>
-                  <th style="min-width: 150px;">Approved / Revised Outlay</th>
-                  <th style="min-width: 180px;">Physical vs Financial</th>
-                  <th style="min-width: 130px;">Risk Profile</th>
-                  <th style="min-width: 200px;">Primary Root Driver</th>
-                  <th class="text-right" style="min-width: 130px;">Surveillance</th>
+                  <th style="min-width: 280px;" class="bg-slate-100">Project Identification & Data Status</th>
+                  <th style="min-width: 170px;" class="bg-slate-100">Ministry & Location</th>
+                  <th style="min-width: 150px;" class="bg-slate-100">Approved / Revised Outlay</th>
+                  <th style="min-width: 180px;" class="bg-slate-100">Physical vs Financial</th>
+                  <th style="min-width: 130px;" class="bg-slate-100">Risk Profile</th>
+                  <th style="min-width: 200px;" class="bg-slate-100">Primary Root Driver</th>
+                  <th class="text-right bg-slate-100" style="min-width: 130px;">Surveillance</th>
                 </tr>
               </thead>
               <tbody id="projects-table-tbody">
@@ -233,7 +238,7 @@ const ProjectsView = {
           </div>
 
           <!-- Government Pagination Bar -->
-          <div class="p-3.5 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-caption">
+          <div class="p-3 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-caption">
             <div class="text-slate-600 text-xs flex items-center gap-1.5">
               <span>Showing</span>
               <strong id="pagination-start-record" class="font-semibold text-slate-900 tabular-nums">1</strong>
@@ -278,6 +283,7 @@ const ProjectsView = {
     this.readHashParams();
     this.bindControls();
     await this.fetchAndRenderProjects();
+    if (window.CommonUI && window.CommonUI.initIcons) window.CommonUI.initIcons();
   },
 
   readHashParams() {
@@ -661,24 +667,24 @@ const ProjectsView = {
         : (p.risk && p.risk.primary_driver ? p.risk.primary_driver : "Scheduled Milestones Pending");
 
       return `
-        <tr class="hover:bg-slate-50/80 transition cursor-pointer" onclick="ProjectsView.handleRowClick(event, '${p.project_id}')">
-          <td>
+        <tr class="hover:bg-blue-50/40 transition cursor-pointer border-b border-slate-100" onclick="ProjectsView.handleRowClick(event, '${p.project_id}')">
+          <td class="py-3 px-4">
             <div class="font-bold text-slate-900 text-xs line-clamp-1 hover:text-blue-700">
               <a href="#/projects/${p.project_id}" class="hover:underline" onclick="event.stopPropagation()">
                 ${this.escapeHtml(p.project_name)}
               </a>
             </div>
             <div class="flex items-center gap-1.5 mt-1">
-              <span class="font-mono text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded uppercase font-semibold">
+              <span class="font-mono text-[10px] text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded uppercase font-semibold border border-slate-200">
                 ${p.project_id}
               </span>
               ${(p.data_source === "REAL_IMPORTED" || (p.metadata && p.metadata.data_status === "REAL_IMPORTED")) ? `
-                <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                  REAL DATA
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> REAL DATA
                 </span>
               ` : `
-                <span class="px-1.5 py-0.2 rounded text-[9px] font-medium bg-slate-100 text-slate-500 border border-slate-200">
-                  SYNTHETIC (10K)
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> SYNTHETIC 10K
                 </span>
               `}
               <span class="text-slate-300">•</span>
@@ -687,14 +693,14 @@ const ProjectsView = {
               </span>
             </div>
           </td>
-          <td>
+          <td class="py-3 px-4">
             <div class="text-slate-800 text-xs font-medium line-clamp-1">${p.ministry || 'Central Sector'}</div>
             <div class="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
               <span>📍</span>
               <span class="truncate">${p.state || 'National / Multi-State'}</span>
             </div>
           </td>
-          <td>
+          <td class="py-3 px-4">
             <div class="text-slate-900 font-bold tabular-nums text-xs">
               ₹${Number(revCost).toLocaleString("en-IN")} Cr
             </div>
@@ -707,7 +713,7 @@ const ProjectsView = {
               ` : ''}
             </div>
           </td>
-          <td>
+          <td class="py-3 px-4">
             <div class="flex justify-between text-[11px] font-semibold mb-1">
               <span class="text-blue-950">Phys: <strong class="text-blue-800 tabular-nums">${physProg}%</strong></span>
               <span class="text-slate-500 font-mono text-[10px] tabular-nums">Fin: ${finProg}%</span>
@@ -722,25 +728,26 @@ const ProjectsView = {
               </div>
             ` : ''}
           </td>
-          <td>
+          <td class="py-3 px-4">
             ${CommonUI.renderRiskBadge(riskLevel, riskScore)}
           </td>
-          <td>
+          <td class="py-3 px-4">
             <div class="text-xs text-slate-700 line-clamp-2 max-w-[210px] font-medium leading-relaxed">
               ${this.escapeHtml(driver)}
             </div>
           </td>
-          <td class="text-right">
-            <div class="flex items-center justify-end gap-1" onclick="event.stopPropagation()">
+          <td class="text-right py-3 px-4">
+            <div class="flex items-center justify-end gap-1.5" onclick="event.stopPropagation()">
               <button onclick="ProjectsView.openQuickDrawer('${p.project_id}')" 
-                      class="px-2 py-1 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 rounded shadow-xs transition"
+                      class="px-2.5 py-1 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg shadow-2xs transition flex items-center gap-1 cursor-pointer"
                       title="Quick inspection slide-over drawer">
-                Quick View
+                <i data-lucide="panel-right" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span>Quick View</span>
               </button>
               <a href="#/projects/${p.project_id}" 
-                 class="p-1 text-slate-400 hover:text-blue-700 rounded transition text-xs font-bold" 
+                 class="p-1.5 text-slate-400 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition text-xs font-bold" 
                  title="Open full Project Intelligence Dossier">
-                →
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
               </a>
             </div>
           </td>
@@ -749,11 +756,12 @@ const ProjectsView = {
     }).join("");
 
     this.updatePaginationUI(this.totalRecords, this.totalPages);
+    if (window.CommonUI && window.CommonUI.initIcons) window.CommonUI.initIcons();
   },
 
   handleRowClick(e, projectId) {
     // If user didn't click an anchor or button directly, open quick inspection drawer
-    if (e.target.tagName !== "A" && e.target.tagName !== "BUTTON") {
+    if (e.target.tagName !== "A" && e.target.tagName !== "BUTTON" && !e.target.closest("button") && !e.target.closest("a")) {
       this.openQuickDrawer(projectId);
     }
   },
@@ -773,6 +781,8 @@ const ProjectsView = {
     const riskLevel = p.risk ? p.risk.level : (p.target_risk_class || "LOW");
     const riskScore = p.risk ? p.risk.overall_score : (p.overall_risk_score || 45);
 
+    const isReal = (p.data_source === "REAL_IMPORTED" || (p.metadata && p.metadata.data_status === "REAL_IMPORTED"));
+
     const health = {
       schedule: riskLevel === "CRITICAL" ? "CRITICAL" : (riskLevel === "HIGH" ? "RISK" : "WATCH"),
       scheduleText: p.delay_months ? `+${p.delay_months} mos drift` : "On Target",
@@ -790,11 +800,22 @@ const ProjectsView = {
       <div class="space-y-4 text-xs">
         
         <!-- Metadata Header -->
-        <div class="bg-slate-50 border border-slate-200 rounded-lg p-3.5 space-y-2">
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2.5">
           <div class="flex items-center justify-between">
-            <span class="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-900 border border-blue-200">
-              ${p.project_id}
-            </span>
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-900 border border-blue-200">
+                ${p.project_id}
+              </span>
+              ${isReal ? `
+                <span class="px-2 py-0.5 rounded text-[9px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  REAL DATA
+                </span>
+              ` : `
+                <span class="px-2 py-0.5 rounded text-[9px] font-medium bg-slate-100 text-slate-500 border border-slate-200">
+                  SYNTHETIC 10K
+                </span>
+              `}
+            </div>
             ${CommonUI.renderStatusBadge(p.status || "ACTIVE")}
           </div>
           <h4 class="font-bold text-slate-900 text-sm leading-snug">${this.escapeHtml(p.project_name)}</h4>
@@ -813,23 +834,23 @@ const ProjectsView = {
 
         <!-- Metric Grid -->
         <div class="grid grid-cols-2 gap-2.5">
-          <div class="p-3 bg-white border border-slate-200 rounded-lg">
+          <div class="p-3 bg-white border border-slate-200 rounded-xl shadow-2xs">
             <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Revised Outlay</div>
             <div class="text-base font-bold text-slate-900 tabular-nums mt-0.5">₹${Number(revCost).toLocaleString("en-IN")} Cr</div>
             <div class="text-[10px] text-slate-400">Orig: ₹${Number(origCost).toLocaleString("en-IN")} Cr</div>
           </div>
-          <div class="p-3 bg-white border border-slate-200 rounded-lg">
+          <div class="p-3 bg-white border border-slate-200 rounded-xl shadow-2xs">
             <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Physical Progress</div>
             <div class="text-base font-bold text-blue-700 tabular-nums mt-0.5">${physProg}%</div>
             <div class="text-[10px] text-slate-400">Expenditure: ${finProg}%</div>
           </div>
-          <div class="p-3 bg-white border border-slate-200 rounded-lg">
+          <div class="p-3 bg-white border border-slate-200 rounded-xl shadow-2xs">
             <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Composite Risk</div>
             <div class="mt-1">
               ${CommonUI.renderRiskBadge(riskLevel, riskScore)}
             </div>
           </div>
-          <div class="p-3 bg-white border border-slate-200 rounded-lg">
+          <div class="p-3 bg-white border border-slate-200 rounded-xl shadow-2xs">
             <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Primary Driver</div>
             <div class="text-xs font-semibold text-slate-800 truncate mt-1">
               ${p.primary_bottleneck ? p.primary_bottleneck.replace(/_/g, ' ') : (p.risk ? p.risk.primary_driver : 'Execution Drift')}
@@ -838,25 +859,27 @@ const ProjectsView = {
         </div>
 
         <!-- Why this project needs attention -->
-        <div class="p-3.5 bg-amber-50/70 border border-amber-200 rounded-lg space-y-1.5">
+        <div class="p-3.5 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1.5">
           <div class="flex items-center gap-1.5 text-amber-900 font-bold text-xs">
             <span>⚠️</span>
             <span>Surveillance Alert Diagnosis</span>
           </div>
           <p class="text-[11px] text-amber-800 leading-relaxed">
-            ${p.executive_summary || `Project demonstrates critical path slippage due to ${p.primary_bottleneck ? p.primary_bottleneck.replace(/_/g, ' ') : 'delayed land clearance'}. Current financial decoupling gap is ${finProg - physProg}%. Requires inter-ministerial coordination.`}
+            ${p.executive_summary || `Project demonstrates critical path slippage due to ${p.primary_bottleneck ? p.primary_bottleneck.replace(/_/g, ' ') : 'delayed statutory clearances'}. Current financial decoupling gap is ${finProg - physProg}%. Requires inter-ministerial coordination.`}
           </p>
         </div>
 
         <!-- Primary Actions -->
         <div class="pt-2 border-t border-slate-200 flex flex-col gap-2">
           <a href="#/projects/${p.project_id}" onclick="CommonUI.closeDrawer()" 
-             class="btn btn-primary w-full justify-center text-xs py-2">
-            Open Full Project Intelligence Dossier →
+             class="btn btn-primary w-full justify-center text-xs py-2.5 flex items-center gap-1.5">
+            <span>Open Full Project Intelligence Dossier</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
           </a>
           <button onclick="ProjectsView.triggerQuickDirective('${p.project_id}')" 
-                  class="btn btn-secondary w-full justify-center text-xs py-2">
-            Issue Secretarial Directive
+                  class="btn btn-secondary w-full justify-center text-xs py-2.5 flex items-center gap-1.5">
+            <i data-lucide="file-signature" class="w-3.5 h-3.5"></i>
+            <span>Issue Secretarial Directive</span>
           </button>
         </div>
 

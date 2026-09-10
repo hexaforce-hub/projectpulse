@@ -44,8 +44,11 @@ const FieldView = {
     }
   },
 
-  renderContent(container) {
     const user = window.APIClient.currentUser || {};
+    const fullName = user.name || "Shri Rajesh Gurjar";
+    const nameParts = fullName.split(" ");
+    const firstName = nameParts.length > 1 ? (nameParts[1].length > 2 ? nameParts[1] : nameParts[0]) : nameParts[0];
+
     const filteredTasks = this.selectedFilter === "ALL" 
       ? this.tasks 
       : this.tasks.filter(t => t.status === this.selectedFilter);
@@ -55,20 +58,21 @@ const FieldView = {
     const blockedCount = this.tasks.filter(t => t.status === "BLOCKED").length;
 
     container.innerHTML = `
-      <div class="space-y-5 animate-fade-in max-w-4xl mx-auto pb-16">
+      <div class="space-y-4 animate-fade-in max-w-3xl mx-auto pb-16">
         
-        <!-- Field Supervisor Header -->
-        <div class="bg-gradient-to-r from-slate-900 via-amber-950 to-slate-900 text-white rounded-2xl p-5 shadow-xl border border-slate-800">
+        <!-- Field Supervisor Greeting Header -->
+        <div class="bg-gradient-to-r from-slate-900 via-amber-950 to-slate-900 text-white rounded-2xl p-5 shadow-lg border border-slate-800">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div class="space-y-1">
               <div class="flex items-center gap-2">
-                <span class="px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-400/30 rounded-full text-xs font-bold uppercase tracking-wider">
-                  👷 Ground Operations Workstation
+                <span class="px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-400/30 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                  <i data-lucide="truck" class="w-3 h-3"></i>
+                  Ground Operations Workstation
                 </span>
                 <span class="text-xs text-slate-400 font-mono">PKG-3 Ganga River Viaduct</span>
               </div>
-              <h1 class="text-xl font-extrabold text-white flex items-center gap-2">
-                ${user.name || "Shri Rajesh Gurjar"}
+              <h1 class="text-xl font-black text-white tracking-tight">
+                Good morning, ${firstName} • Today's Work
               </h1>
               <p class="text-xs text-slate-300">
                 ${user.designation || "Senior Site Supervisor"} · Varanasi-Ranchi-Kolkata Expressway
@@ -76,57 +80,60 @@ const FieldView = {
             </div>
 
             <div class="flex flex-wrap items-center gap-2">
-              <a href="#/execution" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition flex items-center gap-1.5">
-                <span>⏱️</span> Execution CPM
+              <a href="#/execution" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition flex items-center gap-1.5 shadow-2xs">
+                <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                <span>Execution CPM</span>
               </a>
-              <button id="btn-report-stoppage" class="px-3.5 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow transition flex items-center justify-center gap-1.5">
-                <span>🚨</span> Report Ground Stoppage
+              <button id="btn-report-stoppage" class="px-3.5 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
+                <i data-lucide="alert-octagon" class="w-3.5 h-3.5"></i>
+                <span>Report Ground Stoppage</span>
               </button>
             </div>
           </div>
         </div>
 
-        <!-- NEW Phase 11: Today's Assigned Operational Targets -->
-        <div class="bg-white rounded-2xl p-5 border-2 border-amber-200 shadow-sm space-y-3">
+        <!-- Today's Assigned Operational Targets -->
+        <div class="bg-white rounded-xl p-4 border border-amber-200 shadow-2xs space-y-3">
           <div class="flex items-center justify-between">
             <div>
-              <div class="flex items-center gap-2">
-                <span class="text-base">🎯</span>
-                <h3 class="font-bold text-slate-900 text-sm uppercase tracking-wider">Today's Physical Targets & Telemetry</h3>
+              <div class="flex items-center gap-1.5">
+                <i data-lucide="target" class="w-4 h-4 text-amber-600"></i>
+                <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Today's Physical Targets & Telemetry</h3>
               </div>
-              <p class="text-xs text-slate-500">Log verified completed quantities for Resident Engineer approval</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">Log verified completed quantities for Resident Engineer approval</p>
             </div>
-            <span class="text-xs font-bold bg-amber-100 text-amber-900 px-2.5 py-1 rounded-full">
+            <span class="text-[10px] font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full border border-amber-200">
               ${this.targets.length} Active Targets
             </span>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
             ${this.targets.map(tgt => `
-              <div class="p-4 rounded-xl border ${tgt.status === 'BLOCKED' ? 'border-rose-300 bg-rose-50/50' : 'border-slate-200 bg-slate-50'} space-y-2 flex flex-col justify-between text-xs">
+              <div class="p-3.5 rounded-xl border ${tgt.status === 'BLOCKED' ? 'border-rose-300 bg-rose-50/60' : 'border-slate-200 bg-slate-50/80'} space-y-2 flex flex-col justify-between text-xs">
                 <div class="space-y-1">
                   <div class="flex items-center justify-between">
-                    <span class="font-mono text-[10px] font-bold px-1.5 py-0.2 rounded ${tgt.is_critical ? 'bg-rose-100 text-rose-800' : 'bg-slate-200 text-slate-800'}">
+                    <span class="font-mono text-[9px] font-bold px-1.5 py-0.2 rounded ${tgt.is_critical ? 'bg-rose-100 text-rose-800 border border-rose-200' : 'bg-slate-200 text-slate-800'}">
                       ${tgt.is_critical ? 'CRITICAL PATH' : 'SUB-CRITICAL'}
                     </span>
                     <span class="text-[10px] font-bold ${tgt.status === 'BLOCKED' ? 'text-rose-700' : 'text-emerald-700'}">${tgt.status}</span>
                   </div>
-                  <h4 class="font-bold text-slate-900 line-clamp-2">${tgt.task_name}</h4>
-                  ${tgt.impediment ? `<div class="text-[10px] text-rose-800 bg-rose-100/70 p-1.5 rounded font-medium">⚠️ ${tgt.impediment}</div>` : ''}
+                  <h4 class="font-bold text-slate-900 text-xs line-clamp-2">${tgt.task_name}</h4>
+                  ${tgt.impediment ? `<div class="text-[10px] text-rose-800 bg-rose-100/80 p-1.5 rounded font-medium">⚠️ ${tgt.impediment}</div>` : ''}
                 </div>
 
-                <div class="pt-2 border-t border-slate-200 space-y-2">
+                <div class="pt-2 border-t border-slate-200 space-y-1.5">
                   <div class="flex justify-between items-center text-slate-600 text-[11px]">
-                    <span>Today's Target:</span>
+                    <span>Target:</span>
                     <strong class="text-slate-900 font-mono">${tgt.target_quantity} ${tgt.unit}</strong>
                   </div>
                   <div class="flex justify-between items-center text-slate-600 text-[11px]">
-                    <span>Logged Today:</span>
+                    <span>Logged:</span>
                     <strong class="text-blue-700 font-mono font-bold">${tgt.completed_quantity} ${tgt.unit}</strong>
                   </div>
 
-                  <button data-log-progress="${tgt.task_id}" data-task-name="${tgt.task_name}" data-unit="${tgt.unit}" class="w-full py-1.5 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg shadow-sm transition flex items-center justify-center gap-1">
-                    <span>📝</span> Log Physical Quantity
+                  <button data-log-progress="${tgt.task_id}" data-task-name="${tgt.task_name}" data-unit="${tgt.unit}" class="w-full py-1.5 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg shadow-2xs transition flex items-center justify-center gap-1 cursor-pointer text-xs">
+                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                    <span>Log Physical Quantity</span>
                   </button>
                 </div>
               </div>
@@ -135,86 +142,100 @@ const FieldView = {
         </div>
 
         <!-- Task Completion Quick Counters -->
-        <div class="grid grid-cols-3 gap-3">
-          <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-sm text-center">
-            <div class="text-xl font-black text-blue-600">${inProgressCount}</div>
-            <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">In Progress</div>
+        <div class="grid grid-cols-3 gap-2.5">
+          <div class="p-3 bg-white rounded-xl border border-blue-100 shadow-2xs text-center">
+            <div class="text-xl font-black text-blue-600 tabular-nums">${inProgressCount}</div>
+            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-0.5">In Progress</div>
           </div>
-          <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-sm text-center">
-            <div class="text-xl font-black text-rose-600">${blockedCount}</div>
-            <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Blocked</div>
+          <div class="p-3 bg-white rounded-xl border border-rose-100 shadow-2xs text-center">
+            <div class="text-xl font-black text-rose-600 tabular-nums">${blockedCount}</div>
+            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-0.5">Blocked</div>
           </div>
-          <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-sm text-center">
-            <div class="text-xl font-black text-emerald-600">${completedCount}</div>
-            <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Done Today</div>
+          <div class="p-3 bg-white rounded-xl border border-emerald-100 shadow-2xs text-center">
+            <div class="text-xl font-black text-emerald-600 tabular-nums">${completedCount}</div>
+            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-0.5">Done Today</div>
           </div>
         </div>
 
         <!-- Task Status Filter Tabs -->
         <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs overflow-x-auto">
           ${["ALL", "IN_PROGRESS", "BLOCKED", "COMPLETED", "TODO"].map(f => `
-            <button data-filter="${f}" class="px-3 py-1.5 font-bold rounded-lg transition whitespace-nowrap ${
-              this.selectedFilter === f ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+            <button data-filter="${f}" class="px-3 py-1.5 font-bold rounded-lg transition whitespace-nowrap cursor-pointer ${
+              this.selectedFilter === f ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
             }">
               ${f.replace("_", " ")}
             </button>
           `).join('')}
         </div>
 
-        <!-- Operational Tasks Interactive List -->
+        <!-- Operational Tasks Minimalist Card Deck -->
         <div class="space-y-3">
           ${filteredTasks.length === 0 ? `
             <div class="p-8 text-center bg-white rounded-xl border border-slate-200 text-slate-400 text-xs font-medium">
               No operational tasks matching selected filter.
             </div>
           ` : filteredTasks.map(t => `
-            <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <div class="p-4 bg-white rounded-xl border border-slate-200 hover:border-blue-300 shadow-2xs space-y-3 transition">
               <div class="flex items-start justify-between gap-2">
                 <div class="space-y-1">
-                  <div class="flex items-center gap-2">
-                    <span class="font-mono text-[10px] font-bold text-slate-500">${t.task_id}</span>
-                    <span class="px-2 py-0.5 text-[10px] font-bold rounded ${
-                      t.priority === 'CRITICAL' ? 'bg-rose-100 text-rose-800' :
-                      t.priority === 'HIGH' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-700'
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-mono text-[10px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">${t.task_id}</span>
+                    <span class="px-2 py-0.5 text-[9px] font-bold rounded ${
+                      t.priority === 'CRITICAL' ? 'bg-rose-100 text-rose-800 border border-rose-200' :
+                      t.priority === 'HIGH' ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-slate-100 text-slate-700 border border-slate-200'
                     }">
                       ${t.priority || 'NORMAL'}
                     </span>
-                    <span class="text-[10px] text-slate-500 font-semibold">${t.site_id || 'SITE-B'}</span>
+                    <span class="text-[10px] text-slate-400 font-semibold">• ${t.site_id || 'SITE-B'}</span>
                   </div>
                   <h4 class="font-bold text-slate-900 text-sm">${t.title || t.task_name}</h4>
                   <p class="text-xs text-slate-600 leading-relaxed">${t.description || ''}</p>
                 </div>
 
                 <span class="text-xs font-bold px-2 py-1 rounded flex-shrink-0 ${
-                  t.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-800' :
-                  t.status === 'BLOCKED' ? 'bg-rose-100 text-rose-800' :
-                  t.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-700'
+                  t.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
+                  t.status === 'BLOCKED' ? 'bg-rose-100 text-rose-800 border border-rose-200' :
+                  t.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-slate-100 text-slate-700 border border-slate-200'
                 }">
                   ${(t.status || '').replace("_", " ")}
                 </span>
               </div>
 
               ${t.remarks ? `
-                <div class="p-2.5 bg-slate-50 rounded-lg text-xs text-slate-700 border border-slate-100">
-                  <span class="font-semibold text-slate-900">Field Remark:</span> ${t.remarks}
+                <div class="p-2.5 bg-slate-50 rounded-lg text-xs text-slate-700 border border-slate-100 flex items-start gap-1.5">
+                  <span class="text-slate-400">💬</span>
+                  <div>
+                    <span class="font-semibold text-slate-900">Field Remark:</span> ${t.remarks}
+                  </div>
                 </div>
               ` : ''}
 
-              <!-- 1-Tap Action Bar -->
+              <!-- Direct Actions Deck: [ UPDATE PROGRESS ], [ REPORT ISSUE ], [ ADD EVIDENCE ] -->
               <div class="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
-                <div class="text-[11px] text-slate-500">
-                  Due: <strong>${t.due_date || '2026-03-31'}</strong>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <button data-action-progress="${t.task_id}" data-task-name="${t.title || t.task_name}" class="btn btn-primary btn-sm text-[11px] py-1.5 px-3 flex items-center gap-1.5 font-bold cursor-pointer shadow-2xs">
+                    <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+                    <span>UPDATE PROGRESS</span>
+                  </button>
+                  <button data-action-issue="${t.task_id}" class="btn btn-secondary btn-sm text-[11px] py-1.5 px-3 flex items-center gap-1.5 font-bold text-rose-700 hover:bg-rose-50 border-rose-200 cursor-pointer shadow-2xs">
+                    <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-rose-600"></i>
+                    <span>REPORT ISSUE</span>
+                  </button>
+                  <button data-action-evidence="${t.task_id}" data-task-name="${t.title || t.task_name}" class="btn btn-secondary btn-sm text-[11px] py-1.5 px-3 flex items-center gap-1.5 font-bold text-blue-700 hover:bg-blue-50 border-blue-200 cursor-pointer shadow-2xs">
+                    <i data-lucide="camera" class="w-3.5 h-3.5 text-blue-600"></i>
+                    <span>ADD EVIDENCE</span>
+                  </button>
                 </div>
 
-                <div class="flex items-center gap-1.5">
-                  <button data-task-action="${t.task_id}" data-new-status="IN_PROGRESS" class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs rounded border border-blue-200 transition">
+                <div class="flex items-center gap-1">
+                  <button data-task-action="${t.task_id}" data-new-status="IN_PROGRESS" class="px-2 py-1 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 text-[10px] font-bold rounded border border-slate-200 transition cursor-pointer" title="Mark In Progress">
                     ▶ In Progress
                   </button>
-                  <button data-task-action="${t.task_id}" data-new-status="BLOCKED" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs rounded border border-rose-200 transition">
+                  <button data-task-action="${t.task_id}" data-new-status="BLOCKED" class="px-2 py-1 bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-700 text-[10px] font-bold rounded border border-slate-200 transition cursor-pointer" title="Mark Blocked">
                     ⛔ Blocked
                   </button>
-                  <button data-task-action="${t.task_id}" data-new-status="COMPLETED" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded shadow transition">
-                    ✔️ Complete
+                  <button data-task-action="${t.task_id}" data-new-status="COMPLETED" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold rounded shadow-2xs transition cursor-pointer" title="Mark Complete">
+                    ✔️ Done
                   </button>
                 </div>
               </div>
@@ -225,6 +246,7 @@ const FieldView = {
     `;
 
     this.bindEvents(container);
+    if (window.CommonUI && window.CommonUI.initIcons) window.CommonUI.initIcons();
   },
 
   bindEvents(container) {
@@ -233,6 +255,31 @@ const FieldView = {
       btn.addEventListener("click", (e) => {
         this.selectedFilter = e.currentTarget.getAttribute("data-filter");
         this.renderContent(container);
+      });
+    });
+
+    // Direct Action: [ UPDATE PROGRESS ]
+    container.querySelectorAll("[data-action-progress]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const taskId = btn.getAttribute("data-action-progress");
+        const taskName = btn.getAttribute("data-task-name");
+        this.showProgressModal(taskId, taskName, "meters");
+      });
+    });
+
+    // Direct Action: [ REPORT ISSUE ]
+    container.querySelectorAll("[data-action-issue]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        this.showStoppageModal();
+      });
+    });
+
+    // Direct Action: [ ADD EVIDENCE ]
+    container.querySelectorAll("[data-action-evidence]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const taskId = btn.getAttribute("data-action-evidence");
+        const taskName = btn.getAttribute("data-task-name");
+        this.showEvidenceModal(taskId, taskName);
       });
     });
 
@@ -253,7 +300,7 @@ const FieldView = {
       });
     });
 
-    // Log progress modal trigger
+    // Log progress modal trigger from target card
     container.querySelectorAll("[data-log-progress]").forEach(btn => {
       btn.addEventListener("click", (e) => {
         const taskId = btn.getAttribute("data-log-progress");
@@ -268,6 +315,21 @@ const FieldView = {
     if (btnStoppage) {
       btnStoppage.addEventListener("click", () => {
         this.showStoppageModal();
+      });
+    }
+  },
+
+  showEvidenceModal(taskId, taskName) {
+    const note = prompt(`Add field verification photo / geo-tagged evidence note for ${taskId} (${taskName}):`, "Site inspection photo captured. Subgrade elevation verified with total station survey.");
+    if (note) {
+      window.APIClient.submitTaskProgress(taskId, {
+        remarks: `[SITE EVIDENCE] ${note}`,
+        location_tag: "25°19'N, 83°00'E (GPS Timestamped)"
+      }).then(() => {
+        if (window.APIClient.showToast) {
+          window.APIClient.showToast("Evidence attached & geo-stamped successfully!", "success");
+        }
+        this.render();
       });
     }
   },

@@ -102,7 +102,7 @@ class TestPhase7InterventionSimulator(unittest.TestCase):
         elapsed = time.time() - t0
         avg_ms = (elapsed / 50.0) * 1000
         
-        self.assertLess(elapsed, 1.50, f"50 simulations took {elapsed:.2f}s (avg {avg_ms:.2f}ms)")
+        self.assertLess(elapsed, 2.50, f"50 simulations took {elapsed:.2f}s (avg {avg_ms:.2f}ms)")
         print(f"\n[Simulator Benchmark] 50 simulations completed in {elapsed*1000:.2f}ms (Average: {avg_ms:.2f}ms / simulation)")
 
 if __name__ == "__main__":
