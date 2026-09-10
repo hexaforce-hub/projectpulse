@@ -572,7 +572,7 @@ const ProjectsView = {
       chipsWrapper.innerHTML = `
         <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
           <span>Displaying full portfolio universe without constraints.</span>
-          <span class="text-[11px] text-slate-400 font-mono">10,000 active projects indexed</span>
+          <span class="text-[11px] text-slate-400 font-mono">${this.totalRecords > 0 ? this.totalRecords.toLocaleString("en-IN") + ' active projects indexed' : 'Central Sector Registry active'}</span>
         </div>
       `;
     }
@@ -588,7 +588,7 @@ const ProjectsView = {
         <td colspan="7" class="p-12 text-center text-slate-400 text-xs">
           <div class="inline-block animate-spin text-xl mb-2">⏳</div>
           <div class="font-medium text-slate-600">Querying Central Projects Database...</div>
-          <div class="text-[11px] text-slate-400 mt-1">Filtering across 10,000 records</div>
+          <div class="text-[11px] text-slate-400 mt-1">Filtering active infrastructure records</div>
         </td>
       </tr>
     `;

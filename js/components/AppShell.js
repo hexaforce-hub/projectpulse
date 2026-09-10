@@ -129,7 +129,7 @@ const AppShell = {
                 <div class="font-semibold text-slate-800 text-xs">MoSPI • IPMD</div>
                 <span class="text-[9px] font-bold bg-blue-100 text-blue-800 px-1 py-0.2 rounded">PAIMANA</span>
               </div>
-              <div class="text-[11px] text-slate-400 truncate mt-0.5">10,000 Central Sector Projects</div>
+              <div id="sidebar-universe-subtitle" class="text-[11px] text-slate-400 truncate mt-0.5">Central Sector Infrastructure</div>
             </div>
           </aside>
 
@@ -822,14 +822,9 @@ const AppShell = {
     if (r === "NATIONAL_LEADER" || r === "MINISTER") {
       return [
         {
-          heading: "COMMAND CENTER",
+          heading: "MONITOR",
           items: [
-            { route: "dashboard", lucide: "layout-dashboard", icon: "📊", label: "National Command Center" }
-          ]
-        },
-        {
-          heading: "PORTFOLIO",
-          items: [
+            { route: "dashboard", lucide: "layout-dashboard", icon: "📊", label: "National Command Center" },
             { route: "projects", lucide: "folder-kanban", icon: "📁", label: "Central Projects Registry" },
             { route: "reports", lucide: "file-text", icon: "📑", label: "Report Intelligence", badge: "PAIMANA" }
           ]
@@ -838,21 +833,15 @@ const AppShell = {
           heading: "INTELLIGENCE",
           items: [
             { route: "portfolio-matrix", lucide: "pie-chart", icon: "🎯", label: "Risk Stratification" },
-            { route: "early-warnings", lucide: "alert-triangle", icon: "⚠️", label: "Early Warning Radar", badge: "14k" },
-            { route: "bottlenecks", lucide: "map-pin", icon: "📍", label: "Bottlenecks Intel" },
+            { route: "early-warnings", lucide: "alert-triangle", icon: "⚠️", label: "Early Warning Radar" },
             { route: "analytics", lucide: "trending-up", icon: "📈", label: "Portfolio Analytics" }
           ]
         },
         {
-          heading: "DECISIONS",
+          heading: "GOVERNANCE & DECISION",
           items: [
             { route: "directives", lucide: "file-signature", icon: "📜", label: "Directives & Escalations" },
-            { route: "what-if", lucide: "zap", icon: "⚡", label: "What-If Sandbox" }
-          ]
-        },
-        {
-          heading: "GOVERNANCE",
-          items: [
+            { route: "what-if", lucide: "zap", icon: "⚡", label: "What-If Sandbox" },
             { route: "data-quality", lucide: "shield-check", icon: "🛡️", label: "Data Quality Observatory" },
             { route: "settings", lucide: "settings", icon: "⚙️", label: "Governance & Audit" }
           ]
@@ -863,24 +852,19 @@ const AppShell = {
     if (r === "MINISTRY_OFFICIAL" || r === "OFFICIAL") {
       return [
         {
-          heading: "COMMAND CENTER",
+          heading: "MONITOR",
           items: [
-            { route: "ministry", lucide: "landmark", icon: "🏛️", label: "Ministry Command Desk", badge: "MoRTH" }
-          ]
-        },
-        {
-          heading: "PORTFOLIO",
-          items: [
-            { route: "projects", lucide: "folder-kanban", icon: "📁", label: "Ministry Projects (4,113)" },
+            { route: "ministry", lucide: "landmark", icon: "🏛️", label: "Ministry Command Desk", badge: "MoRTH" },
+            { route: "projects", lucide: "folder-kanban", icon: "📁", label: "Ministry Projects" },
             { route: "reports", lucide: "file-text", icon: "📑", label: "Report Intelligence", badge: "PAIMANA" }
           ]
         },
         {
           heading: "INTELLIGENCE",
           items: [
-            { route: "early-warnings", lucide: "alert-triangle", icon: "⚠️", label: "Early Warning Radar", badge: "P1" },
-            { route: "bottlenecks", lucide: "map-pin", icon: "📍", label: "Bottlenecks Intel" },
-            { route: "portfolio-matrix", lucide: "pie-chart", icon: "🎯", label: "Risk Stratification" }
+            { route: "early-warnings", lucide: "alert-triangle", icon: "⚠️", label: "Early Warning Radar" },
+            { route: "portfolio-matrix", lucide: "pie-chart", icon: "🎯", label: "Risk Stratification" },
+            { route: "bottlenecks", lucide: "map-pin", icon: "📍", label: "Bottlenecks Intel" }
           ]
         },
         {
@@ -891,7 +875,7 @@ const AppShell = {
           ]
         },
         {
-          heading: "DECISIONS & GOVERNANCE",
+          heading: "GOVERNANCE & DECISION",
           items: [
             { route: "directives", lucide: "file-signature", icon: "📜", label: "Downward Directives" },
             { route: "data-quality", lucide: "shield-check", icon: "🛡️", label: "Data Quality & Gaps" },
@@ -904,25 +888,30 @@ const AppShell = {
     if (r === "PROJECT_MANAGER" || r === "PM") {
       return [
         {
-          heading: "EXECUTION CONTROL",
+          heading: "MONITOR",
+          items: [
+            { route: "my-projects", lucide: "milestone", icon: "🛣️", label: "My Assigned Corridors" },
+            { route: "projects", lucide: "folder-kanban", icon: "📁", label: "Corridor Projects" }
+          ]
+        },
+        {
+          heading: "EXECUTION",
           items: [
             { route: "execution", lucide: "clock", icon: "⏱️", label: "Execution & CPM Control", badge: "Live CPM" },
-            { route: "onboarding", lucide: "sparkles", icon: "⚡", label: "AI Onboarding & WBS" },
-            { route: "my-projects", lucide: "milestone", icon: "🛣️", label: "My Corridors (3 Active)" }
+            { route: "onboarding", lucide: "sparkles", icon: "⚡", label: "AI Onboarding & WBS" }
           ]
         },
         {
-          heading: "OPERATIONS",
+          heading: "INTELLIGENCE",
           items: [
-            { route: "projects", lucide: "folder-kanban", icon: "📁", label: "Corridor Projects" },
             { route: "early-warnings", lucide: "alert-triangle", icon: "⚠️", label: "Corridor Alerts Queue" },
-            { route: "directives", lucide: "file-signature", icon: "📜", label: "Directives & Actions" }
+            { route: "what-if", lucide: "zap", icon: "⚡", label: "What-If Simulator" }
           ]
         },
         {
-          heading: "DECISIONS",
+          heading: "GOVERNANCE",
           items: [
-            { route: "what-if", lucide: "zap", icon: "⚡", label: "What-If Simulator" },
+            { route: "directives", lucide: "file-signature", icon: "📜", label: "Directives & Actions" },
             { route: "data-quality", lucide: "shield-check", icon: "🛡️", label: "Data Quality Check" }
           ]
         }
@@ -932,17 +921,22 @@ const AppShell = {
     if (r === "ENGINEER") {
       return [
         {
-          heading: "TECHNICAL WORKSPACE",
+          heading: "MONITOR",
           items: [
             { route: "engineer", lucide: "hard-hat", icon: "👷", label: "Site Engineering Desk", badge: "Live" },
-            { route: "execution", lucide: "clock", icon: "⏱️", label: "CPM Work Packages", badge: "CPM" },
             { route: "projects", lucide: "folder-kanban", icon: "📁", label: "Assigned Corridor" }
           ]
         },
         {
-          heading: "OPERATIONS & SAFETY",
+          heading: "EXECUTION",
           items: [
-            { route: "field", lucide: "truck", icon: "🚜", label: "Field Progress Log" },
+            { route: "execution", lucide: "clock", icon: "⏱️", label: "CPM Work Packages", badge: "CPM" },
+            { route: "field", lucide: "truck", icon: "🚜", label: "Field Progress Log" }
+          ]
+        },
+        {
+          heading: "INTELLIGENCE & SAFETY",
+          items: [
             { route: "early-warnings", lucide: "alert-triangle", icon: "⚠️", label: "Project Early Warnings" },
             { route: "directives", lucide: "file-signature", icon: "📜", label: "Compliance Directives" }
           ]
@@ -971,17 +965,22 @@ const AppShell = {
     if (r === "FIELD_OFFICER" || r === "FO") {
       return [
         {
-          heading: "FIELD OPERATIONS",
+          heading: "MONITOR",
           items: [
             { route: "field-officer", lucide: "clipboard-check", icon: "🛡️", label: "Field Inspection Desk", badge: "Field" },
-            { route: "field", lucide: "truck", icon: "🚜", label: "Ground Telemetry & Crew" },
+            { route: "field", lucide: "truck", icon: "🚜", label: "Ground Telemetry & Crew" }
+          ]
+        },
+        {
+          heading: "EXECUTION",
+          items: [
+            { route: "execution", lucide: "clock", icon: "⏱️", label: "Work Packages & WBS", badge: "CPM" },
             { route: "engineer", lucide: "hard-hat", icon: "⚙️", label: "Site Technical Desk" }
           ]
         },
         {
-          heading: "OPERATIONS & ALERTS",
+          heading: "INTELLIGENCE",
           items: [
-            { route: "execution", lucide: "clock", icon: "⏱️", label: "Work Packages & WBS", badge: "CPM" },
             { route: "early-warnings", lucide: "alert-triangle", icon: "⚠️", label: "Site Risk Alerts" }
           ]
         }
@@ -991,14 +990,9 @@ const AppShell = {
     if (r === "ANALYST") {
       return [
         {
-          heading: "COMMAND CENTER",
+          heading: "MONITOR",
           items: [
-            { route: "dashboard", lucide: "layout-dashboard", icon: "📊", label: "National Command Center" }
-          ]
-        },
-        {
-          heading: "PORTFOLIO",
-          items: [
+            { route: "dashboard", lucide: "layout-dashboard", icon: "📊", label: "National Command Center" },
             { route: "projects", lucide: "folder-kanban", icon: "📁", label: "Projects Explorer" },
             { route: "reports", lucide: "file-text", icon: "📑", label: "Report Intelligence", badge: "Flash" }
           ]
@@ -1023,26 +1017,23 @@ const AppShell = {
       ];
     }
 
-    // Default / ADMIN / MONITORING_OFFICER: 6 Canonical Sections
+    // Default / ADMIN / MONITORING_OFFICER: 4 Canonical Domains
     return [
       {
-        heading: "COMMAND CENTER",
+        heading: "MONITOR",
         items: [
-          { route: "dashboard", lucide: "layout-dashboard", icon: "📊", label: "Command Center" }
-        ]
-      },
-      {
-        heading: "PORTFOLIO",
-        items: [
+          { route: "dashboard", lucide: "layout-dashboard", icon: "📊", label: "Command Center" },
           { route: "projects", lucide: "folder-kanban", icon: "📁", label: "Projects Explorer" },
-          { route: "reports", lucide: "file-text", icon: "📑", label: "Report Center", badge: "PAIMANA" }
+          { route: "reports", lucide: "file-text", icon: "📑", label: "Report Center", badge: "PAIMANA" },
+          { route: "ministry", lucide: "landmark", icon: "🏛️", label: "Ministry Desk" },
+          { route: "my-projects", lucide: "milestone", icon: "🛣️", label: "Corridors Workspace" }
         ]
       },
       {
         heading: "INTELLIGENCE",
         items: [
           { route: "portfolio-matrix", lucide: "pie-chart", icon: "🎯", label: "Risk Stratification" },
-          { route: "early-warnings", lucide: "alert-triangle", icon: "⚠️", label: "Early Warnings", badge: "14k" },
+          { route: "early-warnings", lucide: "alert-triangle", icon: "⚠️", label: "Early Warnings" },
           { route: "bottlenecks", lucide: "map-pin", icon: "📍", label: "Bottlenecks & RoW" },
           { route: "analytics", lucide: "trending-up", icon: "📈", label: "Portfolio Analytics" },
           { route: "compare", lucide: "scale", icon: "⚖️", label: "Peer Benchmarking" }
@@ -1059,17 +1050,10 @@ const AppShell = {
         ]
       },
       {
-        heading: "DECISIONS",
+        heading: "GOVERNANCE",
         items: [
           { route: "directives", lucide: "file-signature", icon: "📜", label: "Directives & Actions" },
           { route: "what-if", lucide: "zap", icon: "⚡", label: "What-If Sandbox" },
-          { route: "ministry", lucide: "landmark", icon: "🏛️", label: "Ministry Desk" },
-          { route: "my-projects", lucide: "milestone", icon: "🛣️", label: "Corridors Workspace" }
-        ]
-      },
-      {
-        heading: "GOVERNANCE",
-        items: [
           { route: "data-quality", lucide: "shield-check", icon: "🛡️", label: "Data Quality" },
           { route: "settings", lucide: "settings", icon: "⚙️", label: "Audit & Settings" }
         ]

@@ -119,7 +119,7 @@ const BottleneckView = {
             </div>
             <h1 class="text-page-title mt-1">National Bottleneck Intelligence Observatory</h1>
             <p class="text-caption text-slate-500 mt-0.5">
-              Multi-dimensional analysis of systemic delays, statutory impediments, and institutional friction points across 10,000 projects.
+              Multi-dimensional analysis of systemic delays, statutory impediments, and institutional friction points across the monitored portfolio.
             </p>
           </div>
           <div class="flex items-center gap-2">
@@ -183,7 +183,7 @@ const BottleneckView = {
           <div class="lg:col-span-5 gov-card p-4 space-y-2.5">
             <div class="border-b border-slate-100 pb-2 mb-2 flex items-center justify-between">
               <h3 class="text-card-title">Bottleneck Distribution</h3>
-              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">10,000 Projects</span>
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">MoSPI IPMD Portfolio</span>
             </div>
 
             <div class="space-y-2" id="bottleneck-tabs-container">
@@ -280,7 +280,7 @@ const BottleneckView = {
           <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
             <div>
               <h3 class="text-card-title">High-Exposure Projects Impacted by ${activeInfo.name}</h3>
-              <p class="text-caption text-slate-500">Filtered directly from the 10,000 database matching this primary friction constraint.</p>
+              <p class="text-caption text-slate-500">Filtered directly from the database matching this primary friction constraint.</p>
             </div>
             <span id="bn-table-status" class="text-caption text-slate-500 font-mono">Loading...</span>
           </div>

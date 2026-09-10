@@ -36,22 +36,22 @@ const AnalyticsView = {
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div class="gov-card p-4 bg-white border border-slate-200 shadow-sm">
             <span class="text-kpi-label text-slate-500">Monitored Portfolio</span>
-            <div class="text-2xl font-bold font-mono text-slate-900 mt-1">10,000</div>
+            <div id="analytics-kpi-count" class="text-2xl font-bold font-mono text-slate-900 mt-1">10,000</div>
             <div class="text-[11px] text-slate-500 mt-0.5">Active Central Sector Projects</div>
           </div>
           <div class="gov-card p-4 bg-white border border-slate-200 shadow-sm">
             <span class="text-kpi-label text-slate-500">Total Sanctioned Outlay</span>
-            <div class="text-2xl font-bold font-mono text-blue-900 mt-1">₹42.50L Cr</div>
-            <div class="text-[11px] text-slate-500 mt-0.5">Across 9 Central Ministries</div>
+            <div id="analytics-kpi-outlay" class="text-2xl font-bold font-mono text-blue-900 mt-1">₹42.50L Cr</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">Across Central Ministries</div>
           </div>
           <div class="gov-card p-4 bg-white border border-slate-200 shadow-sm">
             <span class="text-kpi-label text-slate-500">Cumulative Cost Overrun</span>
-            <div class="text-2xl font-bold font-mono text-red-700 mt-1">₹12.45L Cr</div>
-            <div class="text-[11px] text-slate-500 mt-0.5">29.3% Aggregate Portfolio Growth</div>
+            <div id="analytics-kpi-overrun" class="text-2xl font-bold font-mono text-rose-700 mt-1">₹12.45L Cr</div>
+            <div id="analytics-kpi-overrun-pct" class="text-[11px] text-slate-500 mt-0.5">29.3% Aggregate Portfolio Growth</div>
           </div>
           <div class="gov-card p-4 bg-white border border-slate-200 shadow-sm">
             <span class="text-kpi-label text-slate-500">Average Delay Duration</span>
-            <div class="text-2xl font-bold font-mono text-amber-700 mt-1">26.4 Mos</div>
+            <div id="analytics-kpi-delay" class="text-2xl font-bold font-mono text-amber-700 mt-1">26.4 Mos</div>
             <div class="text-[11px] text-slate-500 mt-0.5">Weighted across active delays</div>
           </div>
         </div>
@@ -113,6 +113,37 @@ const AnalyticsView = {
     // Fallback if data is null or empty
     if (!this.data) {
       this.data = this.getDefaultMockAnalytics();
+    }
+
+    // Dynamically update headline summary KPIs
+    try {
+      let totalCount = 0;
+      let totalCostCr = 0;
+      let totalOverrunCr = 0;
+      let totalDelayWeighted = 0;
+
+      if (this.data && this.data.sectors && this.data.sectors.length > 0) {
+        this.data.sectors.forEach(s => {
+          const count = s.project_count || 0;
+          totalCount += count;
+          totalCostCr += (s.total_revised_cost || 0);
+          totalOverrunCr += (s.total_overrun || 0);
+          totalDelayWeighted += (s.avg_delay_months || 0) * count;
+        });
+      }
+
+      const avgDelay = totalCount > 0 ? (totalDelayWeighted / totalCount).toFixed(1) : "26.4";
+      const elCount = document.getElementById("analytics-kpi-count");
+      const elOutlay = document.getElementById("analytics-kpi-outlay");
+      const elOverrun = document.getElementById("analytics-kpi-overrun");
+      const elDelay = document.getElementById("analytics-kpi-delay");
+
+      if (elCount && totalCount > 0) elCount.innerText = totalCount.toLocaleString("en-IN");
+      if (elOutlay && totalCostCr > 0) elOutlay.innerText = totalCostCr > 100000 ? `₹${(totalCostCr / 100000).toFixed(2)}L Cr` : `₹${totalCostCr.toLocaleString("en-IN")} Cr`;
+      if (elOverrun && totalOverrunCr > 0) elOverrun.innerText = totalOverrunCr > 100000 ? `₹${(totalOverrunCr / 100000).toFixed(2)}L Cr` : `₹${totalOverrunCr.toLocaleString("en-IN")} Cr`;
+      if (elDelay) elDelay.innerText = `${avgDelay} Mos`;
+    } catch (e) {
+      console.warn("[AnalyticsView] Error computing summary KPIs:", e);
     }
 
     this.renderActiveTabContent();

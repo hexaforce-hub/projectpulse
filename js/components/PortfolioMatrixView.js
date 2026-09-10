@@ -33,8 +33,8 @@ const PortfolioMatrixView = {
             </p>
           </div>
           <div class="flex items-center gap-2">
-            <span class="text-caption text-slate-500 hidden sm:inline tabular-nums">
-              Dataset: Top 250 Megaprojects by Outlay
+            <span id="matrix-dataset-caption" class="text-caption text-slate-500 hidden sm:inline tabular-nums">
+              Portfolio Universe: Loading...
             </span>
             <a href="#/projects" class="btn btn-secondary btn-sm">
               Projects Registry ↗
@@ -122,7 +122,7 @@ const PortfolioMatrixView = {
             </div>
 
             <div class="flex items-center gap-2">
-              <span id="matrix-filtered-count" class="text-xs font-semibold text-slate-600">Showing 250 points</span>
+              <span id="matrix-filtered-count" class="text-xs font-semibold text-slate-600">Loading projects...</span>
               <button id="matrix-btn-reset" class="btn btn-secondary btn-sm">Reset Filters</button>
             </div>
           </div>
@@ -329,6 +329,9 @@ const PortfolioMatrixView = {
     }
 
     this.filteredData = filtered;
+    
+    const dsCaption = document.getElementById("matrix-dataset-caption");
+    if (dsCaption) dsCaption.innerText = `Portfolio Universe: ${this.matrixData.length} Projects by Outlay`;
 
     const countBadge = document.getElementById("matrix-filtered-count");
     if (countBadge) countBadge.innerText = `Showing ${filtered.length} of ${this.matrixData.length} projects`;

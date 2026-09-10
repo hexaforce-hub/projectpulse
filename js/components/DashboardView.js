@@ -11,6 +11,14 @@ const DashboardView = {
 
   render() {
     const projects = window.MOCK_PROJECTS || [];
+    const totalCount = projects.length;
+    const criticalProjects = projects.filter(p => p.risk && (p.risk.level === 'CRITICAL' || p.risk_level === 'CRITICAL'));
+    const highProjects = projects.filter(p => p.risk && (p.risk.level === 'HIGH' || p.risk_level === 'HIGH'));
+    const realProjects = projects.filter(p => p.data_source === 'REAL_IMPORTED' || p.is_real);
+
+    const displayTotal = totalCount > 0 ? totalCount.toLocaleString("en-IN") : "10,000";
+    const displayCritical = totalCount > 0 ? criticalProjects.length.toLocaleString("en-IN") : "1,160";
+    const displayAtRisk = totalCount > 0 ? (criticalProjects.length + highProjects.length).toLocaleString("en-IN") : "3,640";
 
     // Top priority attention projects with concise explanations (Section 10, 114)
     const attentionProjects = [
@@ -108,7 +116,7 @@ const DashboardView = {
           <div class="flex items-center gap-2.5 flex-shrink-0">
             <a href="#/projects?risk_tier=CRITICAL" class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm transition flex items-center gap-2">
               <span>🚨</span>
-              <span>Critical Interventions (<span id="kpi-review-count">1,160</span>)</span>
+              <span>Critical Interventions (<span id="kpi-review-count">${displayCritical}</span>)</span>
             </a>
             <a href="#/reports" class="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-bold text-xs shadow-2xs transition flex items-center gap-2">
               <span>📑</span>
@@ -124,9 +132,9 @@ const DashboardView = {
               📊 DATASET PROVENANCE
             </span>
             <span class="text-slate-500 font-medium">Composition:</span>
-            <span id="composition-synthetic-count" class="font-bold text-blue-700">10,000 PAIMANA Benchmark Records</span>
+            <span id="composition-synthetic-count" class="font-bold text-blue-700">${totalCount > 0 ? (totalCount - realProjects.length).toLocaleString("en-IN") : '10,000'} PAIMANA Benchmark Records</span>
             <span class="text-slate-300">•</span>
-            <span id="composition-real-count" class="font-bold text-emerald-700">0 Real Imported Records</span>
+            <span id="composition-real-count" class="font-bold text-emerald-700">${realProjects.length.toLocaleString("en-IN")} Real Imported Records</span>
           </div>
           <div class="flex items-center gap-3">
             <a href="#/projects?data_source=REAL" class="text-[11px] text-emerald-700 hover:text-emerald-800 font-semibold flex items-center gap-1 transition">
@@ -213,7 +221,7 @@ const DashboardView = {
               <span class="p-1.5 rounded-lg bg-teal-50 text-teal-700 border border-teal-200 text-sm">📁</span>
             </div>
             <div class="mt-2.5 mb-1">
-              <div id="kpi-tracked-count" class="text-3xl font-extrabold text-slate-900 font-mono tracking-tight">10,000</div>
+              <div id="kpi-tracked-count" class="text-3xl font-extrabold text-slate-900 font-mono tracking-tight">${displayTotal}</div>
             </div>
             <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-100">
               <span>₹150 Cr+ Sanctioned</span>
@@ -228,10 +236,10 @@ const DashboardView = {
               <span class="p-1.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 text-sm">⚠️</span>
             </div>
             <div class="mt-2.5 mb-1">
-              <div id="kpi-high-count" class="text-3xl font-extrabold text-amber-700 font-mono tracking-tight">3,640</div>
+              <div id="kpi-high-count" class="text-3xl font-extrabold text-amber-700 font-mono tracking-tight">${displayAtRisk}</div>
             </div>
             <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-100">
-              <span><strong class="text-rose-700">1,160</strong> Critical Priority</span>
+              <span><strong class="text-rose-700">${displayCritical}</strong> Critical Priority</span>
               <span class="text-amber-800 font-bold group-hover:underline">Radar &rarr;</span>
             </div>
           </a>
@@ -378,7 +386,10 @@ const DashboardView = {
                     <div class="flex items-center justify-between text-[10px] text-slate-500 pt-1 mt-1 border-t border-slate-100/60">
                       <span class="font-bold text-slate-800 font-mono">${p.exposure}</span>
                       <span class="text-rose-700 font-medium">${p.deadline_pressure}</span>
-                      <a href="#/projects/${p.project_id}" class="text-blue-700 font-bold hover:underline">Inspect &rarr;</a>
+                      <button onclick="if(window.ProjectsView && window.ProjectsView.openQuickDrawer) { window.ProjectsView.openQuickDrawer('${p.project_id}'); } else { window.location.hash='#/projects/${p.project_id}'; }" class="text-blue-700 font-bold hover:underline cursor-pointer bg-transparent border-none p-0 text-[10px] flex items-center gap-0.5">
+                        <span>Quick View</span>
+                        <span>&rarr;</span>
+                      </button>
                     </div>
                   </div>
                 `).join('')}
